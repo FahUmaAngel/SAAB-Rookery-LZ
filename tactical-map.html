@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>C2 // TACTICAL MAP</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="tailwind.config.js"></script>
+    </head>
+
+<body
+    class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+
+    <div id="header-placeholder"></div>
+    <div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+        <div id="sidebar-placeholder"></div>
+
+        <main class="h-full p-gutter flex gap-gutter overflow-hidden relative hex-bg">
+            <!-- Center Tactical Map (Fluid) -->
+            <section
+                class="flex-grow flex flex-col relative bg-surface-container border border-outline-variant rounded-DEFAULT overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
+                <!-- Faux Map Background -->
+                <img alt="Dark stylized map of the Baltic Sea region with tactical overlays"
+                    class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity pointer-events-none"
+                    data-alt="Dark highly stylized satellite map of the Baltic Sea region, deep navy and black tones, minimal geography details, cyber aesthetic"
+                    data-location="Baltic Sea"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYFLeQKytJUcTtb4dshwMmP0beiiJeSwYO2G1MImQq5cvTfTBC3gZz7D_LMZXsPsirC3Z3ypByAQCiY2uNJMEoGfPZo3odiDy4nnrrL7IoJfqOIJXYeWugFMwiOOqBShnl-GZIKPVVROOC97BgbWlEALf6xH0I7Ueyl4MogEDRkBGsvUbI3cBdBeRObdZSRPFyEkN2oEcO4_gzJbzKLrmkPevYegjSxMjSo4tqUcMICz4fWd1N71NskLjTU11fCNC1sMnIZUD0Zd_e" />
+                <!-- Map Overlays & Artifacts -->
+                <div class="absolute inset-0 pointer-events-none p-panel-padding">
+                    <div class="flex justify-between items-start">
+                        <div
+                            class="font-label-caps text-label-caps text-outline bg-surface/80 px-2 py-1 border border-outline-variant backdrop-blur-sm">
+                            TACTICAL MAP // OP AREA: BALTIC REGION // GRID: 34T CM
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                            <span
+                                class="font-data-mono text-data-mono text-primary bg-surface/80 px-2 py-1 border border-primary/30 backdrop-blur-sm">DATALINK
+                                SYNCED</span>
+                        </div>
+                    </div>
+                    <!-- Grid Lines -->
+                    <div class="absolute top-1/4 left-0 w-full h-[1px] bg-outline-variant opacity-30"></div>
+                    <div class="absolute top-2/4 left-0 w-full h-[1px] bg-outline-variant opacity-30"></div>
+                    <div class="absolute top-3/4 left-0 w-full h-[1px] bg-outline-variant opacity-30"></div>
+                    <div class="absolute left-1/4 top-0 w-[1px] h-full bg-outline-variant opacity-30"></div>
+                    <div class="absolute left-2/4 top-0 w-[1px] h-full bg-outline-variant opacity-30"></div>
+                    <div class="absolute left-3/4 top-0 w-[1px] h-full bg-outline-variant opacity-30"></div>
+                    <!-- Radar Fan -->
+                    <div
+                        class="absolute top-1/2 left-1/2 w-96 h-96 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/20 flex items-center justify-center">
+                        <div class="w-full h-full radar-sweep opacity-40"></div>
+                    </div>
+                    <div
+                        class="absolute top-1/2 left-1/2 w-[500px] h-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary opacity-10">
+                    </div>
+                    <!-- Active Track (Bogey) -->
+                    <div
+                        class="absolute top-[40%] left-[60%] flex flex-col items-center pointer-events-auto cursor-pointer group">
+                        <div
+                            class="w-3 h-3 bg-error rotate-45 border border-surface shadow-[0_0_8px_rgba(255,180,171,0.6)] group-hover:scale-125 transition-transform">
+                        </div>
+                        <span class="mt-1 font-data-mono text-data-mono text-error uppercase">TRK-842</span>
+                        <!-- Trajectory Line -->
+                        <svg class="absolute top-1.5 left-1.5 w-32 h-32 pointer-events-none"
+                            style="transform: rotate(45deg); transform-origin: top left;">
+                            <line stroke="#ffb4ab" stroke-dasharray="2 4" stroke-width="1" x1="0" x2="100" y1="0"
+                                y2="0"></line>
+                        </svg>
+                    </div>
+                </div>
+                <!-- Map Controls -->
+                <div class="absolute bottom-6 left-6 flex gap-2">
+                    <button
+                        class="bg-surface-container border border-outline-variant text-on-surface px-3 py-1 font-label-caps text-label-caps uppercase hover:bg-surface-bright transition-colors">RADAR</button>
+                    <button
+                        class="bg-surface-container border border-outline-variant text-on-surface px-3 py-1 font-label-caps text-label-caps uppercase hover:bg-surface-bright transition-colors">SAT</button>
+                    <button
+                        class="bg-primary-container text-on-primary-container border border-primary px-3 py-1 font-label-caps text-label-caps uppercase">BNDRY</button>
+                </div>
+                <div class="absolute bottom-6 right-6 flex pointer-events-auto">
+                    <div
+                        class="bg-surface-container border border-outline-variant p-2 flex flex-col gap-2 backdrop-blur-md">
+                        <button
+                            class="w-8 h-8 flex items-center justify-center bg-surface-variant hover:bg-primary/20 border border-outline-variant hover:border-primary transition-colors"><span
+                                class="material-symbols-outlined text-[16px]">add</span></button>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center bg-surface-variant hover:bg-primary/20 border border-outline-variant hover:border-primary transition-colors"><span
+                                class="material-symbols-outlined text-[16px]">remove</span></button>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center bg-surface-variant hover:bg-primary/20 border border-outline-variant hover:border-primary transition-colors"><span
+                                class="material-symbols-outlined text-[16px]">my_location</span></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Telemetry Right Sidebar -->
+            <aside class="w-[360px] flex flex-col gap-gutter overflow-y-auto pr-1 pb-1 scrollbar-hide shrink-0">
+                <!-- Target Details Block -->
+                <div class="bg-surface-container border border-outline-variant rounded-DEFAULT flex flex-col">
+                    <!-- Header -->
+                    <div
+                        class="p-panel-padding border-b border-outline-variant bg-surface-variant/30 flex justify-between items-center">
+                        <h3 class="font-headline-md text-headline-md text-on-surface uppercase tracking-wider">Target
+                            Details</h3>
+                        <span
+                            class="font-label-caps text-label-caps bg-error/20 text-error px-2 py-0.5 rounded border border-error/50">HOSTILE</span>
+                    </div>
+                    <div class="p-gutter space-y-gutter">
+                        <!-- Identification Block -->
+                        <div class="border border-outline-variant bg-surface p-panel-padding relative">
+                            <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">
+                                Identification</h4>
+                            <div
+                                class="font-data-mono text-data-mono text-on-surface text-lg mb-1 text-error shadow-sm">
+                                SU-27 Flanker</div>
+                            <div class="font-data-mono text-data-mono text-on-surface-variant text-xs">Profile Match:
+                                <span class="text-primary">94%</span>
+                            </div>
+                            <div class="absolute top-panel-padding right-panel-padding w-2 h-2 bg-error animate-pulse">
+                            </div>
+                        </div>
+                        <!-- Telemetry Grid -->
+                        <div class="grid grid-cols-2 gap-unit">
+                            <div class="border border-outline-variant bg-surface p-panel-padding">
+                                <div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">
+                                    Speed</div>
+                                <div class="font-data-mono text-data-mono text-on-surface text-lg">M 1.2</div>
+                            </div>
+                            <div class="border border-outline-variant bg-surface p-panel-padding">
+                                <div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">
+                                    Altitude</div>
+                                <div class="font-data-mono text-data-mono text-on-surface text-lg">32k ft</div>
+                            </div>
+                            <div class="border border-outline-variant bg-surface p-panel-padding col-span-2">
+                                <div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">
+                                    Bearing</div>
+                                <div class="font-data-mono text-data-mono text-on-surface text-lg">274° TRUE</div>
+                            </div>
+                        </div>
+                        <!-- Status Block -->
+                        <div class="border border-outline-variant bg-surface p-panel-padding">
+                            <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">
+                                Transponder</h4>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-error text-sm">warning</span>
+                                <span class="font-data-mono text-data-mono text-error font-bold">OFF / NO SQUAWK</span>
+                            </div>
+                        </div>
+                        <!-- Action Buttons -->
+                        <div class="pt-2 flex flex-col gap-2">
+                            <button
+                                class="w-full bg-[#00AEEF] hover:bg-sky-400 text-slate-950 font-label-caps text-label-caps uppercase py-3 border border-[#00AEEF] transition-colors">Designate
+                                Target</button>
+                            <button
+                                class="w-full bg-transparent text-on-surface border border-outline hover:border-on-surface font-label-caps text-label-caps uppercase py-3 transition-colors">Scramble
+                                Intercept</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="./shared-components.js"></script>
+</body>
+
+</html>

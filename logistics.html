@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>C2 // LOGISTICS</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="tailwind.config.js"></script>
+    </head>
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+
+<div id="header-placeholder"></div>
+<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+<div id="sidebar-placeholder"></div>
+
+<main class="h-full flex flex-1 w-full overflow-hidden hex-bg">
+    <!-- Subsidebar -->
+    <aside class="bg-slate-950/80 w-[220px] border-r border-slate-800 flex flex-col py-4 hidden md:flex shrink-0 h-full backdrop-blur-md">
+        <div class="px-4 mb-6">
+            <h2 class="text-sky-500 font-bold font-['Space_Grotesk'] uppercase text-xs tracking-widest">STRATEGIC OPS</h2>
+            <div class="text-slate-500 text-[10px] uppercase font-semibold tracking-wider mt-1">V-22 OSPREY WING</div>
+        </div>
+        <div class="flex-1 flex flex-col gap-1 font-['Space_Grotesk'] uppercase text-[11px] font-semibold tracking-wider">
+            <a class="text-slate-500 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-900 hover:text-slate-200 transition-all" href="#">
+                <span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+            <!-- Active Nav Item -->
+            <a class="bg-slate-900 text-sky-400 border-l-4 border-sky-500 px-4 py-3 flex items-center gap-3" href="#">
+                <span class="material-symbols-outlined text-lg" data-icon="conveyor_belt" style="font-variation-settings: 'FILL' 1;">conveyor_belt</span>
+                Logistics
+            </a>
+            <a class="text-slate-500 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-900 hover:text-slate-200 transition-all" href="#">
+                <span class="material-symbols-outlined text-lg" data-icon="package_2">package_2</span>
+                Supply Chain
+            </a>
+            <a class="text-slate-500 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-900 hover:text-slate-200 transition-all" href="#">
+                <span class="material-symbols-outlined text-lg" data-icon="build">build</span>
+                Maintenance
+            </a>
+            <a class="text-slate-500 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-900 hover:text-slate-200 transition-all" href="#">
+                <span class="material-symbols-outlined text-lg" data-icon="groups">groups</span>
+                Personnel
+            </a>
+        </div>
+        <div class="px-4 mt-auto mb-4">
+            <button class="w-full bg-sky-900/20 text-sky-400 border border-sky-800/50 py-2 text-[10px] uppercase font-bold tracking-widest hover:bg-sky-800/40 transition-colors font-['Space_Grotesk']">
+                INITIATE RESUPPLY
+            </button>
+        </div>
+        <div class="flex flex-col gap-1 font-['Space_Grotesk'] uppercase text-[11px] font-semibold tracking-wider mt-4 border-t border-slate-800 pt-4">
+            <a class="text-slate-500 px-4 py-2 flex items-center gap-3 border-l-4 border-transparent hover:text-slate-300 transition-all" href="#">
+                <span class="material-symbols-outlined text-base" data-icon="terminal">terminal</span>
+                Diagnostics
+            </a>
+            <a class="text-slate-500 px-4 py-2 flex items-center gap-3 border-l-4 border-transparent hover:text-slate-300 transition-all" href="#">
+                <span class="material-symbols-outlined text-base" data-icon="help_center">help_center</span>
+                Help
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <div class="flex-1 p-gutter overflow-y-auto bg-surface/90 h-full scrollbar-hide">
+        <div class="max-w-[1600px] mx-auto space-y-gutter pb-margin">
+            <!-- Page Header -->
+            <header class="flex justify-between items-end border-b border-outline-variant pb-unit mb-margin pt-4">
+                <div>
+                    <h1 class="font-headline-lg text-headline-lg text-on-surface uppercase tracking-widest">Logistics Overview</h1>
+                    <p class="font-data-mono text-data-mono text-on-surface-variant mt-1">SECTOR: NORDIC-BALTIC // TIMESTAMP: 2024-10-24T08:45:00Z</p>
+                </div>
+                <div class="flex gap-2">
+                    <span class="font-label-caps text-label-caps text-secondary bg-surface-container-high px-2 py-1 border border-outline-variant rounded-sm flex items-center gap-1 cursor-pointer hover:bg-surface-variant">
+                        <span class="material-symbols-outlined text-[14px]" data-icon="filter_alt">filter_alt</span> FILTER
+                    </span>
+                    <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-1 border border-primary/30 rounded-sm flex items-center gap-1 cursor-pointer hover:bg-primary/20">
+                        <span class="material-symbols-outlined text-[14px]" data-icon="sync">sync</span> REFRESH
+                    </span>
+                </div>
+            </header>
+
+            <!-- Critical Shortages Alert Bar -->
+            <div class="bg-error-container/20 border-l-2 border-error p-panel-padding flex items-center justify-between rounded-sm">
+                <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-error text-2xl animate-pulse" data-icon="warning">warning</span>
+                    <div>
+                        <h3 class="font-headline-md text-headline-md text-error uppercase">Critical Shortages Detected</h3>
+                        <p class="font-data-mono text-data-mono text-error/80 mt-1">2 Items below minimum operational threshold. Immediate action required.</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 font-data-mono text-data-mono">
+                    <div class="bg-surface-container-high border border-error/30 px-3 py-2 rounded-sm">
+                        <div class="text-on-surface-variant text-[10px] uppercase mb-1">PART # 884-AX (ROTOR HUB)</div>
+                        <div class="text-error font-bold">QTY: 02 <span class="text-on-surface-variant">/ MIN: 05</span></div>
+                    </div>
+                    <div class="bg-surface-container-high border border-error/30 px-3 py-2 rounded-sm">
+                        <div class="text-on-surface-variant text-[10px] uppercase mb-1">METEOR BVRAAM</div>
+                        <div class="text-error font-bold">QTY: 14 <span class="text-on-surface-variant">/ MIN: 20</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bento Box Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+                <!-- Tile 1: Fuel Reserves -->
+                <div class="bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col rounded-sm">
+                    <div class="flex justify-between items-center border-b border-outline-variant/50 pb-2 mb-4">
+                        <h3 class="font-label-caps text-label-caps text-on-surface-variant">FUEL RESERVES (JP-8)</h3>
+                        <span class="material-symbols-outlined text-secondary text-sm" data-icon="local_gas_station">local_gas_station</span>
+                    </div>
+                    <div class="flex-1 flex flex-col justify-center">
+                        <div class="flex items-end gap-2">
+                            <span class="font-headline-lg text-[40px] leading-none text-primary font-bold">482.5</span>
+                            <span class="font-data-mono text-data-mono text-on-surface-variant mb-1">KILOLITERS</span>
+                        </div>
+                        <div class="w-full bg-surface-dim h-2 mt-4 rounded-full overflow-hidden border border-outline-variant/30">
+                            <div class="bg-primary h-full w-[78%]"></div>
+                        </div>
+                        <div class="flex justify-between mt-2 font-data-mono text-[10px] text-on-surface-variant">
+                            <span>DEPLETION RATE: 12kL/HR</span>
+                            <span>78% CAPACITY</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tile 2: Munitions -->
+                <div class="bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col rounded-sm">
+                    <div class="flex justify-between items-center border-b border-outline-variant/50 pb-2 mb-4">
+                        <h3 class="font-label-caps text-label-caps text-on-surface-variant">MUNITIONS STOCKPILE</h3>
+                        <span class="material-symbols-outlined text-secondary text-sm" data-icon="rocket">rocket</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="font-data-mono text-data-mono text-on-surface">IRIS-T</span>
+                            <span class="font-data-mono text-data-mono text-primary bg-primary/10 px-2 border border-primary/20">84</span>
+                        </div>
+                        <div class="w-full bg-surface-dim h-1 rounded-full overflow-hidden">
+                            <div class="bg-primary h-full w-[85%]"></div>
+                        </div>
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="font-data-mono text-data-mono text-error">METEOR</span>
+                            <span class="font-data-mono text-data-mono text-error bg-error/10 px-2 border border-error/20">14</span>
+                        </div>
+                        <div class="w-full bg-surface-dim h-1 rounded-full overflow-hidden">
+                            <div class="bg-error h-full w-[25%]"></div>
+                        </div>
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="font-data-mono text-data-mono text-on-surface">GBU-39 SDB</span>
+                            <span class="font-data-mono text-data-mono text-secondary bg-surface-container-high px-2 border border-outline-variant">120</span>
+                        </div>
+                        <div class="w-full bg-surface-dim h-1 rounded-full overflow-hidden">
+                            <div class="bg-secondary h-full w-[60%]"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tile 3: Spare Parts -->
+                <div class="bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col rounded-sm">
+                    <div class="flex justify-between items-center border-b border-outline-variant/50 pb-2 mb-4">
+                        <h3 class="font-label-caps text-label-caps text-on-surface-variant">SPARE PARTS AVAILABILITY</h3>
+                        <span class="material-symbols-outlined text-secondary text-sm" data-icon="settings">settings</span>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center relative">
+                        <!-- Circular indicator simulation -->
+                        <div class="w-32 h-32 rounded-full border-4 border-surface-dim flex items-center justify-center relative border-t-tertiary border-r-tertiary border-b-tertiary border-l-surface-dim transform -rotate-45">
+                            <div class="transform rotate-45 text-center">
+                                <span class="font-headline-lg text-[32px] text-tertiary leading-none block">68%</span>
+                                <span class="font-label-caps text-[8px] text-on-surface-variant block mt-1">READINESS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center font-data-mono text-[10px] text-tertiary mt-2">
+                        STATUS: MARGINAL (YELLOW)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lower Section Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+                <!-- Logistics Pipeline (Spans 2 cols) -->
+                <div class="lg:col-span-2 bg-surface-container-low border border-outline-variant flex flex-col rounded-sm">
+                    <div class="bg-surface-container p-panel-padding border-b border-outline-variant flex justify-between items-center">
+                        <h3 class="font-label-caps text-label-caps text-on-surface">LOGISTICS PIPELINE: INBOUND</h3>
+                        <span class="font-data-mono text-[10px] text-primary">ETA SYNCHRONIZED</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-surface-dim font-label-caps text-label-caps text-on-surface-variant">
+                                    <th class="p-3 border-b border-outline-variant/50 font-normal">ASSET ID</th>
+                                    <th class="p-3 border-b border-outline-variant/50 font-normal">TYPE</th>
+                                    <th class="p-3 border-b border-outline-variant/50 font-normal">MANIFEST</th>
+                                    <th class="p-3 border-b border-outline-variant/50 font-normal">ETA</th>
+                                    <th class="p-3 border-b border-outline-variant/50 font-normal">STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody class="font-data-mono text-data-mono text-on-surface">
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                    <td class="p-3 flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-secondary text-[16px]" data-icon="local_shipping">local_shipping</span> SE-04
+                                    </td>
+                                    <td class="p-3 text-on-surface-variant">TRUCK CONVOY</td>
+                                    <td class="p-3">AV-GAS, RATIONS</td>
+                                    <td class="p-3 text-primary">T-02:15:00</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-tertiary/10 text-tertiary border border-tertiary/20 text-[10px]">EN ROUTE</span></td>
+                                </tr>
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                    <td class="p-3 flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-secondary text-[16px]" data-icon="flight">flight</span> C-130H
+                                    </td>
+                                    <td class="p-3 text-on-surface-variant">AIR CARGO</td>
+                                    <td class="p-3 text-error">METEOR RESUPPLY</td>
+                                    <td class="p-3 text-primary">T-04:30:00</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 text-[10px]">INBOUND</span></td>
+                                </tr>
+                                <tr class="hover:bg-surface-container-high transition-colors">
+                                    <td class="p-3 flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-secondary text-[16px]" data-icon="train">train</span> RAIL-09
+                                    </td>
+                                    <td class="p-3 text-on-surface-variant">RAIL TRANSPORT</td>
+                                    <td class="p-3">HEAVY ARMOR SPARES</td>
+                                    <td class="p-3 text-on-surface-variant">T-18:00:00</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-surface-dim text-on-surface-variant border border-outline-variant text-[10px]">STAGING</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Maintenance Resources -->
+                <div class="bg-surface-container-low border border-outline-variant flex flex-col rounded-sm">
+                    <div class="bg-surface-container p-panel-padding border-b border-outline-variant flex justify-between items-center">
+                        <h3 class="font-label-caps text-label-caps text-on-surface">RESOURCE ALLOCATION</h3>
+                    </div>
+                    <div class="p-panel-padding space-y-4">
+                        <!-- Hangar Space -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2 font-data-mono text-data-mono">
+                                <span class="text-on-surface-variant flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[16px]" data-icon="warehouse">warehouse</span> HANGAR SPACE
+                                </span>
+                                <span class="text-on-surface">4 / 6 BAYS ACTIVE</span>
+                            </div>
+                            <div class="flex gap-1 h-6">
+                                <div class="flex-1 bg-surface-dim border border-primary text-primary flex items-center justify-center font-data-mono text-[10px]">JAS-39</div>
+                                <div class="flex-1 bg-surface-dim border border-primary text-primary flex items-center justify-center font-data-mono text-[10px]">JAS-39</div>
+                                <div class="flex-1 bg-surface-dim border border-tertiary text-tertiary flex items-center justify-center font-data-mono text-[10px]">V-22</div>
+                                <div class="flex-1 bg-surface-dim border border-tertiary text-tertiary flex items-center justify-center font-data-mono text-[10px]">V-22</div>
+                                <div class="flex-1 bg-surface-dim border border-outline-variant/30"></div>
+                                <div class="flex-1 bg-surface-dim border border-outline-variant/30"></div>
+                            </div>
+                        </div>
+
+                        <!-- Ground Crew -->
+                        <div class="pt-2 border-t border-outline-variant/30">
+                            <div class="flex justify-between items-center mb-2 font-data-mono text-data-mono">
+                                <span class="text-on-surface-variant flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[16px]" data-icon="engineering">engineering</span> GROUND CREW
+                                </span>
+                                <span class="text-primary">82% DEPLOYED</span>
+                            </div>
+                            <div class="w-full bg-surface-dim h-1.5 rounded-full overflow-hidden border border-outline-variant/30">
+                                <div class="bg-primary h-full w-[82%]"></div>
+                            </div>
+                            <div class="flex justify-between mt-1 font-data-mono text-[10px] text-on-surface-variant">
+                                <span>SHIFT: DELTA</span>
+                                <span>AV: 14 PERSONNEL</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</div>
+
+<script src="./shared-components.js"></script>
+</body>
+</html>

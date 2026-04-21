@@ -1,0 +1,49 @@
+/* Global CSS for SAAB C2 Tactical Dashboard */
+
+/* Hex Background Pattern */
+.hex-bg {
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='69.28203230275509' viewBox='0 0 40 69.28203230275509' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 17.32050807568877L20 0L0 17.32050807568877V51.96152422706632L20 69.28203230275509L40 51.96152422706632V17.32050807568877Z M20 67.28203230275509L2 50.80650807568877V18.47552422706632L20 2L38 18.47552422706632V50.80650807568877L20 67.28203230275509Z' fill='%233e4850' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+}
+
+/* Radar Sweep Animation */
+.radar-sweep {
+    background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(130, 207, 255, 0.1) 270deg, rgba(130, 207, 255, 0.5) 360deg);
+    animation: sweep 4s linear infinite;
+    border-radius: 50%;
+}
+
+@keyframes sweep {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Custom Scrollbar - Hide but keep functionality */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+/* Base Body Resets if any not handled by Tailwind */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tactical Scrollbar — thin, dark, accented */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+::-webkit-scrollbar-track {
+    background: #131313;
+}
+::-webkit-scrollbar-thumb {
+    background: #3e4850;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #82cfff;
+}

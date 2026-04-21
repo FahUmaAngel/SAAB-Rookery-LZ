@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mission Logs &amp; Historical Analysis - Aegis C2 System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="tailwind.config.js"></script>`n<style>
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 9999;
+            position: absolute;
+            pointer-events: none;
+            background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(130,207,255,0.05) 50%, rgba(0,0,0,0) 100%);
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<div class="scanline"></div>
+<!-- TopNavBar -->
+<div id="header-placeholder"></div>
+<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+<!-- SideNavBar -->
+<div id="sidebar-placeholder"></div>
+<!-- Main Content Area -->
+<main class="h-full p-gutter overflow-hidden flex flex-col gap-gutter lg:flex-row">
+<!-- Mission Archive List -->
+<section class="flex-1 flex flex-col bg-surface-container-low border border-slate-800 min-w-[400px]">
+<header class="p-panel-padding border-b border-slate-800 bg-surface-container-high flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface uppercase tracking-widest">Archive Index</h3>
+<div class="flex gap-2">
+<button class="bg-slate-800 border border-slate-700 text-on-surface px-3 py-1 text-data-mono font-data-mono hover:border-primary hover:text-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">filter_list</span> FILTER
+                        </button>
+<button class="bg-slate-800 border border-slate-700 text-on-surface px-3 py-1 text-data-mono font-data-mono hover:border-primary hover:text-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">download</span> CSV
+                        </button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-surface-container-high border-b border-slate-800 text-slate-500 font-label-caps text-label-caps uppercase z-10">
+<tr>
+<th class="py-2 px-4 font-normal">Date / Time (Z)</th>
+<th class="py-2 px-4 font-normal">Designation</th>
+<th class="py-2 px-4 font-normal">Target Class</th>
+<th class="py-2 px-4 font-normal">Sector</th>
+<th class="py-2 px-4 font-normal text-right">Outcome</th>
+</tr>
+</thead>
+<tbody class="font-data-mono text-data-mono text-on-surface-variant divide-y divide-slate-800">
+<tr class="hover:bg-slate-800/50 cursor-pointer border-l-2 border-transparent">
+<td class="py-3 px-4">2024-08-11 09:14Z</td>
+<td class="py-3 px-4 text-slate-300">INCIDENT #2024-08-11-A</td>
+<td class="py-3 px-4">TU-95 Bear</td>
+<td class="py-3 px-4">GIUK Gap</td>
+<td class="py-3 px-4 text-right text-slate-400">Monitored</td>
+</tr>
+<tr class="bg-surface-container-high/50 hover:bg-slate-800 cursor-pointer border-l-2 border-primary">
+<td class="py-3 px-4 text-primary">2024-08-12 14:22Z</td>
+<td class="py-3 px-4 text-primary">BOGEY_GOLF_42</td>
+<td class="py-3 px-4 text-primary">SU-27 Flanker</td>
+<td class="py-3 px-4 text-primary">Baltic Sea</td>
+<td class="py-3 px-4 text-right text-tertiary">Escorted</td>
+</tr>
+<tr class="hover:bg-slate-800/50 cursor-pointer border-l-2 border-transparent">
+<td class="py-3 px-4">2024-08-14 22:45Z</td>
+<td class="py-3 px-4 text-slate-300">INCIDENT #2024-08-14-B</td>
+<td class="py-3 px-4">IL-20 Coot</td>
+<td class="py-3 px-4">North Sea</td>
+<td class="py-3 px-4 text-right text-slate-400">Intercepted</td>
+</tr>
+<tr class="hover:bg-slate-800/50 cursor-pointer border-l-2 border-transparent">
+<td class="py-3 px-4">2024-08-15 03:10Z</td>
+<td class="py-3 px-4 text-slate-300">TRACK_ALPHA_NINER</td>
+<td class="py-3 px-4">UNKNOWN</td>
+<td class="py-3 px-4">Barents Sea</td>
+<td class="py-3 px-4 text-right text-slate-400">Lost Contact</td>
+</tr>
+<tr class="hover:bg-slate-800/50 cursor-pointer border-l-2 border-transparent">
+<td class="py-3 px-4">2024-08-18 11:30Z</td>
+<td class="py-3 px-4 text-slate-300">INCIDENT #2024-08-18-A</td>
+<td class="py-3 px-4">SU-24 Fencer</td>
+<td class="py-3 px-4">Black Sea</td>
+<td class="py-3 px-4 text-right text-tertiary">Warning Issued</td>
+</tr>
+<tr class="hover:bg-slate-800/50 cursor-pointer border-l-2 border-transparent">
+<td class="py-3 px-4">2024-08-20 16:55Z</td>
+<td class="py-3 px-4 text-slate-300">BOGEY_HOTEL_07</td>
+<td class="py-3 px-4">TU-160 Blackjack</td>
+<td class="py-3 px-4">Norwegian Sea</td>
+<td class="py-3 px-4 text-right text-slate-400">Monitored</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Log Detail View -->
+<section class="flex-[1.5] flex flex-col gap-gutter overflow-y-auto pr-2">
+<!-- Header & Executive Summary -->
+<div class="bg-surface-container-low border border-slate-800 p-panel-padding flex flex-col gap-4">
+<div class="flex justify-between items-start border-b border-slate-800 pb-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary uppercase tracking-wider">BOGEY_GOLF_42</h2>
+<p class="font-data-mono text-data-mono text-slate-500 mt-1">CLASS: SU-27 Flanker | SECTOR: Baltic Sea | STATUS: RESOLVED</p>
+</div>
+<div class="bg-tertiary/10 border border-tertiary/30 px-3 py-1 text-tertiary font-label-caps text-label-caps flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                            ESCORTED
+                        </div>
+</div>
+<div>
+<h4 class="font-label-caps text-label-caps text-slate-500 uppercase mb-2">Executive Summary</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                            Unidentified fast mover detected originating from Kaliningrad FIR, bearing 270. Transponder disabled, no flight plan filed. QRA scrambled from Ämari Air Base. Intercept achieved at FL350. Target identified as SU-27 Flanker. Visual warnings issued after target deviated towards sovereign airspace. Target acknowledged and altered course parallel to border. Escort maintained until target returned to international airspace.
+                        </p>
+</div>
+</div>
+<!-- Tactical Timeline -->
+<div class="bg-surface-container-low border border-slate-800 p-panel-padding">
+<h4 class="font-label-caps text-label-caps text-slate-500 uppercase mb-4 border-b border-slate-800 pb-2">Tactical Timeline</h4>
+<div class="relative pl-6 border-l border-slate-700 ml-3 space-y-6 font-data-mono text-data-mono">
+<div class="relative">
+<div class="absolute -left-[31px] top-1 w-3 h-3 bg-slate-800 border-2 border-slate-500 rounded-full"></div>
+<div class="text-slate-500">14:02:15Z</div>
+<div class="text-on-surface mt-1">Initial Radar Detection by Ground Station Alpha. Track designated BOGEY_GOLF_42.</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[31px] top-1 w-3 h-3 bg-slate-800 border-2 border-tertiary rounded-full"></div>
+<div class="text-slate-500">14:05:00Z</div>
+<div class="text-tertiary mt-1">QRA Scramble Order Issued. Alpha Flight (2x F-35A) airborne from Ämari.</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[31px] top-1 w-3 h-3 bg-slate-800 border-2 border-primary rounded-full"></div>
+<div class="text-slate-500">14:18:30Z</div>
+<div class="text-primary mt-1">Visual Identification (VID) confirmed. Target is 1x SU-27 Flanker, armed.</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[31px] top-1 w-3 h-3 bg-slate-800 border-2 border-error rounded-full"></div>
+<div class="text-slate-500">14:22:00Z</div>
+<div class="text-error mt-1">Target approaches 10nm buffer zone. Visual warnings (wing rock) executed.</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[31px] top-1 w-3 h-3 bg-slate-800 border-2 border-slate-500 rounded-full"></div>
+<div class="text-slate-500">14:35:45Z</div>
+<div class="text-on-surface mt-1">Target alters course to 090. Escort disengaged. RTB ordered.</div>
+</div>
+</div>
+</div>
+<!-- Bento Grid: Intel & Telemetry -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Intelligence Attachments -->
+<div class="bg-surface-container-low border border-slate-800 flex flex-col">
+<div class="p-panel-padding border-b border-slate-800 bg-surface-container-high flex justify-between items-center">
+<h4 class="font-label-caps text-label-caps text-slate-500 uppercase">Intelligence Attachments</h4>
+<span class="material-symbols-outlined text-[16px] text-slate-500">photo_library</span>
+</div>
+<div class="p-panel-padding grid grid-cols-2 gap-2 flex-1">
+<div class="relative border border-slate-700 group cursor-pointer h-24 bg-slate-900 overflow-hidden">
+<img alt="High contrast black and white grainy tactical HUD footage of a fighter jet in flight" class="w-full h-full object-cover opacity-60 mix-blend-luminosity group-hover:opacity-100 transition-opacity" data-alt="grainy black and white tactical HUD camera view tracking a fighter jet against cloudy sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvqq-pLRz_nPgz06QGDxr-Pi94zIFgseu8nqdGAasWNTcJvCllk3LlRMpYvL-pqvPHGXRWOU6e6aRgCneWW4cH_JlbMzu1pgVeXpmOegGPANKPUFBZ6UaUANADthCU9osyaw9QBM-tKHQurVeTcheYhrPHVl0FdiUeIxfx1M7n6uYUlvlagKCv0-YFKclTQwcPxti-HCBGX79-YqcF7hdt_NkinCGBEfVy9ju8SopNdbztCmastbFvnuH4p22YkfSq64xOZWIxiSy0"/>
+<div class="absolute bottom-1 left-1 text-[8px] font-data-mono text-primary bg-black/50 px-1">VID_CAM_1</div>
+</div>
+<div class="relative border border-slate-700 group cursor-pointer h-24 bg-slate-900 overflow-hidden">
+<img alt="Infrared thermal imaging view of a twin-engine fighter aircraft" class="w-full h-full object-cover opacity-60 mix-blend-luminosity group-hover:opacity-100 transition-opacity" data-alt="green and white thermal FLIR camera view of a twin-engine military jet exhaust" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClV5jyBFzpE6y5k1FWOZK-dleCnndwMR6QFOjPsWw8xAp_eW5ORucePIzFpMJz8faDK7S0QIo_Glah6KvFixQmFeoKHeGyOOaVFdh5ZTY29Wxcp9zRUyACsqaTEQR6EZ5vod85C_4MpPvG4gEQQuaXIT1a-HyaMyycerV-CiOla8-YFyfmtLvJfHgISHwotRHuqrYwDquKzGs-aMKFwLCBjB6j2fSUZpZ7oe7AKQdnXsC0wWjxYpXUQOmTG-buioDXQvNiXH45726r"/>
+<div class="absolute bottom-1 left-1 text-[8px] font-data-mono text-primary bg-black/50 px-1">FLIR_POD</div>
+</div>
+<div class="relative border border-slate-700 group cursor-pointer h-24 bg-slate-900 overflow-hidden col-span-2">
+<div class="w-full h-full flex flex-col items-center justify-center text-slate-600 border border-dashed border-slate-700 hover:text-primary hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-[24px] mb-1">add_a_photo</span>
+<span class="font-label-caps text-[8px] uppercase">Attach Post-Flight</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Telemetry Data -->
+<div class="bg-surface-container-low border border-slate-800 flex flex-col">
+<div class="p-panel-padding border-b border-slate-800 bg-surface-container-high flex justify-between items-center">
+<h4 class="font-label-caps text-label-caps text-slate-500 uppercase">Intercept Telemetry</h4>
+<span class="material-symbols-outlined text-[16px] text-slate-500">show_chart</span>
+</div>
+<div class="p-panel-padding flex-1 flex flex-col gap-4">
+<div>
+<div class="flex justify-between font-label-caps text-label-caps mb-1">
+<span class="text-slate-500">Max Speed (Mach)</span>
+<span class="text-primary">1.2M</span>
+</div>
+<div class="w-full bg-slate-900 h-1">
+<div class="bg-primary h-1 w-[60%] relative">
+<div class="absolute right-0 -top-1 w-1 h-3 bg-white"></div>
+</div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-caps text-label-caps mb-1">
+<span class="text-slate-500">Intercept Altitude (FL)</span>
+<span class="text-tertiary">350</span>
+</div>
+<div class="w-full bg-slate-900 h-1">
+<div class="bg-tertiary h-1 w-[80%] relative">
+<div class="absolute right-0 -top-1 w-1 h-3 bg-white"></div>
+</div>
+</div>
+</div>
+<div class="mt-auto grid grid-cols-2 gap-2 border-t border-slate-800 pt-3">
+<div>
+<div class="font-label-caps text-[8px] text-slate-500 uppercase">Initial Bearing</div>
+<div class="font-data-mono text-[14px] text-on-surface">270° True</div>
+</div>
+<div>
+<div class="font-label-caps text-[8px] text-slate-500 uppercase">Exit Bearing</div>
+<div class="font-data-mono text-[14px] text-on-surface">090° True</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Reporting Console -->
+<div class="bg-surface-container-low border border-slate-800 p-panel-padding flex gap-4 mt-auto">
+<button class="flex-1 bg-transparent border border-slate-600 text-on-surface hover:bg-slate-800 hover:border-slate-400 py-2 px-4 font-headline-md text-[12px] uppercase tracking-wider transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+                        Export Classified PDF
+                    </button>
+<button class="flex-1 bg-transparent border border-slate-600 text-on-surface hover:bg-slate-800 hover:border-slate-400 py-2 px-4 font-headline-md text-[12px] uppercase tracking-wider transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">gavel</span>
+                        Generate Protest
+                    </button>
+<button class="flex-[1.5] bg-inverse-primary text-on-primary hover:bg-primary hover:text-on-primary-fixed font-headline-md text-[12px] uppercase tracking-wider font-bold transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+                        Sync to NATO HQ
+                    </button>
+</div>
+</section>
+</main>
+</div>
+<script src="./shared-components.js"></script>
+</body></html>

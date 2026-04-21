@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>C2 Tactical Overwatch - Active Incident</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="tailwind.config.js"></script>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- JSON Component: TopNavBar -->
+<div id="header-placeholder"></div>
+
+<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+<!-- JSON Component: SideNavBar -->
+<div id="sidebar-placeholder"></div>
+<!-- Main Content Area -->
+<main class="p-margin h-full flex flex-col gap-gutter">
+<!-- Header Telemetry Block -->
+<header class="bg-surface-container border border-outline-variant p-panel-padding flex justify-between items-end relative overflow-hidden rounded-none">
+<div class="absolute top-0 left-0 w-2 h-full bg-primary"></div>
+<div class="flex flex-col pl-4">
+<span class="font-label-caps text-label-caps text-primary tracking-widest mb-1 flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+                    ACTIVE QRA ENGAGEMENT // TIER 1
+                </span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface uppercase m-0">INCIDENT #2024-08-12: <span class="text-primary">BOGEY_GOLF_42</span></h1>
+</div>
+<div class="flex gap-6 text-right">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline-variant">SYSTEM STATUS</span>
+<span class="font-data-mono text-data-mono text-secondary">SECURE LK</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline-variant">ROE STATE</span>
+<span class="font-data-mono text-data-mono text-tertiary">WEAPONS TIGHT</span>
+</div>
+</div>
+</header>
+<!-- 5-Phase Escalation Visualizer -->
+<section class="bg-surface-container border border-outline-variant p-panel-padding rounded-none">
+<div class="flex items-center justify-between w-full relative">
+<!-- Connecting Line Base -->
+<div class="absolute left-8 right-8 top-1/2 -translate-y-1/2 h-px bg-outline-variant z-0"></div>
+<!-- Connecting Line Active -->
+<div class="absolute left-8 w-[40%] top-1/2 -translate-y-1/2 h-px bg-primary z-0 shadow-[0_0_8px_rgba(130,207,255,0.5)]"></div>
+<!-- Phase 1 -->
+<div class="flex flex-col items-center gap-2 z-10 w-24">
+<div class="w-8 h-8 bg-surface-container border border-primary rounded-none flex items-center justify-center text-primary shadow-[0_0_8px_rgba(130,207,255,0.3)]">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<span class="font-label-caps text-label-caps text-primary text-center">DETECTION<br/><span class="text-outline text-[8px]">COMPLETE</span></span>
+</div>
+<!-- Phase 2 -->
+<div class="flex flex-col items-center gap-2 z-10 w-24">
+<div class="w-8 h-8 bg-surface-container border border-primary rounded-none flex items-center justify-center text-primary shadow-[0_0_8px_rgba(130,207,255,0.3)]">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">flight_takeoff</span>
+</div>
+<span class="font-label-caps text-label-caps text-primary text-center">SCRAMBLE<br/><span class="text-outline text-[8px]">COMPLETE</span></span>
+</div>
+<!-- Phase 3 (Active) -->
+<div class="flex flex-col items-center gap-2 z-10 w-24">
+<div class="w-10 h-10 bg-primary-container border-2 border-primary rounded-none flex items-center justify-center text-on-primary-container relative">
+<div class="absolute -inset-1 border border-primary opacity-50 animate-ping"></div>
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface text-center font-bold">VISUAL ID<br/><span class="text-tertiary text-[8px] animate-pulse">ACTIVE FEED</span></span>
+</div>
+<!-- Phase 4 (Pending) -->
+<div class="flex flex-col items-center gap-2 z-10 w-24 opacity-60">
+<div class="w-8 h-8 bg-surface border border-outline rounded-none flex items-center justify-center text-outline">
+<span class="material-symbols-outlined text-[16px]">campaign</span>
+</div>
+<span class="font-label-caps text-label-caps text-outline text-center">WARNING<br/><span class="text-outline-variant text-[8px]">PENDING</span></span>
+</div>
+<!-- Phase 5 (Pending) -->
+<div class="flex flex-col items-center gap-2 z-10 w-24 opacity-60">
+<div class="w-8 h-8 bg-surface border border-outline rounded-none flex items-center justify-center text-outline">
+<span class="material-symbols-outlined text-[16px]">my_location</span>
+</div>
+<span class="font-label-caps text-label-caps text-outline text-center">ESCORT<br/><span class="text-outline-variant text-[8px]">PENDING</span></span>
+</div>
+</div>
+</section>
+<!-- Main Action Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter flex-1">
+<!-- Centerpiece: Visual ID Live Stream -->
+<div class="lg:col-span-2 bg-surface-container border border-outline-variant flex flex-col rounded-none relative">
+<!-- Video Header -->
+<div class="flex justify-between items-center p-panel-padding border-b border-outline-variant bg-surface-container-high">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[18px]">videocam</span>
+<span class="font-label-caps text-label-caps text-on-surface tracking-wider">GRIPEN-1 // HUD_OPTICAL_LINK</span>
+</div>
+<div class="flex items-center gap-2 bg-error-container/20 border border-error-container px-2 py-1">
+<div class="w-2 h-2 bg-error rounded-full animate-pulse"></div>
+<span class="font-data-mono text-data-mono text-error">LIVE REC</span>
+</div>
+</div>
+<!-- Video Canvas -->
+<div class="flex-1 relative bg-surface-lowest overflow-hidden min-h-[400px]">
+<!-- Placeholder Image for HUD -->
+<div class="absolute inset-0 bg-gradient-to-b from-[#26483a] to-[#0b1112] opacity-45 mix-blend-multiply z-10 pointer-events-none"></div>
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_55%,rgba(62,102,83,0.35)_0%,rgba(20,34,31,0.58)_55%,rgba(8,13,13,0.78)_100%)]"></div>
+<img alt="Aircraft shadow silhouette" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[86%] max-w-[920px] opacity-95 brightness-125 contrast-110 z-[16] pointer-events-none select-none" src="./airplane-shadow.svg"/>
+<!-- HUD Overlay Elements (Hard-Surface purely functional) -->
+<div class="absolute inset-0 z-20 pointer-events-none p-6 flex flex-col justify-between border-4 border-transparent">
+<!-- Top HUD -->
+<div class="flex justify-between font-data-mono text-data-mono text-primary/80">
+<div>HDG: 045<br/>MACH: 1.25</div>
+<div class="text-center text-tertiary border border-tertiary/30 px-2 bg-tertiary/10">TRK: BOGEY_G42<br/>RNG: 12.4 NM</div>
+<div class="text-right">ALT: 28,500<br/>G: 1.2</div>
+</div>
+<!-- Center Reticle -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+<div class="w-48 h-48 border border-tertiary/40 rounded-full flex items-center justify-center relative">
+<div class="w-2 h-2 bg-tertiary/80 transform rotate-45"></div>
+<div class="absolute top-[-10px] w-px h-4 bg-tertiary/60"></div>
+<div class="absolute bottom-[-10px] w-px h-4 bg-tertiary/60"></div>
+<div class="absolute left-[-10px] w-4 h-px bg-tertiary/60"></div>
+<div class="absolute right-[-10px] w-4 h-px bg-tertiary/60"></div>
+<!-- Target Box -->
+<div class="absolute w-16 h-16 border border-error/50 animate-pulse flex items-center justify-center">
+<span class="absolute -top-4 -right-12 text-[10px] text-error font-data-mono">SU-27</span>
+</div>
+</div>
+</div>
+<!-- Bottom HUD -->
+<div class="flex justify-between items-end font-data-mono text-data-mono text-primary/80">
+<div>WPN: ARM<br/>QTY: 4</div>
+<div class="flex gap-1">
+<div class="w-8 h-2 bg-primary/40 border border-primary/60"></div>
+<div class="w-8 h-2 bg-primary/40 border border-primary/60"></div>
+<div class="w-8 h-2 border border-primary/60"></div>
+</div>
+<div class="text-right">TIME: 14:32:05Z<br/>SYS: NOMINAL</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Telemetry & Action Sidebar -->
+<div class="flex flex-col gap-gutter">
+<!-- Target Telemetry Bento -->
+<div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col gap-3 rounded-none relative">
+<div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-outline-variant"></div>
+<span class="font-label-caps text-label-caps text-outline-variant uppercase border-b border-outline-variant/50 pb-2">TARGET PROFILING</span>
+<div class="grid grid-cols-2 gap-x-4 gap-y-3">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline">CLASS ID</span>
+<span class="font-headline-md text-headline-md text-on-surface truncate">SU-27 FLANKER</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline">CONFIDENCE</span>
+<span class="font-headline-md text-headline-md text-tertiary">94.2%</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline">CLOSURE RATE</span>
+<span class="font-headline-md text-headline-md text-error">-450 KTS</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline">SQUAWK</span>
+<span class="font-headline-md text-headline-md text-on-surface">NONE</span>
+</div>
+</div>
+</div>
+<!-- Comms Log Bento -->
+<div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col gap-2 rounded-none flex-1 min-h-[150px]">
+<span class="font-label-caps text-label-caps text-outline-variant uppercase border-b border-outline-variant/50 pb-2">INTERCEPT COMM LOG</span>
+<div class="flex flex-col gap-1 overflow-y-auto font-data-mono text-data-mono text-[10px]">
+<div class="flex gap-2 text-outline"><span class="text-secondary w-16">14:28:10Z</span> <span>ATC: UNKNOWN TRAFFIC NO RADIO CONTACT.</span></div>
+<div class="flex gap-2 text-outline"><span class="text-secondary w-16">14:29:05Z</span> <span>GRIPEN-1: BOGEY IN SIGHT. MANEUVERING TO INTERCEPT.</span></div>
+<div class="flex gap-2 text-tertiary"><span class="text-secondary w-16">14:31:12Z</span> <span>GRIPEN-1: VISUAL CONFIRMATION SU-27. NO EXTERNAL STORES VISIBLE.</span></div>
+<div class="flex gap-2 text-on-surface"><span class="text-secondary w-16 animate-pulse">14:32:00Z</span> <span class="bg-surface-container-high px-1">AWAITING C2 ORDERS...</span></div>
+</div>
+</div>
+<!-- Action Command Block -->
+<div class="bg-surface-container-high border border-outline p-panel-padding flex flex-col gap-3 rounded-none relative">
+<!-- Warning tape top -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-[repeating-linear-gradient(45deg,#f1c100,#f1c100_4px,#201f1f_4px,#201f1f_8px)] opacity-50"></div>
+<span class="font-label-caps text-label-caps text-on-surface uppercase mt-2">AUTHORIZATION TERMINAL</span>
+<button class="w-full py-3 bg-surface hover:bg-surface-bright border border-outline text-on-surface font-label-caps text-label-caps flex items-center justify-center gap-2 transition-colors rounded-none">
+<span class="material-symbols-outlined text-[16px]">campaign</span>
+                        AUTHORIZE RADIO WARNING
+                    </button>
+<button class="w-full py-3 bg-surface hover:bg-tertiary-container/20 border border-tertiary text-tertiary font-label-caps text-label-caps flex items-center justify-center gap-2 transition-colors rounded-none">
+<span class="material-symbols-outlined text-[16px]">local_fire_department</span>
+                        DEPLOY FLARE WARNING
+                    </button>
+<button class="w-full py-3 mt-2 bg-primary hover:bg-primary-fixed border border-primary text-on-primary font-label-caps text-label-caps flex items-center justify-center gap-2 transition-colors rounded-none opacity-50 cursor-not-allowed" title="Requires phase completion">
+<span class="material-symbols-outlined text-[16px]">task_alt</span>
+                        FINALIZE REPORT
+                    </button>
+</div>
+</div>
+</div>
+ </main>
+<script src="./shared-components.js"></script>
+</body></html>

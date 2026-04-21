@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>SWAF C2 STRATOS - COMMS & SIGINT</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        .tactical-grid {
+            background-size: 32px 32px;
+            background-image: 
+                linear-gradient(to right, rgba(62, 72, 80, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(62, 72, 80, 0.1) 1px, transparent 1px);
+        }
+        .pulse-amber {
+            animation: pulse-amber 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-amber {
+            0%, 100% { opacity: 1; box-shadow: 0 0 4px #f1c100; }
+            50% { opacity: .5; box-shadow: 0 0 0px #f1c100; }
+        }
+    </style>
+    <script src="tailwind.config.js"></script>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+    <!-- JSON INJECTED: TopNavBar -->
+    <div id="header-placeholder"></div>
+
+    <div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+        <!-- JSON INJECTED: SideNavBar -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- Main Canvas -->
+        <main class="flex h-full relative bg-surface-lowest p-gutter gap-gutter overflow-hidden">
+            <!-- Left Column: Fixed Width Controls -->
+            <div class="w-[320px] flex flex-col gap-gutter shrink-0 h-full overflow-y-auto pr-1">
+                <!-- Comms Status Panel -->
+                <section class="bg-surface-container border border-outline-variant p-panel-padding rounded-DEFAULT flex flex-col gap-unit">
+                    <header class="flex justify-between items-center mb-2">
+                        <h3 class="font-label-caps text-label-caps text-on-surface-variant">COMMUNICATION CHANNELS</h3>
+                        <span class="material-symbols-outlined text-[14px] text-primary">router</span>
+                    </header>
+                    <div class="flex flex-col gap-2">
+                        <!-- Link 16 -->
+                        <div class="bg-surface border border-outline-variant p-2 rounded-DEFAULT flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-primary shadow-[0_0_4px_#82cfff]"></div>
+                                <div>
+                                    <div class="font-data-mono text-data-mono text-on-surface">LINK 16</div>
+                                    <div class="font-label-caps text-label-caps text-on-surface-variant">TDMA NET / ENCRYPTED</div>
+                                </div>
+                            </div>
+                            <span class="font-data-mono text-data-mono text-primary">100%</span>
+                        </div>
+                        <!-- Guard 121.5 -->
+                        <div class="bg-surface border border-outline-variant p-2 rounded-DEFAULT flex justify-between items-center border-l-2 border-l-tertiary">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-tertiary pulse-amber"></div>
+                                <div>
+                                    <div class="font-data-mono text-data-mono text-tertiary">GUARD 121.5 MHz</div>
+                                    <div class="font-label-caps text-label-caps text-tertiary/70">OPEN EMERGENCY CH</div>
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined text-[16px] text-tertiary">volume_up</span>
+                        </div>
+                        <!-- Sat Uplink -->
+                        <div class="bg-surface border border-outline-variant p-2 rounded-DEFAULT flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-primary"></div>
+                                <div>
+                                    <div class="font-data-mono text-data-mono text-on-surface">SAT UPLINK</div>
+                                    <div class="font-label-caps text-label-caps text-on-surface-variant">UHF BAND</div>
+                                </div>
+                            </div>
+                            <span class="font-data-mono text-data-mono text-on-surface-variant">STDBY</span>
+                        </div>
+                        <!-- Secure Ground -->
+                        <div class="bg-surface border border-outline-variant p-2 rounded-DEFAULT flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-primary"></div>
+                                <div>
+                                    <div class="font-data-mono text-data-mono text-on-surface">SECURE GROUND LINE</div>
+                                    <div class="font-label-caps text-label-caps text-on-surface-variant">FIBER BACKBONE</div>
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined text-[16px] text-primary">lock</span>
+                        </div>
+                    </div>
+                </section>
+                <!-- Radio Transmission Control -->
+                <section class="bg-surface-container border border-tertiary/50 p-panel-padding rounded-DEFAULT flex flex-col gap-unit">
+                    <header class="flex justify-between items-center mb-2">
+                        <h3 class="font-label-caps text-label-caps text-tertiary">TRANSMISSION CONTROL - TX: ARMED</h3>
+                        <div class="px-1.5 py-0.5 bg-tertiary/10 border border-tertiary rounded-DEFAULT">
+                            <span class="font-data-mono text-[10px] text-tertiary leading-none">PHASE 4 QRA</span>
+                        </div>
+                    </header>
+                    <div class="flex flex-col gap-3">
+                        <div class="flex flex-col gap-1">
+                            <label class="font-label-caps text-label-caps text-on-surface-variant">GUARD FREQUENCY MESSAGE (121.5 MHz)</label>
+                            <textarea class="bg-surface-container-lowest border border-outline-variant focus:border-tertiary outline-none font-data-mono text-data-mono text-tertiary p-2 rounded-DEFAULT h-24 resize-none placeholder-tertiary/30 uppercase" placeholder="Enter transmission string...">UNIDENTIFIED AIRCRAFT ON SQUAWK 7000. YOU ARE APPROACHING RESTRICTED SWEDISH MILITARY AIRSPACE. TURN SOUTH IMMEDIATELY OR YOU WILL BE INTERCEPTED.</textarea>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="flex-1 bg-tertiary text-on-tertiary font-headline-md text-data-mono h-8 rounded-DEFAULT flex items-center justify-center gap-1 hover:opacity-90 transition-opacity">
+                                <span class="material-symbols-outlined text-[16px]">podcasts</span>
+                                TRANSMIT ON GUARD
+                            </button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="flex-1 border border-primary text-primary font-headline-md text-data-mono h-8 rounded-DEFAULT flex items-center justify-center gap-1 hover:bg-primary/10 transition-colors">
+                                <span class="material-symbols-outlined text-[16px]">enhanced_encryption</span>
+                                ENCRYPTED BURST (L16)
+                            </button>
+                        </div>
+                    </div>
+                </section>
+                <!-- Encryption Status -->
+                <section class="bg-surface-container border border-outline-variant p-panel-padding rounded-DEFAULT flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">shield</span>
+                        <div>
+                            <div class="font-label-caps text-label-caps text-on-surface-variant">CRYPTO KEY</div>
+                            <div class="font-data-mono text-data-mono text-primary">ENCRYPTED SECURE</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-label-caps text-label-caps text-on-surface-variant">SYSTEM CLOCK</div>
+                        <div class="font-data-mono text-data-mono text-on-surface shared-zulu-clock">12:45:08 ZULU</div>
+                    </div>
+                </section>
+            </div>
+            <!-- Right Column: Fluid Workspace -->
+            <div class="flex-1 flex flex-col gap-gutter min-w-[500px] h-full">
+                <!-- Active Intercept Spectrum -->
+                <section class="bg-surface-container border border-outline-variant rounded-DEFAULT flex flex-col h-1/3 min-h-[240px] relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full p-panel-padding flex justify-between items-center z-10 bg-gradient-to-b from-surface-container to-transparent">
+                        <h3 class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[14px]">graphic_eq</span>
+                            ACTIVE INTERCEPT SPECTRUM [VHF/UHF]
+                        </h3>
+                        <div class="flex gap-2">
+                            <span class="font-data-mono text-[10px] text-primary border border-primary px-1">SWEEP: ACTIVE</span>
+                        </div>
+                    </div>
+                    <!-- Visualization Area -->
+                    <div class="flex-1 tactical-grid relative flex items-end justify-center pb-8 px-4 gap-[2px]">
+                        <!-- Dummy Spectrum Bars -->
+                        <div class="w-1 bg-primary-fixed/20 h-[10%]"></div>
+                        <div class="w-1 bg-primary-fixed/30 h-[25%]"></div>
+                        <div class="w-1 bg-primary-fixed/20 h-[15%]"></div>
+                        <div class="w-1 bg-primary-fixed/40 h-[40%]"></div>
+                        <div class="w-1 bg-primary-fixed/20 h-[20%]"></div>
+                        <div class="w-1 bg-primary-fixed/50 h-[30%]"></div>
+                        <div class="w-1 bg-primary-fixed/30 h-[45%]"></div>
+                        <div class="w-1 bg-primary-fixed/60 h-[60%] relative group">
+                            <div class="absolute -top-6 left-1/2 -translate-x-1/2 font-data-mono text-[10px] text-primary hidden group-hover:block whitespace-nowrap bg-surface px-1 border border-outline-variant">118.2 MHz</div>
+                        </div>
+                        <div class="w-1 bg-primary-fixed/40 h-[35%]"></div>
+                        <div class="w-1 bg-primary-fixed/20 h-[15%]"></div>
+                        <!-- Target Spike (Guard Freq) -->
+                        <div class="w-1.5 bg-tertiary h-[85%] relative shadow-[0_0_8px_#f1c100]">
+                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                                <span class="font-data-mono text-[10px] text-tertiary bg-surface px-1 border border-tertiary whitespace-nowrap">121.500 MHz</span>
+                                <div class="w-px h-3 bg-tertiary"></div>
+                            </div>
+                        </div>
+                        <div class="w-1 bg-primary-fixed/20 h-[20%]"></div>
+                        <div class="w-1 bg-primary-fixed/30 h-[40%]"></div>
+                        <div class="w-1 bg-primary-fixed/50 h-[55%]"></div>
+                        <div class="w-1 bg-primary-fixed/20 h-[10%]"></div>
+                        <div class="w-1 bg-primary-fixed/40 h-[30%]"></div>
+                        <div class="w-1 bg-primary-fixed/20 h-[15%]"></div>
+                        <div class="w-1 bg-primary-fixed/30 h-[25%]"></div>
+                        <div class="w-1 bg-primary-fixed/10 h-[5%]"></div>
+                        <!-- X-Axis Labels -->
+                        <div class="absolute bottom-2 left-4 right-4 flex justify-between font-data-mono text-[10px] text-on-surface-variant border-t border-outline-variant pt-1">
+                            <span>100 MHz</span>
+                            <span>110 MHz</span>
+                            <span>120 MHz</span>
+                            <span>130 MHz</span>
+                            <span>140 MHz</span>
+                        </div>
+                    </div>
+                </section>
+                <!-- SIGINT Log -->
+                <section class="bg-surface-container border border-outline-variant rounded-DEFAULT flex-1 flex flex-col overflow-hidden">
+                    <header class="p-panel-padding border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
+                        <h3 class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[14px]">receipt_long</span>
+                            SIGNAL INTERCEPT LOG (SIGINT)
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-primary pulse-amber"></span>
+                            <span class="font-data-mono text-[10px] text-primary">LIVE FEED</span>
+                        </div>
+                    </header>
+                    <div class="flex-1 overflow-auto bg-surface-lowest">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="sticky top-0 bg-surface-container border-b border-outline-variant z-10">
+                                <tr>
+                                    <th class="font-label-caps text-label-caps text-on-surface-variant py-2 px-4 w-24">TIME (Z)</th>
+                                    <th class="font-label-caps text-label-caps text-on-surface-variant py-2 px-4 w-24">FREQ</th>
+                                    <th class="font-label-caps text-label-caps text-on-surface-variant py-2 px-4 w-28">SRC_BRG</th>
+                                    <th class="font-label-caps text-label-caps text-on-surface-variant py-2 px-4 w-24">SIG_STR</th>
+                                    <th class="font-label-caps text-label-caps text-on-surface-variant py-2 px-4">DECODE_CLASS</th>
+                                    <th class="font-label-caps text-label-caps text-on-surface-variant py-2 px-4">ENTITY REF</th>
+                                </tr>
+                            </thead>
+                            <tbody class="font-data-mono text-data-mono text-on-surface">
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                    <td class="py-2 px-4 text-on-surface-variant">12:44:02</td>
+                                    <td class="py-2 px-4 text-primary">118.250</td>
+                                    <td class="py-2 px-4">184° / 45NM</td>
+                                    <td class="py-2 px-4">-65 dBm</td>
+                                    <td class="py-2 px-4">CLEAR VOICE</td>
+                                    <td class="py-2 px-4 text-on-surface-variant">CIV_ATC_STOCKHOLM</td>
+                                </tr>
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                    <td class="py-2 px-4 text-on-surface-variant">12:44:15</td>
+                                    <td class="py-2 px-4 text-primary">UHF_SAT_4</td>
+                                    <td class="py-2 px-4">N/A (ORBITAL)</td>
+                                    <td class="py-2 px-4">-92 dBm</td>
+                                    <td class="py-2 px-4 text-primary">ENCRYPTED_L16</td>
+                                    <td class="py-2 px-4 text-on-surface-variant">SWAF_AWACS_01</td>
+                                </tr>
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                    <td class="py-2 px-4 text-on-surface-variant">12:44:30</td>
+                                    <td class="py-2 px-4 text-primary">243.000</td>
+                                    <td class="py-2 px-4">045° / 110NM</td>
+                                    <td class="py-2 px-4">-88 dBm</td>
+                                    <td class="py-2 px-4">PULSE_BEACON</td>
+                                    <td class="py-2 px-4 text-on-surface-variant">UNKNOWN_MARINE</td>
+                                </tr>
+                                <!-- Target Row -->
+                                <tr class="bg-tertiary/10 border-l-2 border-l-tertiary border-b border-outline-variant/30 hover:bg-tertiary/20 transition-colors">
+                                    <td class="py-2 px-4 text-tertiary">12:44:58</td>
+                                    <td class="py-2 px-4 text-tertiary font-bold">121.500</td>
+                                    <td class="py-2 px-4 text-tertiary">092° / 68NM</td>
+                                    <td class="py-2 px-4 text-tertiary">-52 dBm</td>
+                                    <td class="py-2 px-4 text-tertiary">UNMODULATED CARRIER</td>
+                                    <td class="py-2 px-4 text-tertiary font-bold">Bogey_Golf_42</td>
+                                </tr>
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                    <td class="py-2 px-4 text-on-surface-variant">12:45:01</td>
+                                    <td class="py-2 px-4 text-primary">134.100</td>
+                                    <td class="py-2 px-4">210° / 30NM</td>
+                                    <td class="py-2 px-4">-70 dBm</td>
+                                    <td class="py-2 px-4">CLEAR VOICE</td>
+                                    <td class="py-2 px-4 text-on-surface-variant">CIV_ATC_GOT</td>
+                                </tr>
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                    <td class="py-2 px-4 text-on-surface-variant">12:45:05</td>
+                                    <td class="py-2 px-4 text-primary">UHF_LINK_B</td>
+                                    <td class="py-2 px-4">GROUND_NODE_7</td>
+                                    <td class="py-2 px-4">-40 dBm</td>
+                                    <td class="py-2 px-4 text-primary">ENCRYPTED_DATA</td>
+                                    <td class="py-2 px-4 text-on-surface-variant">C2_HQ_SEC_STHLM</td>
+                                </tr>
+                                <tr class="hover:bg-surface-container-high transition-colors text-on-surface-variant opacity-50">
+                                    <td class="py-2 px-4">12:45:08</td>
+                                    <td class="py-2 px-4">--</td>
+                                    <td class="py-2 px-4">--</td>
+                                    <td class="py-2 px-4">--</td>
+                                    <td class="py-2 px-4">AWAITING SIGNAL...</td>
+                                    <td class="py-2 px-4">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script src="./shared-components.js"></script>
+</body>
+</html>
