@@ -8,6 +8,8 @@ const SharedComponents = {
         :root {
             --sidebar-width: 80px;
             --header-height: 48px;
+            --ai-accent: #82cfff;
+            --hitl-danger: #ff5252;
         }
         body.sidebar-expanded {
             --sidebar-width: 260px;
@@ -59,10 +61,22 @@ const SharedComponents = {
                     <input class="bg-transparent border-none outline-none text-data-mono font-data-mono text-on-surface w-full p-0 placeholder-outline" placeholder="QUERY DATABASE..." type="text"/>
                 </div>
                 <div class="flex items-center gap-4 font-['Space_Grotesk'] font-bold uppercase tracking-tighter text-xs">
+                    <!-- AI Threat Meter -->
+                    <div id="ai-threat-container" class="flex items-center gap-2 border-x border-slate-800 px-4 h-full">
+                        <span class="text-slate-500 text-[9px]">AI THREAT</span>
+                        <div class="w-32 h-2 bg-slate-900 border border-slate-800 relative overflow-hidden">
+                            <div id="ai-threat-bar" class="absolute top-0 left-0 h-full bg-sky-500 transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                        <span id="ai-threat-value" class="text-sky-500 w-8">0%</span>
+                    </div>
                     <span class="text-error">THREAT: ALPHA</span>
                     <span class="text-slate-500" id="shared-zulu-clock">ZULU 00:00:00</span>
                 </div>
-                <div class="flex items-center gap-3">
+                    <!-- AI Pipeline Phase Indicator -->
+                    <div id="ai-phase-indicator" class="flex items-center gap-1 border border-slate-800 px-2 py-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-700" id="ai-phase-dot"></span>
+                        <span id="ai-phase-label" class="text-[8px] font-['Space_Grotesk'] font-bold text-slate-700 uppercase tracking-widest">AI OFFLINE</span>
+                    </div>
                     <button class="text-slate-500 hover:text-sky-300 hover:bg-slate-800/50 p-1 duration-75 ease-in-out">
                         <span class="material-symbols-outlined text-[20px]">satellite_alt</span>
                     </button>
@@ -344,6 +358,74 @@ const SharedComponents = {
         SharedComponents.initHeader(currentPage);
         SharedComponents.initSidebar(currentPage);
         SharedComponents.initZuluClock();
+        SharedComponents.initAIUpdates();
+    },
+
+    initAIUpdates: () => {
+        const PHASE_COLORS = {
+            SCAN:    { dot: '#38bdf8', label: 'AI: SCANNING' },
+            DETECT:  { dot: '#f59e0b', label: 'AI: DETECTING' },
+            SUGGEST: { dot: '#a78bfa', label: 'AI: SUGGESTING' },
+            PROTECT: { dot: '#f87171', label: 'AI: PROTECTING' },
+            REPORT:  { dot: '#34d399', label: 'AI: REPORTING' },
+        };
+
+        window.addEventListener('ai-update', (e) => {
+            const { phase } = e.detail;
+            const bar = document.getElementById('ai-threat-bar');
+            const val = document.getElementById('ai-threat-value');
+            const dot = document.getElementById('ai-phase-dot');
+            const label = document.getElementById('ai-phase-label');
+
+            // Update phase indicator
+            if (dot && label && PHASE_COLORS[phase]) {
+                dot.style.backgroundColor = PHASE_COLORS[phase].dot;
+                dot.style.boxShadow = `0 0 6px ${PHASE_COLORS[phase].dot}`;
+                label.textContent = PHASE_COLORS[phase].label;
+                label.style.color = PHASE_COLORS[phase].dot;
+            }
+
+            // Update threat bar
+            if (bar && val && window.AISystem) {
+                const score = window.AISystem.state.threatScore;
+                bar.style.width = `${score}%`;
+                val.textContent = `${score}%`;
+                if (score > 70) bar.className = 'absolute top-0 left-0 h-full bg-error transition-all duration-1000';
+                else if (score > 40) bar.className = 'absolute top-0 left-0 h-full bg-amber-500 transition-all duration-1000';
+                else bar.className = 'absolute top-0 left-0 h-full bg-sky-500 transition-all duration-1000';
+            }
+
+            if (window.AISystem?.state.hitlPending) {
+                SharedComponents.showHITLCard();
+            }
+        });
+    },
+
+    showHITLCard: () => {
+        if (document.getElementById('ai-hitl-card')) return;
+        
+        const suggestion = window.AISystem.state.suggestions[0];
+        const card = document.createElement('div');
+        card.id = 'ai-hitl-card';
+        card.className = "fixed top-20 right-6 w-80 bg-slate-950 border-2 border-sky-500 shadow-[0_0_20px_rgba(130,207,255,0.2)] z-[100] p-4 animate-in slide-in-from-right fade-in";
+        card.innerHTML = `
+            <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-2">
+                <span class="material-symbols-outlined text-sky-500">psychology</span>
+                <span class="font-['Space_Grotesk'] text-xs font-bold text-sky-400 uppercase tracking-widest">AI Suggestion</span>
+            </div>
+            <p class="text-slate-300 text-sm mb-4 font-medium">${suggestion.action}</p>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="AISystem.approveAction('${suggestion.id}'); document.getElementById('ai-hitl-card').remove();" 
+                        class="bg-sky-500 hover:bg-sky-400 text-slate-950 text-[10px] font-black py-2 uppercase tracking-tighter">
+                    Approve
+                </button>
+                <button onclick="AISystem.rejectAction('${suggestion.id}'); document.getElementById('ai-hitl-card').remove();"
+                        class="bg-slate-900 border border-slate-700 text-slate-500 hover:text-white text-[10px] font-black py-2 uppercase tracking-tighter">
+                    Dismiss
+                </button>
+            </div>
+        `;
+        document.body.appendChild(card);
     }
 };
 

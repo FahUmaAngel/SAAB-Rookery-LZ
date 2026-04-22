@@ -69,6 +69,27 @@
                                 y2="0"></line>
                         </svg>
                     </div>
+                    <!-- AI Intercept Vector (Hidden by default) -->
+                    <div id="ai-intercept-vector" class="absolute top-[50%] left-[30%] hidden pointer-events-none">
+                        <div class="flex flex-col items-center">
+                            <span class="text-[9px] font-data-mono text-sky-400 mb-1 uppercase tracking-tighter">AI Reco Intercept Vec</span>
+                            <svg class="w-64 h-64" style="transform: rotate(-30deg); transform-origin: top left;">
+                                <line stroke="#82cfff" stroke-dasharray="4 4" stroke-width="2" x1="0" x2="200" y1="0" y2="0"></line>
+                                <circle cx="200" cy="0" r="4" fill="#82cfff" class="animate-ping"></circle>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <!-- AI Geofencing Alert Zone (Hidden by default, activates on PROTECT phase) -->
+                <div id="ai-geofence-zone" class="absolute top-[35%] left-[55%] hidden pointer-events-none -translate-x-1/2 -translate-y-1/2">
+                    <div class="relative flex items-center justify-center w-48 h-48">
+                        <div class="absolute inset-0 rounded-full border-2 border-error/60 animate-ping" style="animation-duration: 1.5s;"></div>
+                        <div class="absolute inset-4 rounded-full border border-error/30"></div>
+                        <div class="bg-slate-950/80 border border-error/50 px-2 py-1 text-center">
+                            <span class="text-[8px] font-data-mono text-error uppercase tracking-widest block">⚠ GEOFENCE</span>
+                            <span class="text-[7px] font-data-mono text-error/70 uppercase block">PROTECT ZONE BREACH</span>
+                        </div>
+                    </div>
                 </div>
                 <!-- Map Controls -->
                 <div class="absolute bottom-6 left-6 flex gap-2">
@@ -150,6 +171,11 @@
                         </div>
                         <!-- Action Buttons -->
                         <div class="pt-2 flex flex-col gap-2">
+                                                        <button onclick="triggerAIScan()"
+                                class="w-full bg-sky-950/50 hover:bg-sky-900 border border-sky-500 text-sky-400 font-label-caps text-label-caps uppercase py-3 transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-sm animate-spin-slow">psychology</span>
+                                AI Tactical Scan
+                            </button>
                             <button
                                 class="w-full bg-[#00AEEF] hover:bg-sky-400 text-slate-950 font-label-caps text-label-caps uppercase py-3 border border-[#00AEEF] transition-colors">Designate
                                 Target</button>
@@ -163,7 +189,34 @@
         </main>
     </div>
 
+    <script src="./ai-system.js"></script>
     <script src="./shared-components.js"></script>
+    <script>
+        // AI Integration for Map
+        window.addEventListener('ai-update', (e) => {
+            if (e.detail.phase === 'SUGGEST') {
+                const vector = document.getElementById('ai-intercept-vector');
+                if (vector) {
+                    vector.classList.remove('hidden');
+                    vector.classList.add('animate-pulse');
+                }
+            }
+            if (e.detail.phase === 'PROTECT') {
+                const geofence = document.getElementById('ai-geofence-zone');
+                if (geofence) {
+                    geofence.classList.remove('hidden');
+                }
+            }
+        });
+
+        function triggerAIScan() {
+            AISystem.scan({
+                speed: 1150,
+                distance: 42,
+                iff: false
+            });
+        }
+    </script>
 </body>
 
 </html>

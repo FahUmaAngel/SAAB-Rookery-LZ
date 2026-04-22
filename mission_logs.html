@@ -216,6 +216,21 @@
 </div>
 </div>
 </div>
+<!-- AI Decision Audit Log (Dynamic) -->
+<div class="bg-surface-container-low border border-sky-500/30 p-panel-padding">
+    <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-4">
+        <h4 class="font-label-caps text-label-caps text-sky-500 uppercase flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">psychology</span>
+            AI Decision Audit Log
+        </h4>
+        <span class="text-[8px] font-data-mono text-slate-600 uppercase">Continuous Monitoring Active</span>
+    </div>
+    <div id="ai-audit-log" class="space-y-2 max-h-[200px] overflow-y-auto custom-scrollbar">
+        <div class="text-center py-6 text-slate-700 font-data-mono text-xs uppercase italic">
+            Waiting for AI Pipeline data...
+        </div>
+    </div>
+</div>
 <!-- Reporting Console -->
 <div class="bg-surface-container-low border border-slate-800 p-panel-padding flex gap-4 mt-auto">
 <button class="flex-1 bg-transparent border border-slate-600 text-on-surface hover:bg-slate-800 hover:border-slate-400 py-2 px-4 font-headline-md text-[12px] uppercase tracking-wider transition-colors flex justify-center items-center gap-2">
@@ -234,5 +249,23 @@
 </section>
 </main>
 </div>
+<script src="./ai-system.js"></script>
 <script src="./shared-components.js"></script>
+<script>
+    window.addEventListener('ai-update', (e) => {
+        const auditContainer = document.getElementById('ai-audit-log');
+        if (!auditContainer) return;
+        if (auditContainer.querySelector('.text-center')) auditContainer.innerHTML = '';
+        const logItem = document.createElement('div');
+        logItem.className = "flex gap-4 border-l-2 border-sky-500 pl-4 py-2 bg-sky-950/10 mb-2";
+        logItem.innerHTML = `
+            <div class="w-20 font-data-mono text-[10px] text-sky-500 shrink-0">${e.detail.timestamp}</div>
+            <div class="flex-1">
+                <div class="font-label-caps text-[9px] text-sky-400 uppercase font-bold tracking-wider">${e.detail.phase}</div>
+                <div class="font-data-mono text-[11px] text-slate-300 mt-0.5">${e.detail.message}</div>
+            </div>
+        `;
+        auditContainer.prepend(logItem);
+    });
+</script>
 </body></html>
