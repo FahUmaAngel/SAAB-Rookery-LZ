@@ -22,10 +22,16 @@
 <h2 class="font-headline-lg text-headline-lg text-on-surface mb-1 uppercase">Fleet Management</h2>
 <p class="font-data-mono text-data-mono text-outline">SYS: ONLINE // REFRESH: LIVE</p>
 </div>
+<div class="flex gap-2">
+<button onclick="AISystem.recommendAsset('Baltic Sea')" class="bg-sky-950 border border-sky-500 text-sky-400 px-4 py-2 font-label-caps text-label-caps flex items-center gap-2 hover:bg-sky-900 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[14px] animate-pulse">psychology</span>
+                AI OPTIMIZE SCRAMBLE
+            </button>
 <button class="bg-primary-container/10 border border-primary text-primary px-4 py-2 font-label-caps text-label-caps flex items-center gap-2 hover:bg-primary-container/20">
 <span class="material-symbols-outlined text-[14px]">sync</span>
                 FORCE REFRESH
             </button>
+</div>
 </div>
 <!-- Main Bento Grid -->
 <div class="grid grid-cols-12 gap-gutter">
@@ -88,7 +94,7 @@
 <h3 class="font-label-caps text-label-caps text-primary uppercase border-b border-outline-variant pb-2">Tactical Wing Status</h3>
 <div class="grid grid-cols-3 gap-gutter h-full">
 <!-- F7 Såtenäs -->
-<div class="bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden group">
+<div id="base-f7-såtenäs" class="base-card bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden group transition-all duration-500">
 <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]"></div>
 <div class="relative z-10 flex-1">
 <div class="flex justify-between items-center mb-6 border-b border-surface-variant pb-2">
@@ -114,7 +120,7 @@
 </div>
 </div>
 <!-- F17 Kallinge -->
-<div class="bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden">
+<div id="base-f17-kallinge" class="base-card bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden transition-all duration-500">
 <div class="relative z-10 flex-1">
 <div class="flex justify-between items-center mb-6 border-b border-surface-variant pb-2">
 <span class="font-headline-md text-headline-md text-on-surface uppercase">F17 Kallinge</span>
@@ -139,7 +145,7 @@
 </div>
 </div>
 <!-- F21 Luleå -->
-<div class="bg-surface-container-low border border-error/50 p-panel-padding flex flex-col relative overflow-hidden">
+<div id="base-f21-luleå" class="base-card bg-surface-container-low border border-error/50 p-panel-padding flex flex-col relative overflow-hidden transition-all duration-500">
 <div class="absolute top-0 right-0 w-8 h-8 bg-error/10 border-l border-b border-error/30 flex items-center justify-center">
 <span class="material-symbols-outlined text-[16px] text-error">warning</span>
 </div>
@@ -268,5 +274,27 @@
 </div>
 </div>
 </main>
-<script src="./shared-components.js"></script>
+    <script src="./ai-system.js"></script>
+    <script src="./shared-components.js"></script>
+    <script>
+        window.addEventListener('ai-asset-recommendation', (e) => {
+            const recommendedBase = e.detail.baseName.toLowerCase();
+            document.querySelectorAll('.base-card').forEach(card => {
+                card.classList.remove('border-sky-500', 'shadow-[0_0_20px_rgba(130,207,255,0.4)]', 'scale-[1.02]', 'z-20');
+                card.classList.add('border-outline-variant');
+            });
+            const targetId = `base-${recommendedBase.replace(' ', '-')}`;
+            const targetCard = document.getElementById(targetId);
+            if (targetCard) {
+                targetCard.classList.remove('border-outline-variant');
+                targetCard.classList.add('border-sky-500', 'shadow-[0_0_20px_rgba(130,207,255,0.4)]', 'scale-[1.02]', 'z-20');
+                if (!targetCard.querySelector('.ai-badge')) {
+                    const badge = document.createElement('div');
+                    badge.className = "ai-badge absolute top-0 left-0 bg-sky-500 text-slate-950 font-black text-[8px] px-2 py-0.5 z-30 uppercase tracking-tighter";
+                    badge.textContent = "AI RECOMMENDED";
+                    targetCard.appendChild(badge);
+                }
+            }
+        });
+    </script>
 </body></html>
