@@ -178,8 +178,12 @@
 <!-- Warning tape top -->
 <div class="absolute top-0 left-0 right-0 h-1 bg-[repeating-linear-gradient(45deg,#f1c100,#f1c100_4px,#201f1f_4px,#201f1f_8px)] opacity-50"></div>
 <span class="font-label-caps text-label-caps text-on-surface uppercase mt-2">AUTHORIZATION TERMINAL</span>
-<button class="w-full py-3 bg-surface hover:bg-surface-bright border border-outline text-on-surface font-label-caps text-label-caps flex items-center justify-center gap-2 transition-colors rounded-none">
-<span class="material-symbols-outlined text-[16px]">campaign</span>
+                    <button onclick="startAISimulation()" class="w-full py-3 mb-2 bg-sky-950 border border-sky-500 text-sky-400 font-label-caps text-label-caps flex items-center justify-center gap-2 transition-all hover:bg-sky-900 active:scale-95 rounded-none">
+                        <span class="material-symbols-outlined text-[16px] animate-pulse">psychology</span>
+                        RUN AI THREAT SCAN
+                    </button>
+                    <button class="w-full py-3 bg-surface hover:bg-surface-bright border border-outline text-on-surface font-label-caps text-label-caps flex items-center justify-center gap-2 transition-colors rounded-none">
+                        <span class="material-symbols-outlined text-[16px]">campaign</span>
                         AUTHORIZE RADIO WARNING
                     </button>
 <button class="w-full py-3 bg-surface hover:bg-tertiary-container/20 border border-tertiary text-tertiary font-label-caps text-label-caps flex items-center justify-center gap-2 transition-colors rounded-none">
@@ -194,5 +198,16 @@
 </div>
 </div>
  </main>
-<script src="./shared-components.js"></script>
+    <script src="./ai-system.js"></script>
+    <script src="./shared-components.js"></script>
+    <script>
+        // Simulation for Demo
+        function startAISimulation() {
+            AISystem.scan({
+                speed: 1200,
+                distance: 12.4,
+                iff: false
+            });
+        }
+    </script>
 </body></html>
