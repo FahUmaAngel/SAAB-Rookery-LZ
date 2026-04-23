@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
+<html class="dark" lang="en">
+<head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>C2 // TACTICAL OVERWATCH</title>
@@ -15,47 +15,109 @@
 <div id="sidebar-placeholder"></div>
 <!-- Main Canvas -->
 <main class="h-full p-gutter flex gap-gutter overflow-hidden relative hex-bg">
-<!-- Center Tactical Map (Fluid) -->
+<style>
+    /* ── Leaflet overrides for tactical dark theme ── */
+    .leaflet-container { background: #0a0e14 !important; font-family: 'Inter', sans-serif; }
+    .leaflet-control-zoom a { background: #1a1f2e !important; color: #82cfff !important; border: 1px solid #3e4850 !important; }
+    .leaflet-control-zoom a:hover { background: #252b3b !important; }
+    .leaflet-control-attribution { display: none !important; }
+
+    /* ── Radar sweep conic gradient overlay ── */
+    .radar-sweep-overlay {
+        background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 270deg, rgba(130,207,255,0.12) 330deg, rgba(130,207,255,0.25) 360deg);
+        border-radius: 50%;
+        animation: radarSweep 4s linear infinite;
+    }
+    @keyframes radarSweep {
+        0%   { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* ── Node pulse animation ── */
+    @keyframes nodePulse {
+        0%, 100% { box-shadow: 0 0 4px rgba(130,207,255,0.8), 0 0 8px rgba(130,207,255,0.4); }
+        50%      { box-shadow: 0 0 8px rgba(130,207,255,1), 0 0 20px rgba(130,207,255,0.6); }
+    }
+    .node-dot { animation: nodePulse 2s ease-in-out infinite; }
+
+    /* ── Hostile diamond pulse ── */
+    @keyframes hostilePulse {
+        0%, 100% { box-shadow: 0 0 6px rgba(255,180,171,0.8); transform: rotate(45deg) scale(1); }
+        50%      { box-shadow: 0 0 14px rgba(255,85,85,1); transform: rotate(45deg) scale(1.15); }
+    }
+    .hostile-diamond { animation: hostilePulse 1.5s ease-in-out infinite; }
+
+    /* ── Friendly track pulse ── */
+    @keyframes friendlyPulse {
+        0%, 100% { box-shadow: 0 0 4px rgba(130,207,255,0.8); }
+        50%      { box-shadow: 0 0 12px rgba(130,207,255,1); }
+    }
+    .friendly-dot { animation: friendlyPulse 2s ease-in-out infinite; }
+
+    /* ── ICEYE swath shimmer ── */
+    @keyframes swathShimmer {
+        0%, 100% { opacity: 0.06; }
+        50%      { opacity: 0.12; }
+    }
+
+    /* ── Leaflet popup override ── */
+    .leaflet-popup-content-wrapper { background: rgba(10,14,20,0.95) !important; border: 1px solid #3e4850 !important; border-radius: 4px !important; color: #e5e2e1 !important; font-family: 'Inter', sans-serif !important; box-shadow: 0 0 20px rgba(0,0,0,0.5) !important; }
+    .leaflet-popup-tip { background: rgba(10,14,20,0.95) !important; border: 1px solid #3e4850 !important; }
+    .leaflet-popup-content { margin: 8px 12px !important; font-size: 11px !important; line-height: 1.6 !important; }
+</style>
+
+<!-- ══════════════════════════════════════════════
+     CENTER: Interactive Leaflet Map View
+     ══════════════════════════════════════════════ -->
 <section class="flex-grow flex flex-col relative bg-surface-container border border-outline-variant rounded-DEFAULT overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
-<div class="absolute inset-0 w-full h-full opacity-30 mix-blend-screen bg-cover bg-center" data-alt="High altitude satellite view of the Baltic Sea region in deep blues and black, subtle glowing coastlines, dark tactical aesthetic" data-location="Baltic Sea" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAtY3EOyN-2ZK7CYOBzTJ4xQKYV__5E2ehu_hy5ahEUFszNcvNl0Pz1-Pqgg6xQyaT3V6-7WZO0vgJq9STQaf3JmCMa3QeI7FRabXDjj1ZIeDrQEuhmykTElB2sw3ho-V44ZY7z7ct83x81851Lg7xb-mY2KVVUowRV81tdWOa4FRQxrX6Gx70CI1klfD507P4BgmyJynQxq7ijdhfcfY7UiwPferM4-j2gl6gv13D2S0CXSOeXhXCu78A9-fRwymLXFl1uK5yzbj7i');"></div>
-<!-- Map Overlay UI -->
-<div class="absolute inset-0 p-panel-padding flex flex-col justify-between pointer-events-none">
-<div class="flex justify-between items-start">
-<div class="font-label-caps text-label-caps text-outline bg-surface/80 px-2 py-1 border border-outline-variant backdrop-blur-sm">
-                        MAP VIEW // OP AREA: BALTIC REGION // GRID: 34T CM
-                    </div>
-<div class="flex gap-2">
-<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-<span class="font-data-mono text-data-mono text-primary bg-surface/80 px-2 py-1 border border-primary/30 backdrop-blur-sm">DATALINK SYNCED</span>
-</div>
-</div>
-<!-- Central Radar Emulation -->
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-primary/20 rounded-full flex items-center justify-center">
-<div class="w-full h-full radar-sweep opacity-40"></div>
-<div class="absolute w-64 h-64 border border-outline-variant/30 rounded-full"></div>
-<div class="absolute w-32 h-32 border border-outline-variant/30 rounded-full"></div>
-<div class="absolute w-[1px] h-full bg-outline-variant/30"></div>
-<div class="absolute h-[1px] w-full bg-outline-variant/30"></div>
-<!-- Tactical Track (Unknown) -->
-<div class="absolute top-1/3 left-2/3 flex flex-col items-center">
-<div class="w-3 h-3 border-2 border-error rotate-45 animate-pulse bg-error/20"></div>
-<span class="font-data-mono text-[10px] text-error mt-1 bg-surface-dim/80 px-1">TRK-U99</span>
-</div>
-<!-- Tactical Track (Friendly) -->
-<div class="absolute bottom-1/3 left-1/4 flex flex-col items-center">
-<div class="w-3 h-3 rounded-full bg-primary border-2 border-primary-fixed"></div>
-<span class="font-data-mono text-[10px] text-primary mt-1 bg-surface-dim/80 px-1">BLU-01</span>
-</div>
-</div>
-<div class="flex justify-end pointer-events-auto">
-<div class="bg-surface-container border border-outline-variant p-2 flex flex-col gap-2 backdrop-blur-md">
-<button class="w-8 h-8 flex items-center justify-center bg-surface-variant hover:bg-primary/20 border border-outline-variant hover:border-primary transition-colors"><span class="material-symbols-outlined text-[16px]">add</span></button>
-<button class="w-8 h-8 flex items-center justify-center bg-surface-variant hover:bg-primary/20 border border-outline-variant hover:border-primary transition-colors"><span class="material-symbols-outlined text-[16px]">remove</span></button>
-<button class="w-8 h-8 flex items-center justify-center bg-surface-variant hover:bg-primary/20 border border-outline-variant hover:border-primary transition-colors"><span class="material-symbols-outlined text-[16px]">my_location</span></button>
-</div>
-</div>
-</div>
+
+    <!-- Leaflet Map Container -->
+    <div id="map-view-container" class="absolute inset-0 w-full h-full z-0"></div>
+
+    <!-- ── HUD Overlay ── -->
+    <div class="absolute inset-0 pointer-events-none z-[500] p-panel-padding flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+            <div class="font-label-caps text-label-caps text-outline bg-surface/80 px-2 py-1 border border-outline-variant backdrop-blur-sm">
+                MAP VIEW // OP AREA: BALTIC REGION // GRID: 34T CM
+            </div>
+            <div class="flex gap-2 items-center">
+                <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                <span class="font-data-mono text-data-mono text-primary bg-surface/80 px-2 py-1 border border-primary/30 backdrop-blur-sm">DATALINK SYNCED</span>
+            </div>
+        </div>
+
+        <!-- ── Bottom HUD ── -->
+        <div class="flex justify-between items-end">
+            <!-- Legend -->
+            <div class="bg-surface/90 border border-outline-variant backdrop-blur-sm px-3 py-2 flex flex-col gap-1.5">
+                <span class="font-label-caps text-[8px] text-outline tracking-widest mb-0.5">LEGEND</span>
+                <div class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 rounded-full bg-primary" style="box-shadow:0 0 4px rgba(130,207,255,0.8);"></div>
+                    <span class="font-data-mono text-[10px] text-on-surface-variant">FRIENDLY TRACK</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 bg-error rotate-45" style="margin: 0 1px;"></div>
+                    <span class="font-data-mono text-[10px] text-on-surface-variant">HOSTILE TRACK</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 bg-[#555] border border-[#777]" style="margin: 0 1px;"></div>
+                    <span class="font-data-mono text-[10px] text-on-surface-variant">AIR BASE</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-5 h-2 bg-error/15 border border-error/30" style="clip-path: polygon(40% 0%, 100% 0%, 100% 100%, 0% 100%);"></div>
+                    <span class="font-data-mono text-[10px] text-on-surface-variant">AI PROB. CONE</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-5 h-2 bg-primary/10 border border-primary/20"></div>
+                    <span class="font-data-mono text-[10px] text-on-surface-variant">ICEYE SWATH</span>
+                </div>
+            </div>
+            <!-- Zoom controls -->
+            <div></div>
+        </div>
+    </div>
 </section>
+
 <!-- Right Telemetry Sidebar (Fixed Width) -->
 <aside class="w-[360px] flex flex-col gap-gutter overflow-y-auto pr-1 pb-1 scrollbar-hide">
 <!-- Threat Level Box -->
@@ -189,6 +251,431 @@
 </div>
 </div>
 </aside>
+
+<!-- ══════════════════════════════════════════════
+     MAP VIEW — Leaflet Init (SPA-compatible)
+     ══════════════════════════════════════════════ -->
+<script>
+(function initMapView() {
+    // Ensure Leaflet CSS is loaded
+    if (!document.getElementById('leaflet-css')) {
+        const link = document.createElement('link');
+        link.id = 'leaflet-css';
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+    }
+
+    // Cleanup previous map instance
+    if (window.mapViewInstance) {
+        window.mapViewInstance.remove();
+        window.mapViewInstance = null;
+    }
+
+    function loadLeafletJS(callback) {
+        if (typeof L !== 'undefined') { callback(); return; }
+        if (document.getElementById('leaflet-js')) {
+            const checkL = setInterval(() => {
+                if (typeof L !== 'undefined') { clearInterval(checkL); callback(); }
+            }, 50);
+            return;
+        }
+        const script = document.createElement('script');
+        script.id = 'leaflet-js';
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.onload = callback;
+        document.head.appendChild(script);
+    }
+
+    loadLeafletJS(() => {
+
+        // ── Initialize Map ──
+        const map = L.map('map-view-container', {
+            center: [60.0, 19.0],
+            zoom: 5,
+            zoomControl: false,
+            attributionControl: false,
+            minZoom: 4,
+            maxZoom: 10
+        });
+        window.mapViewInstance = map;
+
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // ── Dark tactical base tiles (no labels) ──
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+
+
+        // ══════════════════════════════════════════
+        //  SOVEREIGN AIRSPACE BOUNDARY (12nm)
+        // ══════════════════════════════════════════
+
+        // Simplified Swedish coastal 12nm line (offset seaward)
+        const sovereignBoundary = [
+            [55.40, 12.95], [55.45, 14.30], [56.15, 16.10], [56.55, 16.55],
+            [57.30, 16.80], [57.75, 16.75], [58.40, 16.95], [58.80, 17.10],
+            [59.10, 17.30], [59.45, 17.50], [59.80, 17.90], [60.15, 18.10],
+            [60.35, 18.70], [60.50, 19.20], [60.40, 19.80],
+            // Gotland eastern coast
+            [57.95, 19.50], [57.50, 18.80], [57.10, 18.55],
+        ];
+
+        L.polyline(sovereignBoundary, {
+            color: '#ff6b6b',
+            weight: 1.5,
+            dashArray: '8 6',
+            opacity: 0.45,
+            interactive: false
+        }).addTo(map);
+
+        // Gotland sovereign ring
+        const gotlandSovereign = [
+            [57.95, 19.50], [58.00, 19.00], [57.90, 18.50],
+            [57.50, 18.10], [57.10, 18.20], [56.90, 18.60],
+            [57.00, 19.10], [57.30, 19.40], [57.70, 19.60], [57.95, 19.50]
+        ];
+
+        L.polyline(gotlandSovereign, {
+            color: '#ff6b6b',
+            weight: 1,
+            dashArray: '6 8',
+            opacity: 0.3,
+            interactive: false
+        }).addTo(map);
+
+        // Label for sovereign line
+        const sovLabel = L.divIcon({
+            className: '',
+            html: `<div style="
+                font-family:'Inter',monospace; font-size:7px; font-weight:600;
+                letter-spacing:0.12em; color:rgba(255,107,107,0.5);
+                white-space:nowrap; pointer-events:none;
+                transform: rotate(-20deg); transform-origin: left center;
+            ">12 NM SOVEREIGN LIMIT</div>`,
+            iconSize: [120, 12],
+            iconAnchor: [0, 6]
+        });
+        L.marker([58.0, 17.4], { icon: sovLabel, interactive: false }).addTo(map);
+
+
+        // ══════════════════════════════════════════
+        //  AIR BASES (F7, F17, F21)
+        // ══════════════════════════════════════════
+
+        const airBases = [
+            { name: 'F7',  fullName: 'F7 SÅTENÄS',  lat: 58.4300, lng: 12.7100, wing: 'WING 7',  status: 'READY',     statusColor: '#82cfff', highlight: false },
+            { name: 'F17', fullName: 'F17 KALLINGE',  lat: 56.2600, lng: 15.2636, wing: 'WING 17', status: 'SCRAMBLED', statusColor: '#ffb4ab', highlight: true },
+            { name: 'F21', fullName: 'F21 LULEÅ',     lat: 65.5848, lng: 22.1567, wing: 'WING 21', status: 'READY',     statusColor: '#82cfff', highlight: false },
+        ];
+
+        airBases.forEach(base => {
+            const borderColor = base.highlight ? '#ffb4ab' : '#666';
+            const bgColor = base.highlight ? 'rgba(255,180,171,0.15)' : 'rgba(80,80,80,0.4)';
+            const glowStyle = base.highlight
+                ? 'box-shadow: 0 0 8px rgba(255,180,171,0.4), 0 0 16px rgba(255,180,171,0.15);'
+                : '';
+            const labelColor = base.highlight ? '#ffb4ab' : '#888';
+
+            const baseIcon = L.divIcon({
+                className: '',
+                html: `
+                    <div style="position:relative; width:24px; height:32px;">
+                        <div style="
+                            position:absolute; top:2px; left:50%; transform:translateX(-50%);
+                            width:12px; height:12px;
+                            background: ${bgColor};
+                            border: 1.5px solid ${borderColor};
+                            ${glowStyle}
+                        "></div>
+                        <div style="
+                            position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+                            font-family:'Inter',monospace; font-size:8px; font-weight:700;
+                            letter-spacing:0.08em; color:${labelColor};
+                            white-space:nowrap;
+                        ">${base.name}</div>
+                    </div>
+                `,
+                iconSize: [24, 32],
+                iconAnchor: [12, 16]
+            });
+
+            const marker = L.marker([base.lat, base.lng], { icon: baseIcon, zIndexOffset: 400 }).addTo(map);
+            marker.bindPopup(`
+                <div style="font-family:'Inter',monospace;">
+                    <div style="color:${base.statusColor}; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">${base.fullName}</div>
+                    <div style="color:#87929b; font-size:9px;">${base.wing}</div>
+                    <div style="color:${base.statusColor}; font-size:9px; margin-top:4px; font-weight:600;">● STATUS: ${base.status}</div>
+                </div>
+            `);
+        });
+
+
+        // ══════════════════════════════════════════
+        //  HOSTILE TRACK — TRK-U99
+        // ══════════════════════════════════════════
+
+        const hostilePos = [58.5, 21.8];
+        const hostileHeading = 270; // West
+
+        // Diamond icon
+        const hostileIcon = L.divIcon({
+            className: '',
+            html: `
+                <div style="position:relative; width:30px; height:40px;">
+                    <div class="hostile-diamond" style="
+                        position:absolute; top:4px; left:50%; transform:translateX(-50%) rotate(45deg);
+                        width:12px; height:12px;
+                        background: rgba(255,100,90,0.3);
+                        border: 2px solid #ffb4ab;
+                        box-shadow: 0 0 8px rgba(255,180,171,0.6);
+                    "></div>
+                    <div style="
+                        position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+                        font-family:'Inter',monospace; font-size:9px; font-weight:700;
+                        letter-spacing:0.08em; color:#ffb4ab;
+                        text-shadow: 0 0 6px rgba(255,180,171,0.5);
+                        white-space:nowrap;
+                    ">TRK-U99</div>
+                </div>
+            `,
+            iconSize: [30, 40],
+            iconAnchor: [15, 20]
+        });
+
+        L.marker(hostilePos, { icon: hostileIcon, zIndexOffset: 1000 }).addTo(map)
+            .bindPopup(`
+                <div style="font-family:'Inter',monospace;">
+                    <div style="color:#ffb4ab; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">TRK-U99 — UNKNOWN / HOSTILE</div>
+                    <div style="color:#87929b; font-size:9px;">CLASSIFICATION: PENDING</div>
+                    <div style="color:#87929b; font-size:9px;">SPEED: 850 KTS</div>
+                    <div style="color:#87929b; font-size:9px;">ALT: 28,000 FT</div>
+                    <div style="color:#87929b; font-size:9px;">BRG: 270° TRUE (WEST)</div>
+                    <div style="color:#ffb4ab; font-size:9px; margin-top:4px; font-weight:600;">⚠ TRANSPONDER: OFF</div>
+                </div>
+            `);
+
+
+        // ── AI Probability Cone ──
+        // Widening polygon in front of TRK-U99 showing 10-min prediction
+        const coneTip = hostilePos;
+        const coneNarrow1 = [58.60, 20.5];
+        const coneNarrow2 = [58.40, 20.5];
+        const coneMid1    = [58.80, 19.0];
+        const coneMid2    = [58.20, 19.0];
+        const coneWide1   = [59.10, 17.2];
+        const coneWide2   = [57.90, 17.2];
+
+        L.polygon([coneTip, coneNarrow1, coneMid1, coneWide1, coneWide2, coneMid2, coneNarrow2], {
+            color: 'rgba(255,180,171,0.25)',
+            weight: 1,
+            fillColor: 'rgba(255,100,90,0.06)',
+            fillOpacity: 1,
+            dashArray: '4 6',
+            interactive: false
+        }).addTo(map);
+
+        // AI Cone label
+        const coneLabel = L.divIcon({
+            className: '',
+            html: `<div style="
+                font-family:'Inter',monospace; font-size:7px; font-weight:600;
+                letter-spacing:0.1em; color:rgba(255,180,171,0.5);
+                white-space:nowrap; pointer-events:none;
+                background: rgba(10,14,20,0.6); padding: 1px 4px;
+                border: 1px solid rgba(255,180,171,0.15);
+            ">AI PROB. CONE — 10 MIN</div>`,
+            iconSize: [140, 14],
+            iconAnchor: [70, 7]
+        });
+        L.marker([58.5, 18.5], { icon: coneLabel, interactive: false }).addTo(map);
+
+        // Trajectory "center line" through the cone
+        L.polyline([hostilePos, [58.5, 16.5]], {
+            color: '#ffb4ab',
+            weight: 1,
+            dashArray: '4 8',
+            opacity: 0.4,
+            interactive: false
+        }).addTo(map);
+
+
+        // ══════════════════════════════════════════
+        //  FRIENDLY TRACK — BLU-01
+        // ══════════════════════════════════════════
+
+        const friendlyPos = [57.0, 16.5]; // Scrambled from F17 heading NE
+
+        const friendlyIcon = L.divIcon({
+            className: '',
+            html: `
+                <div style="position:relative; width:30px; height:36px;">
+                    <div class="friendly-dot" style="
+                        position:absolute; top:4px; left:50%; transform:translateX(-50%);
+                        width:10px; height:10px; border-radius:50%;
+                        background: #82cfff;
+                        border: 2px solid #c6e7ff;
+                    "></div>
+                    <div style="
+                        position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+                        font-family:'Inter',monospace; font-size:9px; font-weight:700;
+                        letter-spacing:0.08em; color:#82cfff;
+                        text-shadow: 0 0 6px rgba(130,207,255,0.5);
+                        white-space:nowrap;
+                    ">BLU-01</div>
+                </div>
+            `,
+            iconSize: [30, 36],
+            iconAnchor: [15, 18]
+        });
+
+        L.marker(friendlyPos, { icon: friendlyIcon, zIndexOffset: 1000 }).addTo(map)
+            .bindPopup(`
+                <div style="font-family:'Inter',monospace;">
+                    <div style="color:#82cfff; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">BLU-01 — FRIENDLY</div>
+                    <div style="color:#87929b; font-size:9px;">TYPE: JAS 39 GRIPEN</div>
+                    <div style="color:#87929b; font-size:9px;">ORIGIN: F17 KALLINGE</div>
+                    <div style="color:#87929b; font-size:9px;">MISSION: INTERCEPT TRK-U99</div>
+                    <div style="color:#87929b; font-size:9px;">SPEED: MACH 1.4</div>
+                    <div style="color:#87929b; font-size:9px;">ALT: 30,000 FT</div>
+                    <div style="color:#82cfff; font-size:9px; margin-top:4px; font-weight:600;">● SQUAWK: 7401</div>
+                </div>
+            `);
+
+        // BLU-01 departure trail from F17
+        L.polyline([[56.2600, 15.2636], friendlyPos], {
+            color: '#82cfff',
+            weight: 1,
+            dashArray: '3 6',
+            opacity: 0.25,
+            interactive: false
+        }).addTo(map);
+
+        // BLU-01 intercept heading toward TRK-U99
+        L.polyline([friendlyPos, [58.0, 19.5]], {
+            color: '#82cfff',
+            weight: 1.5,
+            dashArray: '6 4',
+            opacity: 0.4,
+            interactive: false
+        }).addTo(map);
+
+
+        // ══════════════════════════════════════════
+        //  ICEYE SATELLITE SWATH OVERLAY
+        // ══════════════════════════════════════════
+
+        // Angled rectangular swath across the Baltic region
+        const swathCoords = [
+            [62.5, 16.0], [63.5, 22.0],
+            [56.5, 24.0], [55.5, 18.0]
+        ];
+
+        L.polygon(swathCoords, {
+            color: 'rgba(130,207,255,0.12)',
+            weight: 1,
+            fillColor: 'rgba(130,207,255,0.04)',
+            fillOpacity: 1,
+            dashArray: '4 8',
+            interactive: false
+        }).addTo(map);
+
+        // ICEYE Swath label
+        const swathLabel = L.divIcon({
+            className: '',
+            html: `<div style="
+                font-family:'Inter',monospace; font-size:8px; font-weight:600;
+                letter-spacing:0.12em; color:rgba(130,207,255,0.35);
+                white-space:nowrap; pointer-events:none;
+                transform: rotate(-25deg); transform-origin: center center;
+            ">ICEYE SWATH — SAR ACTIVE</div>`,
+            iconSize: [160, 14],
+            iconAnchor: [80, 7]
+        });
+        L.marker([59.5, 20.0], { icon: swathLabel, interactive: false }).addTo(map);
+
+
+        // ══════════════════════════════════════════
+        //  RADAR NODES (from existing map-view)
+        // ══════════════════════════════════════════
+
+        const radarNodes = [
+            { name: 'VISBY',   lat: 57.6348, lng: 18.2948, radius: 180000 },
+            { name: 'UPPSALA', lat: 59.8586, lng: 17.6389, radius: 130000 },
+            { name: 'RONNEBY', lat: 56.2600, lng: 15.2636, radius: 130000 },
+            { name: 'LULEÅ',   lat: 65.5848, lng: 22.1567, radius: 130000 },
+            { name: 'SÅTENÄS', lat: 58.4300, lng: 12.7100, radius: 130000 },
+        ];
+
+        radarNodes.forEach(node => {
+            // Glowing dot
+            const dotIcon = L.divIcon({
+                className: '',
+                html: `
+                    <div style="position:relative; width:16px; height:16px;">
+                        <div style="
+                            position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                            width:6px; height:6px; border-radius:50%;
+                            background: #82cfff;
+                            box-shadow: 0 0 4px rgba(130,207,255,0.7), 0 0 10px rgba(130,207,255,0.3);
+                            animation: nodePulse 3s ease-in-out infinite;
+                        "></div>
+                        <div style="
+                            position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                            width:14px; height:14px; border-radius:50%;
+                            border: 1px solid rgba(130,207,255,0.15);
+                        "></div>
+                    </div>
+                `,
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+            L.marker([node.lat, node.lng], { icon: dotIcon, zIndexOffset: 200 }).addTo(map);
+
+            // Label
+            const labelIcon = L.divIcon({
+                className: '',
+                html: `<div style="
+                    font-family:'Inter',monospace; font-size:8px; font-weight:600;
+                    letter-spacing:0.08em; color:rgba(130,207,255,0.5);
+                    white-space:nowrap; text-align:center; pointer-events:none;
+                ">${node.name}</div>`,
+                iconSize: [70, 12],
+                iconAnchor: [35, -4]
+            });
+            L.marker([node.lat, node.lng], { icon: labelIcon, interactive: false }).addTo(map);
+
+            // Radar coverage circle (very subtle)
+            L.circle([node.lat, node.lng], {
+                radius: node.radius,
+                color: 'rgba(130,207,255,0.12)',
+                weight: 1,
+                fillColor: 'rgba(130,207,255,0.02)',
+                fillOpacity: 1,
+                dashArray: '6 6',
+                interactive: false
+            }).addTo(map);
+        });
+
+        // Central radar sweep decoration
+        const sweepIcon = L.divIcon({
+            className: '',
+            html: `<div class="radar-sweep-overlay" style="
+                position:absolute; top:50%; left:50%;
+                width:300px; height:300px;
+                pointer-events:none; opacity:0.3;
+            "></div>`,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0]
+        });
+        L.marker([59.0, 18.5], { icon: sweepIcon, interactive: false }).addTo(map);
+
+    }); // end loadLeafletJS
+})();
+</script>
 </main>
+</div>
 <script src="./shared-components.js"></script>
 </body></html>
