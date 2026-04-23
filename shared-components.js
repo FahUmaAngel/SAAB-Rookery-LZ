@@ -58,7 +58,7 @@ const SharedComponents = {
                 <!-- Search Bar -->
                 <div class="relative hidden md:flex items-center w-64 border border-outline-variant bg-surface-container/50 px-2 h-7">
                     <span class="material-symbols-outlined text-[16px] text-outline mr-2">search</span>
-                    <input class="bg-transparent border-none outline-none text-data-mono font-data-mono text-on-surface w-full p-0 placeholder-outline" placeholder="QUERY DATABASE..." type="text"/>
+                    <input id="global-search" class="bg-transparent border-none outline-none text-data-mono font-data-mono text-on-surface w-full p-0 placeholder-outline" placeholder="QUERY DATABASE..." type="text"/>
                 </div>
                 <div class="flex items-center gap-4 font-['Space_Grotesk'] font-bold uppercase tracking-tighter text-xs">
                     <!-- AI Threat Meter -->
@@ -72,18 +72,19 @@ const SharedComponents = {
                     <span class="text-error">THREAT: ALPHA</span>
                     <span class="text-slate-500" id="shared-zulu-clock">ZULU 00:00:00</span>
                 </div>
+                <div class="flex items-center gap-2">
                     <!-- AI Pipeline Phase Indicator -->
                     <div id="ai-phase-indicator" class="flex items-center gap-1 border border-slate-800 px-2 py-0.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-slate-700" id="ai-phase-dot"></span>
                         <span id="ai-phase-label" class="text-[8px] font-['Space_Grotesk'] font-bold text-slate-700 uppercase tracking-widest">AI OFFLINE</span>
                     </div>
-                    <button class="text-slate-500 hover:text-sky-300 hover:bg-slate-800/50 p-1 duration-75 ease-in-out">
+                    <button id="btn-satellite" onclick="SharedComponents.handleHeaderBtn('satellite')" class="text-slate-500 hover:text-sky-300 hover:bg-slate-800/50 p-1 duration-75 ease-in-out">
                         <span class="material-symbols-outlined text-[20px]">satellite_alt</span>
                     </button>
-                    <button class="text-slate-500 hover:text-sky-300 hover:bg-slate-800/50 p-1 duration-75 ease-in-out">
+                    <button id="btn-radar" onclick="SharedComponents.handleHeaderBtn('radar')" class="text-slate-500 hover:text-sky-300 hover:bg-slate-800/50 p-1 duration-75 ease-in-out">
                         <span class="material-symbols-outlined text-[20px]">radar</span>
                     </button>
-                    <button class="text-slate-500 hover:text-sky-300 hover:bg-slate-800/50 p-1 duration-75 ease-in-out">
+                    <button id="btn-settings" onclick="SharedComponents.handleHeaderBtn('settings')" class="text-slate-500 hover:text-sky-300 hover:bg-slate-800/50 p-1 duration-75 ease-in-out">
                         <span class="material-symbols-outlined text-[20px]">settings_input_component</span>
                     </button>
                 </div>
@@ -183,7 +184,7 @@ const SharedComponents = {
                     ${linksHtml}
                 </nav>
                 <div class="mt-auto w-full px-2 pb-2 shrink-0">
-                    <button class="w-full bg-slate-900 border border-slate-700 text-sky-500 py-2 rounded-sm hover:bg-slate-800 transition-colors flex items-center justify-center">
+                    <button id="btn-armsys" onclick="SharedComponents.handleArmSys()" class="w-full bg-slate-900 border border-slate-700 text-sky-500 py-2 rounded-sm hover:bg-slate-800 transition-colors flex items-center justify-center">
                         <span class="material-symbols-outlined text-[16px]">bolt</span>
                     </button>
                     <p class="text-[6px] text-slate-700 uppercase font-bold text-center mt-1">ARM SYS</p>
@@ -264,6 +265,8 @@ const SharedComponents = {
             return;
         }
 
+        SharedComponents.showLoading(true);
+        
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -291,11 +294,50 @@ const SharedComponents = {
                     oldScript.replaceWith(newScript);
                 });
 
+                // Execute page-level scripts declared after </main> in fetched pages.
+                // Many pages keep their page controller scripts at the end of <body>,
+                // so navigating via the shared sidebar would otherwise swap markup
+                // without re-running the page logic.
+                const bodyScripts = Array.from(doc.body.querySelectorAll('script'));
+                for (const sourceScript of bodyScripts) {
+                    const src = sourceScript.getAttribute('src');
+                    if (src) {
+                        const resolvedSrc = new URL(src, new URL(url, window.location.href)).href;
+                        const alreadyLoaded = Array.from(document.scripts).some(existing => {
+                            if (!existing.src) return false;
+                            try {
+                                return new URL(existing.src, window.location.href).href === resolvedSrc;
+                            } catch {
+                                return false;
+                            }
+                        });
+                        if (alreadyLoaded) continue;
+
+                        await new Promise((resolve) => {
+                            const scriptEl = document.createElement('script');
+                            Array.from(sourceScript.attributes).forEach(attr =>
+                                scriptEl.setAttribute(attr.name, attr.value)
+                            );
+                            scriptEl.onload = resolve;
+                            scriptEl.onerror = resolve;
+                            document.body.appendChild(scriptEl);
+                        });
+                    } else if (sourceScript.textContent.trim()) {
+                        const scriptEl = document.createElement('script');
+                        scriptEl.textContent = sourceScript.textContent;
+                        document.body.appendChild(scriptEl);
+                        scriptEl.remove();
+                    }
+                }
+
                 // Update active state in sidebar
                 SharedComponents.initSidebar(url);
             }
         } catch (err) {
             console.error('Failed to load content:', err);
+            SharedComponents.showToast('LOAD ERROR', 'Failed to load page', 'error', 'error');
+        } finally {
+            SharedComponents.showLoading(false);
         }
     },
 
@@ -355,10 +397,41 @@ const SharedComponents = {
             document.head.appendChild(styleSheet);
         }
 
+        // Load saved sidebar state
+        SharedComponents.loadState();
+        
+        // Setup event listeners
+        setTimeout(() => SharedComponents.setupEventListeners(), 100);
+
         SharedComponents.initHeader(currentPage);
         SharedComponents.initSidebar(currentPage);
         SharedComponents.initZuluClock();
         SharedComponents.initAIUpdates();
+    },
+
+    setupEventListeners: () => {
+        // Global search
+        const searchInput = document.getElementById('global-search');
+        if (searchInput) {
+            let timeout;
+            searchInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    clearTimeout(timeout);
+                    SharedComponents.handleGlobalSearch(searchInput.value);
+                } else {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        SharedComponents.handleGlobalSearch(searchInput.value);
+                    }, 500);
+                }
+            });
+        }
+        
+        // Save state on sidebar toggle
+        const observer = new MutationObserver(() => {
+            SharedComponents.saveState();
+        });
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
     },
 
     initAIUpdates: () => {
@@ -426,6 +499,184 @@ const SharedComponents = {
             </div>
         `;
         document.body.appendChild(card);
+    },
+
+    handleHeaderBtn: (btnId) => {
+        const actions = {
+            satellite: () => {
+                SharedComponents.showToast('SATELLITE UPLINK', 'Connecting to comms hub...', 'satellite_alt');
+                SharedComponents.handleNav(new Event('click'), './comms.html');
+            },
+            radar: () => {
+                SharedComponents.showToast('RADAR SCAN', 'Opening tactical radar...', 'radar');
+                SharedComponents.handleNav(new Event('click'), './tactical-map.html');
+            },
+            settings: () => {
+                SharedComponents.showSettingsModal();
+            }
+        };
+        if (actions[btnId]) actions[btnId]();
+    },
+
+    handleArmSys: () => {
+        const btn = document.getElementById('btn-armsys');
+        const isArmed = btn?.classList.contains('bg-red-600');
+        
+        if (isArmed) {
+            btn.classList.remove('bg-red-600', 'text-white');
+            btn.classList.add('bg-slate-900', 'text-sky-500');
+            SharedComponents.showToast('ARM SYS', 'WEAPONS DISENGAGED', 'lock', 'error');
+        } else {
+            btn.classList.remove('bg-slate-900', 'text-sky-500');
+            btn.classList.add('bg-red-600', 'text-white', 'animate-pulse');
+            SharedComponents.showToast('ARM SYS', 'WEAPONS ARMED - STAND BY', 'lock_open', 'error');
+        }
+    },
+
+    handleGlobalSearch: (query) => {
+        if (!query || query.length < 2) return;
+        
+        const results = [];
+        const q = query.toLowerCase();
+        
+        const pages = {
+            'map': 'map-view.html',
+            'tactical': 'tactical-map.html',
+            'asset': 'Asset-ready.html',
+            'sensor': 'Sensor-Fusion.html',
+            'fusion': 'Sensor-Fusion.html',
+            'comms': 'comms.html',
+            'logs': 'mission_logs.html',
+            'logistics': 'logistics.html'
+        };
+        
+        Object.keys(pages).forEach(key => {
+            if (key.includes(q) || q.includes(key)) {
+                results.push({ label: key, url: pages[key] });
+            }
+        });
+        
+        if (results.length > 0) {
+            SharedComponents.showToast(`FOUND ${results.length} RESULT(S)`, `Navigate to: ${results[0].label}`, 'search');
+            SharedComponents.handleNav(new Event('click'), results[0].url);
+        } else {
+            SharedComponents.showToast('NO RESULTS', `No matches for "${query}"`, 'search', 'error');
+        }
+    },
+
+    showToast: (title, message, icon = 'info', type = 'primary') => {
+        const existing = document.querySelector('.toast-notification');
+        if (existing) existing.remove();
+        
+        const colors = {
+            primary: 'border-sky-500 text-sky-400',
+            error: 'border-error text-error',
+            success: 'border-green-500 text-green-400',
+            warning: 'border-amber-500 text-amber-400'
+        };
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-notification fixed bottom-6 right-6 w-72 bg-slate-950 border-2 ${colors[type] || colors.primary} shadow-lg z-[200] p-4 animate-in slide-in-from-right`;
+        toast.innerHTML = `
+            <div class="flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined ${colors[type] || colors.primary}">${icon}</span>
+                <span class="font-['Space_Grotesk'] text-xs font-bold uppercase">${title}</span>
+            </div>
+            <p class="text-slate-400 text-sm">${message}</p>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    },
+
+    showLoading: (show = true) => {
+        let loader = document.getElementById('page-loader');
+        if (!show && loader) {
+            loader.remove();
+            return;
+        }
+        if (loader) return;
+        
+        loader = document.createElement('div');
+        loader.id = 'page-loader';
+        loader.className = 'fixed inset-0 bg-slate-950/80 flex items-center justify-center z-[150]';
+        loader.innerHTML = `
+            <div class="flex flex-col items-center gap-4">
+                <div class="w-12 h-12 border-4 border-sky-500/30 border-t-sky-500 rounded-full animate-spin"></div>
+                <span class="font-['Space_Grotesk'] text-sky-400 uppercase text-sm tracking-widest">Loading</span>
+            </div>
+        `;
+        document.body.appendChild(loader);
+    },
+
+    showSettingsModal: () => {
+        if (document.getElementById('settings-modal')) return;
+        
+        const modal = document.createElement('div');
+        modal.id = 'settings-modal';
+        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-[200]';
+        modal.innerHTML = `
+            <div class="bg-slate-900 border border-slate-700 w-[400px] max-w-[90vw]">
+                <div class="p-4 border-b border-slate-700 flex justify-between items-center">
+                    <h3 class="font-['Space_Grotesk'] text-sky-400 uppercase font-bold">System Settings</h3>
+                    <button onclick="document.getElementById('settings-modal').remove()" class="text-slate-500 hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400">Auto-refresh Data</span>
+                        <button class="w-12 h-6 bg-sky-600 rounded-full relative">
+                            <span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></span>
+                        </button>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400">Sound Alerts</span>
+                        <button class="w-12 h-6 bg-slate-700 rounded-full relative">
+                            <span class="absolute left-1 top-1 w-4 h-4 bg-slate-500 rounded-full"></span>
+                        </button>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400">Threat Overlay</span>
+                        <button class="w-12 h-6 bg-sky-600 rounded-full relative">
+                            <span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></span>
+                        </button>
+                    </div>
+                    <div class="border-t border-slate-700 pt-4">
+                        <span class="text-slate-500 text-xs">C2 STRATOS v1.0.4</span>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-slate-700 flex justify-end">
+                    <button onclick="document.getElementById('settings-modal').remove()" class="bg-sky-600 text-white px-4 py-2 text-sm font-bold uppercase">Done</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    },
+
+    saveState: () => {
+        try {
+            const state = {
+                expanded: document.body.classList.contains('sidebar-expanded'),
+                timestamp: Date.now()
+            };
+            localStorage.setItem('c2_sidebar_state', JSON.stringify(state));
+        } catch (e) {}
+    },
+
+    loadState: () => {
+        try {
+            const saved = localStorage.getItem('c2_sidebar_state');
+            if (saved) {
+                const state = JSON.parse(saved);
+                if (state.expanded) {
+                    document.body.classList.add('sidebar-expanded');
+                }
+            }
+        } catch (e) {}
     }
 };
 

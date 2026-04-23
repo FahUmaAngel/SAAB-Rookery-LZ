@@ -47,3 +47,13 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #82cfff;
 }
+
+/* Spin Animation */
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
