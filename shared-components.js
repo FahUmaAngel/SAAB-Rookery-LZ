@@ -103,7 +103,7 @@ const SharedComponents = {
                     { label: 'Tactical Map', icon: 'explore', href: './tactical-map.html' },
                     { label: 'Threat Intel', icon: 'warning', href: '#' },
                     { label: 'Battery Status', icon: 'battery_charging_full', href: '#' },
-                    { label: 'Logistics', icon: 'local_shipping', href: './logistics.html' }
+                    { label: 'Dashboard', icon: 'dashboard', href: './logistics.html' }
                 ]
             },
             { id: 'assets', label: 'Asset Ready', icon: 'flight_takeoff', href: './Asset-ready.html' },
