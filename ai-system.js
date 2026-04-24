@@ -215,29 +215,3 @@ const AISystem = {
 };
 
 window.AISystem = AISystem;
-
-AISystem.recommendAsset = (incidentSector) => {
-    AISystem.log('SCAN', `Optimizing asset allocation for sector: ${incidentSector}`);
-
-    const bases = [
-        { id: 'base-f7-satenas', name: 'F7 Såtenäs', readiness: 75, distance: 350, sector: 'North Sea' },
-        { id: 'base-f17-kallinge', name: 'F17 Kallinge', readiness: 87, distance: 120, sector: 'Baltic Sea' },
-        { id: 'base-f21-lulea', name: 'F21 Luleå', readiness: 44, distance: 800, sector: 'Barents Sea' }
-    ];
-
-    const scoredBases = bases.map((b) => {
-        let score = b.readiness;
-        if (b.sector === incidentSector) score += 50;
-        return { ...b, totalScore: score };
-    });
-
-    const best = scoredBases.sort((a, b) => b.totalScore - a.totalScore)[0];
-
-    AISystem.log('SUGGEST', `AI Optimized: ${best.name} is recommended (Score: ${best.totalScore})`);
-
-    window.dispatchEvent(new CustomEvent('ai-asset-recommendation', {
-        detail: { baseId: best.id, baseName: best.name, score: best.totalScore }
-    }));
-
-    return best;
-};
