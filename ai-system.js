@@ -35,7 +35,7 @@ const AISystem = {
                 })
             });
             const data = await response.json();
-            return data.choices[0].message.content;
+            return data.choices?.[0]?.message?.content ?? null;
         } catch (error) {
             console.error("OpenRouter Error:", error);
             return null;
@@ -55,6 +55,7 @@ const AISystem = {
      * Phase 2: DETECT - Calculate threat score
      */
     detect: async (data) => {
+        AISystem.state.currentPhase = 'DETECT';
         // Simulation logic for threat scoring
         let score = 0;
         if (data.speed > 800) score += 30; // High speed
@@ -77,6 +78,7 @@ const AISystem = {
      * Phase 3: SUGGEST - Generate recommendations
      */
     suggest: async (data) => {
+        AISystem.state.currentPhase = 'SUGGEST';
         AISystem.log('SUGGEST', "AI Generating tactical suggestions...");
         
         if (AISystem.state.apiKey) {
@@ -106,40 +108,49 @@ const AISystem = {
      */
     approveAction: (actionId) => {
         AISystem.state.hitlPending = false;
+        AISystem.state.currentPhase = 'PROTECT';
         const action = AISystem.state.suggestions.find(s => s.id === actionId);
+        if (!action) return;
         AISystem.log('PROTECT', `HUMAN APPROVED: ${action.action}`);
-        // Proceed to execution simulation...
+        AISystem.generateReport();
     },
 
     /**
      * Asset Optimization Logic
      */
     recommendAsset: (incidentSector) => {
-        AISystem.log('SCAN', `Optimizing asset allocation for sector: ${incidentSector}`);
-        
+        AISystem.log('SUGGEST', `Optimizing asset allocation for sector: ${incidentSector}`);
+
+        // Map base names → sector names so callers can pass either
+        const baseToSector = {
+            'F7 Såtenäs':   'North Sea',
+            'F17 Kallinge': 'Baltic Sea',
+            'F21 Luleå':    'Barents Sea'
+        };
+        const resolvedSector = baseToSector[incidentSector] || incidentSector;
+
         // Simulated airbase data
         const bases = [
-            { name: 'F7 Såtenäs', readiness: 75, distance: 350, sector: 'North Sea' },
+            { name: 'F7 Såtenäs',  readiness: 75, distance: 350, sector: 'North Sea' },
             { name: 'F17 Kallinge', readiness: 87, distance: 120, sector: 'Baltic Sea' },
-            { name: 'F21 Luleå', readiness: 44, distance: 800, sector: 'Barents Sea' }
+            { name: 'F21 Luleå',    readiness: 44, distance: 800, sector: 'Barents Sea' }
         ];
 
-        // Scoring: Higher readiness is good, lower distance is good
+        // Scoring: Higher readiness is good, sector match gets proximity bonus
         const scoredBases = bases.map(b => {
             let score = b.readiness;
-            if (b.sector === incidentSector) score += 50; // Bonus for proximity
+            if (b.sector === resolvedSector) score += 50;
             return { ...b, totalScore: score };
         });
 
-        const best = scoredBases.sort((a, b) => b.totalScore - a.totalScore)[0];
-        
+        const best = scoredBases.toSorted((a, b) => b.totalScore - a.totalScore)[0];
+
         AISystem.log('SUGGEST', `AI Optimized: ${best.name} is recommended (Score: ${best.totalScore})`);
-        
-        // Dispatch specific event for Asset-ready.html
-        window.dispatchEvent(new CustomEvent('ai-asset-recommendation', { 
-            detail: { baseName: best.name, score: best.totalScore } 
+
+        dispatchEvent(new CustomEvent('ai-asset-recommendation', {
+            detail: { baseName: best.name, score: best.totalScore }
         }));
-        
+
         return best;
     },
 
@@ -156,9 +167,9 @@ const AISystem = {
                 lines.forEach(line => {
                     const parts = line.split(':');
                     const type = parts[0].replace(/[^A-Z]/g, '') || 'SIGINT';
-                    const msg = parts[1] || line;
-                    window.dispatchEvent(new CustomEvent('ai-signal-analysis', { 
-                        detail: { type: type, msg: msg.trim(), prob: 0.95 } 
+                    const msg = parts.slice(1).join(':') || line;
+                    dispatchEvent(new CustomEvent('ai-signal-analysis', {
+                        detail: { type: type, msg: msg.trim(), prob: 0.95 }
                     }));
                 });
                 return;
@@ -174,18 +185,20 @@ const AISystem = {
         ];
 
         // Pick 2 random analyses
-        const selected = analyses.sort(() => 0.5 - Math.random()).slice(0, 2);
+        const selected = analyses.toSorted(() => 0.5 - Math.random()).slice(0, 2);
         
         AISystem.log('DETECT', "SIGINT Analysis completed.");
         
         selected.forEach(a => {
-            window.dispatchEvent(new CustomEvent('ai-signal-analysis', { detail: a }));
+            dispatchEvent(new CustomEvent('ai-signal-analysis', { detail: a }));
         });
     },
 
     rejectAction: (actionId) => {
         AISystem.state.hitlPending = false;
+        AISystem.state.currentPhase = 'SCAN';
         const action = AISystem.state.suggestions.find(s => s.id === actionId);
+        if (!action) return;
         AISystem.log('PROTECT', `HUMAN REJECTED: ${action.action}`);
     },
 
@@ -193,12 +206,13 @@ const AISystem = {
      * Phase 5: REPORT - Generate mission summary
      */
     generateReport: () => {
+        AISystem.state.currentPhase = 'REPORT';
         const report = {
             timestamp: new Date().toISOString(),
             events: AISystem.state.logs,
             finalThreatLevel: AISystem.state.threatScore > 70 ? 'CRITICAL' : 'STABLE'
         };
-        AISystem.log('REPORT', 'Mission report generated');
+        AISystem.log('REPORT', `Mission report generated — Threat: ${report.finalThreatLevel}`);
         return report;
     },
 
@@ -210,7 +224,7 @@ const AISystem = {
         };
         AISystem.state.logs.push(entry);
         // Dispatch event for UI updates
-        window.dispatchEvent(new CustomEvent('ai-update', { detail: entry }));
+        dispatchEvent(new CustomEvent('ai-update', { detail: entry }));
     }
 };
 
