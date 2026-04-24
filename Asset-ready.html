@@ -1,965 +1,391 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>C2 Tactical Overwatch - Asset Readiness</title>
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<!-- Tailwind Config based on Theme Configuration -->
-<script src="tailwind.config.js"></script>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>C2 Tactical Overwatch - Asset Readiness</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Tailwind Config based on Theme Configuration -->
+    <script src="tailwind.config.js"></script>
 </head>
 <body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
-<!-- JSON INJECTED: TopAppBar -->
-<div id="header-placeholder"></div>
-<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
-<!-- JSON INJECTED: SideNavBar -->
-<div id="sidebar-placeholder"></div>
-<!-- Main Content Canvas -->
-<main class="p-margin h-full overflow-y-auto">
-<!-- Header -->
-<div class="mb-gutter flex justify-between items-end">
-<div>
-<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1 uppercase">Fleet Management</h2>
-<p class="font-data-mono text-data-mono text-outline">SYS: ONLINE // REFRESH: LIVE</p>
-</div>
-<div class="flex gap-2">
-<button onclick="AssetManager.exportCSV()" class="bg-surface-variant border border-outline-variant text-outline px-4 py-2 font-label-caps text-label-caps flex items-center gap-2 hover:bg-surface-container-high">
-<span class="material-symbols-outlined text-[14px]">download</span>
-                EXPORT CSV
-            </button>
-<button onclick="AssetManager.aiOptimizeScramble()" class="bg-sky-950 border border-sky-500 text-sky-400 px-4 py-2 font-label-caps text-label-caps flex items-center gap-2 hover:bg-sky-900 transition-all active:scale-95">
-<span class="material-symbols-outlined text-[14px] animate-pulse">psychology</span>
-                AI OPTIMIZE SCRAMBLE
-            </button>
-<button id="btn-refresh" onclick="AssetManager.refreshData()" class="bg-primary-container/10 border border-primary text-primary px-4 py-2 font-label-caps text-label-caps flex items-center gap-2 hover:bg-primary-container/20">
-<span class="material-symbols-outlined text-[14px]">sync</span>
-                FORCE REFRESH
-            </button>
-</div>
-</div>
-<!-- Main Bento Grid -->
-<div class="grid grid-cols-12 gap-gutter">
-<!-- Incident Feed (Col Span 4) -->
-<div class="col-span-4 flex flex-col gap-gutter">
-<h3 class="font-label-caps text-label-caps text-error uppercase border-b border-outline-variant pb-2">ACTIVE INCIDENTS</h3>
-<div class="flex flex-col gap-2 max-h-[200px] overflow-y-auto" id="incident-feed">
-<div class="incident-card bg-error-container/20 border border-error/30 p-2 rounded-sm cursor-pointer hover:bg-error-container/30" data-incident-id="INC-2026-0423-01" onclick="AssetManager.createMissionFromIncident('INC-2026-0423-01')">
-<div class="flex justify-between items-center">
-<span class="font-data-mono text-[10px] text-error">14:28Z</span>
-<span class="font-label-caps text-[8px] bg-error text-white px-1">ALPHA</span>
-</div>
-<p class="text-[11px] text-on-surface mt-1">Unknown track approaching Sector 7</p>
-<div class="flex justify-between items-center mt-2">
-<span class="font-label-caps text-[9px] text-outline">SU-27</span>
-<span class="text-[9px] text-tertiary">45km to border</span>
-</div>
-</div>
-<div class="incident-card bg-surface-container border border-outline-variant p-2 rounded-sm opacity-70 cursor-pointer hover:bg-surface-container-high" data-incident-id="INC-2026-0423-02" onclick="AssetManager.createMissionFromIncident('INC-2026-0423-02')">
-<div class="flex justify-between items-center">
-<span class="font-data-mono text-[10px] text-outline">14:15Z</span>
-<span class="font-label-caps text-[8px] bg-tertiary/30 text-tertiary px-1">CAUTION</span>
-</div>
-<p class="text-[11px] text-on-surface mt-1">Cargo vessel in restricted zone</p>
-<div class="mt-1 text-[9px] text-outline">Sector 4 - cleared</div>
-</div>
-</div>
-</div>
-<!-- QRA Panel (Col Span 8) -->
-<div class="col-span-8 flex flex-col gap-gutter">
-<h3 class="font-label-caps text-label-caps text-tertiary uppercase border-b border-outline-variant pb-2">QUICK REACTION ALERT (QRA)</h3>
-<div class="grid grid-cols-3 gap-2" id="qra-panel">
-<!-- QRA Slot 1 -->
-<div class="qra-slot bg-surface-container border border-outline-variant p-2 rounded-sm cursor-pointer hover:border-tertiary" data-slot="1" onclick="AssetManager.selectQRASlot(1)">
-<div class="flex justify-between items-center mb-2">
-<span class="font-label-caps text-[10px] text-tertiary uppercase">QRA-1</span>
-<span class="w-2 h-2 bg-tertiary rounded-full animate-pulse"></span>
-</div>
-<div class="flex justify-between text-[9px]">
-<span class="text-outline">Pilot:</span>
-<span class="text-on-surface">LT Berg</span>
-</div>
-<div class="flex justify-between text-[9px]">
-<span class="text-outline">A/C:</span>
-<span class="text-on-surface">JAS 39C</span>
-</div>
-<div class="flex justify-between text-[9px]">
-<span class="text-outline">Status:</span>
-<span class="qra-status text-tertiary">HOT</span>
-</div>
-</div>
-<!-- QRA Slot 2 -->
-<div class="qra-slot bg-surface-container border border-outline-variant p-2 rounded-sm cursor-pointer hover:border-tertiary" data-slot="2" onclick="AssetManager.selectQRASlot(2)">
-<div class="flex justify-between items-center mb-2">
-<span class="font-label-caps text-[10px] text-tertiary uppercase">QRA-2</span>
-<span class="w-2 h-2 bg-tertiary rounded-full animate-pulse"></span>
-</div>
-<div class="flex justify-between text-[9px]">
-<span class="text-outline">Pilot:</span>
-<span class="text-on-surface">LT Lind</span>
-</div>
-<div class="flex justify-between text-[9px]">
-<span class="text-outline">A/C:</span>
-<span class="text-on-surface">JAS 39E</span>
-</div>
-<div class="flex justify-between text-[9px]">
-<span class="text-outline">Status:</span>
-<span class="qra-status text-tertiary">HOT</span>
-</div>
-</div>
-<!-- QRA Slot 3 -->
-<div class="qra-slot bg-surface-container border border-outline-variant p-2 rounded-sm opacity-50" data-slot="3">
-<div class="flex justify-between items-center mb-2">
-<span class="font-label-caps text-[10px] text-outline uppercase">QRA-3</span>
-<span class="w-2 h-2 bg-outline rounded-full"></span>
-</div>
-<div class="text-[9px] text-outline text-center py-4">STANDBY</div>
-</div>
-</div>
-<div class="flex gap-2 mt-2">
-<button onclick="AssetManager.scramble()" class="bg-error border border-error text-white px-4 py-2 font-label-caps text-label-caps flex items-center gap-2 hover:bg-error/80 flex-1">
-<span class="material-symbols-outlined text-[14px]">flight_takeoff</span>
-SCRAMBLE
-</button>
-<button onclick="AssetManager.showPreFlightChecklist()" class="bg-surface-variant border border-outline text-outline px-4 py-2 font-label-caps text-label-caps flex items-center gap-2 hover:bg-surface-container-high">
-<span class="material-symbols-outlined text-[14px]">checklist</span>
-CHECKLIST
-</button>
-<button onclick="AssetManager.showLoadoutConfig()" class="bg-surface-variant border border-outline text-outline px-4 py-2 font-label-caps text-label-caps flex items-center gap-2 hover:bg-surface-container-high">
-<span class="material-symbols-outlined text-[14px]"> arsenal</span>
-LOADOUT
-</button>
-</div>
-</div>
-</div>
-<!-- KPIs Row (Col Span 12) -->
-<div class="col-span-12 grid grid-cols-3 gap-gutter">
-<!-- Total Fleet Card -->
-<div class="bg-surface-container border border-outline-variant p-panel-padding relative">
-<div class="flex justify-between items-start mb-4">
-<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Total Fleet Availability</span>
-<span class="material-symbols-outlined text-outline text-[16px]">flight</span>
-</div>
-<div class="flex items-baseline gap-2">
-<span class="font-headline-lg text-[32px] text-on-surface leading-none font-bold">84%</span>
-<span class="font-data-mono text-data-mono text-primary">+2% 24H</span>
-</div>
-<div class="mt-4 w-full h-1 bg-surface-variant">
-<div class="h-full bg-primary w-[84%]"></div>
-</div>
-</div>
-<!-- QRA Standby Card -->
-<div class="bg-surface-container border border-outline-variant p-panel-padding relative">
-<div class="absolute top-0 left-0 w-full h-[1px] bg-tertiary shadow-[0_0_8px_#f1c100]"></div>
-<div class="flex justify-between items-start mb-4">
-<span class="font-label-caps text-label-caps text-tertiary uppercase flex items-center gap-2">
-<span class="w-2 h-2 bg-tertiary rounded-none"></span>
-                            QRA Standby Status
+    <!-- JSON INJECTED: TopAppBar -->
+    <div id="header-placeholder"></div>
+    <div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+        <!-- JSON INJECTED: SideNavBar -->
+        <div id="sidebar-placeholder"></div>
+        <!-- Main Content Canvas -->
+        <main class="p-margin h-full overflow-y-auto">
+            <!-- Header -->
+            <div class="mb-gutter flex justify-between items-end">
+                <div>
+                    <h2 class="font-headline-lg text-headline-lg text-on-surface mb-1 uppercase font-bold tracking-tight">Fleet Management</h2>
+                    <p class="font-data-mono text-data-mono text-outline uppercase tracking-widest text-[10px]">SYS: ONLINE // REFRESH: LIVE // TELEMETRY: ACTIVE</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="AssetManager.exportCSV()" class="glass-panel text-outline px-4 py-2 font-label-caps text-label-caps flex items-center gap-2 hover:bg-surface-container-high transition-all">
+                        <span class="material-symbols-outlined text-[16px]">download</span>
+                        EXPORT CSV
+                    </button>
+                    <button onclick="AssetManager.aiOptimizeScramble()" class="bg-sky-950/40 border border-sky-500 text-sky-400 px-4 py-2 font-label-caps text-label-caps flex items-center gap-2 hover:bg-sky-900/60 transition-all active:scale-95 glow-primary">
+                        <span class="material-symbols-outlined text-[16px] animate-pulse">psychology</span>
+                        AI OPTIMIZE SCRAMBLE
+                    </button>
+                    <button id="btn-refresh" onclick="AssetManager.refreshData()" class="glass-panel border-primary text-primary px-4 py-2 font-label-caps text-label-caps flex items-center gap-2 hover:bg-primary/10 transition-all">
+                        <span class="material-symbols-outlined text-[16px]">sync</span>
+                        FORCE REFRESH
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Bento Grid -->
+            <div class="grid grid-cols-12 gap-gutter">
+                <!-- Incident Feed (Col Span 4) -->
+                <div class="col-span-4 flex flex-col gap-gutter">
+                    <h3 class="font-label-caps text-label-caps text-error uppercase border-b border-outline-variant pb-2 font-bold tracking-widest">Active Incidents</h3>
+                    <div class="flex flex-col gap-3 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar" id="incident-feed">
+                        <div class="incident-card glass-panel p-3 rounded-sm cursor-pointer hover:bg-error/5 transition-all border-error/30" data-incident-id="INC-2026-0423-01" onclick="AssetManager.setIncidentActive('INC-2026-0423-01')">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-data-mono text-[10px] text-error font-bold">14:28Z</span>
+                                <span class="font-label-caps text-[8px] bg-error text-white px-2 py-0.5 rounded-sm font-black">ALPHA</span>
+                            </div>
+                            <p class="text-[12px] text-on-surface font-medium">Unknown track approaching Sector 7</p>
+                            <div class="flex justify-between items-center mt-3 pt-2 border-t border-outline-variant/20">
+                                <span class="font-label-caps text-[9px] text-outline uppercase font-bold">SU-27 Flanker</span>
+                                <span class="text-[9px] text-tertiary font-bold">45km to border</span>
+                            </div>
+                        </div>
+                        <div class="incident-card glass-panel p-3 rounded-sm opacity-70 cursor-pointer hover:bg-surface-container-high transition-all" data-incident-id="INC-2026-0423-02" onclick="AssetManager.setIncidentActive('INC-2026-0423-02')">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-data-mono text-[10px] text-outline font-bold">14:15Z</span>
+                                <span class="font-label-caps text-[8px] bg-tertiary text-slate-950 px-2 py-0.5 rounded-sm font-black">CAUTION</span>
+                            </div>
+                            <p class="text-[12px] text-on-surface font-medium">Cargo vessel in restricted zone</p>
+                            <div class="mt-2 text-[9px] text-outline uppercase font-bold">Sector 4 - Monitoring</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- QRA Panel (Col Span 8) -->
+                <div class="col-span-8 flex flex-col gap-gutter">
+                    <h3 class="font-label-caps text-label-caps text-tertiary uppercase border-b border-outline-variant pb-2 font-bold tracking-widest">Quick Reaction Alert (QRA)</h3>
+                    <div class="grid grid-cols-3 gap-3" id="qra-panel">
+                        <!-- QRA Slot 1 -->
+                        <div class="qra-slot glass-panel p-4 rounded-sm cursor-pointer hover:border-tertiary transition-all group" data-slot="1" onclick="AssetManager.selectQRASlot(1)">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="font-label-caps text-[12px] text-tertiary uppercase font-black">QRA-1</span>
+                                <span class="w-3 h-3 bg-tertiary rounded-full animate-pulse shadow-[0_0_12px_#f1c100]"></span>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-[10px]">
+                                    <span class="text-outline uppercase font-bold">Pilot:</span>
+                                    <span class="text-on-surface font-black">LT Berg</span>
+                                </div>
+                                <div class="flex justify-between text-[10px]">
+                                    <span class="text-outline uppercase font-bold">A/C:</span>
+                                    <span class="text-on-surface">JAS 39C</span>
+                                </div>
+                                <div class="flex justify-between text-[10px] pt-1 border-t border-outline-variant/20">
+                                    <span class="text-outline uppercase font-bold">Status:</span>
+                                    <span class="qra-status text-tertiary font-black uppercase tracking-widest">Hot</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- QRA Slot 2 -->
+                        <div class="qra-slot glass-panel p-4 rounded-sm cursor-pointer hover:border-tertiary transition-all group" data-slot="2" onclick="AssetManager.selectQRASlot(2)">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="font-label-caps text-[12px] text-tertiary uppercase font-black">QRA-2</span>
+                                <span class="w-3 h-3 bg-tertiary rounded-full animate-pulse shadow-[0_0_12px_#f1c100]"></span>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-[10px]">
+                                    <span class="text-outline uppercase font-bold">Pilot:</span>
+                                    <span class="text-on-surface font-black">LT Lind</span>
+                                </div>
+                                <div class="flex justify-between text-[10px]">
+                                    <span class="text-outline uppercase font-bold">A/C:</span>
+                                    <span class="text-on-surface">JAS 39E</span>
+                                </div>
+                                <div class="flex justify-between text-[10px] pt-1 border-t border-outline-variant/20">
+                                    <span class="text-outline uppercase font-bold">Status:</span>
+                                    <span class="qra-status text-tertiary font-black uppercase tracking-widest">Hot</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- QRA Slot 3 -->
+                        <div class="qra-slot glass-panel p-4 rounded-sm cursor-pointer hover:border-primary transition-all group opacity-60 hover:opacity-100" data-slot="3" onclick="AssetManager.selectQRASlot(3)">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-label-caps text-[12px] text-outline uppercase font-black group-hover:text-primary transition-colors">QRA-3</span>
+                                <span class="w-3 h-3 bg-outline rounded-full group-hover:bg-primary transition-colors"></span>
+                            </div>
+                            <div class="text-[10px] text-outline text-center py-6 group-hover:text-primary transition-colors font-bold uppercase tracking-widest">
+                                Standby<br/>
+                                <span class="text-[7px] font-medium">Click to Initiate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-3">
+                        <button onclick="AssetManager.scramble()" class="bg-error/20 border border-error/50 text-error px-6 py-3 font-label-caps text-label-caps flex items-center justify-center gap-3 hover:bg-error hover:text-white transition-all flex-1 glow-error font-black tracking-widest">
+                            <span class="material-symbols-outlined text-[18px]">flight_takeoff</span>
+                            SCRAMBLE
+                        </button>
+                        <button onclick="AssetManager.showPreFlightChecklist()" class="glass-panel border-outline text-outline px-4 py-3 font-label-caps text-label-caps flex items-center gap-2 hover:bg-surface-container-high transition-all font-bold">
+                            <span class="material-symbols-outlined text-[18px]">checklist</span>
+                            CHECKLIST
+                        </button>
+                        <button onclick="AssetManager.showLoadoutConfig()" class="glass-panel border-outline text-outline px-4 py-3 font-label-caps text-label-caps flex items-center gap-2 hover:bg-surface-container-high transition-all font-bold">
+                            <span class="material-symbols-outlined text-[18px]"> arsenal</span>
+                            LOADOUT
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPIs Row (Col Span 12) -->
+            <div class="col-span-12 grid grid-cols-3 gap-gutter mt-2">
+                <!-- Total Fleet Card -->
+                <div class="glass-panel p-panel-padding relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase font-bold tracking-widest">Fleet Availability</span>
+                        <span class="material-symbols-outlined text-outline text-[20px]">flight</span>
+                    </div>
+                    <div class="flex items-baseline gap-3">
+                        <span class="font-headline-lg text-[40px] text-on-surface leading-none font-black font-['Orbitron']">84%</span>
+                        <span class="font-data-mono text-data-mono text-primary font-bold">+2.4% 24H</span>
+                    </div>
+                    <div class="mt-6 w-full h-1.5 bg-surface-variant rounded-full overflow-hidden">
+                        <div class="h-full bg-primary glow-primary w-[84%] transition-all duration-1500 ease-out"></div>
+                    </div>
+                </div>
+                <!-- QRA Standby Card -->
+                <div class="glass-panel p-panel-padding relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-tertiary shadow-[0_0_15px_#f1c100]"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="font-label-caps text-label-caps text-tertiary uppercase flex items-center gap-2 font-bold tracking-widest">
+                            <span class="w-2.5 h-2.5 bg-tertiary rounded-none animate-pulse"></span>
+                            QRA Ready Status
                         </span>
-<span class="material-symbols-outlined text-outline text-[16px]">radar</span>
-</div>
-<div class="flex items-baseline gap-2">
-<span class="font-headline-lg text-[32px] text-on-surface leading-none font-bold">4/4</span>
-<span class="font-data-mono text-data-mono text-outline">SQUADRONS ARMED</span>
-</div>
-<div class="mt-4 grid grid-cols-4 gap-1">
-<div class="h-1 bg-tertiary w-full"></div>
-<div class="h-1 bg-tertiary w-full"></div>
-<div class="h-1 bg-tertiary w-full"></div>
-<div class="h-1 bg-tertiary w-full"></div>
-</div>
-</div>
-<!-- Maintenance Cycle Card -->
-<div class="bg-surface-container border border-outline-variant p-panel-padding relative">
-<div class="flex justify-between items-start mb-4">
-<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Critical Maint. Alerts</span>
-<span class="material-symbols-outlined text-outline text-[16px]">build</span>
-</div>
-<div class="flex items-baseline gap-2">
-<span class="font-headline-lg text-[32px] text-error leading-none font-bold">3</span>
-<span class="font-data-mono text-data-mono text-outline">AIRFRAMES GROUNDED</span>
-</div>
-<div class="mt-4 flex gap-2">
-<span class="px-2 py-0.5 bg-error-container text-on-error-container border border-error/50 font-data-mono text-[10px]">A/C-391</span>
-<span class="px-2 py-0.5 bg-error-container text-on-error-container border border-error/50 font-data-mono text-[10px]">A/C-394</span>
-<span class="px-2 py-0.5 bg-surface-variant text-on-surface border border-outline/50 font-data-mono text-[10px]">+1 MORE</span>
-</div>
-</div>
-</div>
-<!-- Airbase Status (Col Span 8) -->
-<div class="col-span-8 flex flex-col gap-gutter">
-<h3 class="font-label-caps text-label-caps text-primary uppercase border-b border-outline-variant pb-2">Tactical Wing Status</h3>
-<div class="grid grid-cols-3 gap-gutter h-full">
-<!-- F7 Såtenäs -->
-<div id="base-f7-satenas" onclick="AssetManager.showBaseDetail('F7 Såtenäs')" class="base-card bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden group transition-all duration-500 cursor-pointer hover:border-primary">
-<div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]"></div>
-<div class="relative z-10 flex-1">
-<div class="flex justify-between items-center mb-6 border-b border-surface-variant pb-2">
-<span class="font-headline-md text-headline-md text-on-surface uppercase">F7 Såtenäs</span>
-<span class="font-data-mono text-[10px] text-tertiary border border-tertiary/30 px-1">QRA-READY</span>
-</div>
-<div class="space-y-4">
-<div>
-<div class="flex justify-between font-data-mono text-[10px] text-outline mb-1">
-<span>GRIPEN E/F READY</span>
-<span class="text-on-surface">18 / 24</span>
-</div>
-<div class="h-1 bg-surface-variant"><div class="h-full bg-primary w-[75%]"></div></div>
-</div>
-<div>
-<div class="flex justify-between font-data-mono text-[10px] text-outline mb-1">
-<span>MUNITIONS YIELD</span>
-<span class="text-on-surface">92%</span>
-</div>
-<div class="h-1 bg-surface-variant"><div class="h-full bg-secondary w-[92%]"></div></div>
-</div>
-</div>
-</div>
-</div>
-<!-- F17 Kallinge -->
-<div id="base-f17-kallinge" onclick="AssetManager.showBaseDetail('F17 Kallinge')" class="base-card bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden transition-all duration-500 cursor-pointer hover:border-primary">
-<div class="relative z-10 flex-1">
-<div class="flex justify-between items-center mb-6 border-b border-surface-variant pb-2">
-<span class="font-headline-md text-headline-md text-on-surface uppercase">F17 Kallinge</span>
-<span class="font-data-mono text-[10px] text-primary border border-primary/30 px-1">NOMINAL</span>
-</div>
-<div class="space-y-4">
-<div>
-<div class="flex justify-between font-data-mono text-[10px] text-outline mb-1">
-<span>GRIPEN C/D READY</span>
-<span class="text-on-surface">14 / 16</span>
-</div>
-<div class="h-1 bg-surface-variant"><div class="h-full bg-primary w-[87%]"></div></div>
-</div>
-<div>
-<div class="flex justify-between font-data-mono text-[10px] text-outline mb-1">
-<span>MUNITIONS YIELD</span>
-<span class="text-on-surface">88%</span>
-</div>
-<div class="h-1 bg-surface-variant"><div class="h-full bg-secondary w-[88%]"></div></div>
-</div>
-</div>
-</div>
-</div>
-<!-- F21 Luleå -->
-<div id="base-f21-lulea" onclick="AssetManager.showBaseDetail('F21 Luleå')" class="base-card bg-surface-container-low border border-error/50 p-panel-padding flex flex-col relative overflow-hidden transition-all duration-500 cursor-pointer hover:border-error">
-<div class="absolute top-0 right-0 w-8 h-8 bg-error/10 border-l border-b border-error/30 flex items-center justify-center">
-<span class="material-symbols-outlined text-[16px] text-error">warning</span>
-</div>
-<div class="relative z-10 flex-1">
-<div class="flex justify-between items-center mb-6 border-b border-surface-variant pb-2">
-<span class="font-headline-md text-headline-md text-on-surface uppercase">F21 Luleå</span>
-<span class="font-data-mono text-[10px] text-error border border-error/30 px-1 mr-6">DEGRADED</span>
-</div>
-<div class="space-y-4">
-<div>
-<div class="flex justify-between font-data-mono text-[10px] text-outline mb-1">
-<span>GRIPEN C/D READY</span>
-<span class="text-error font-bold">8 / 18</span>
-</div>
-<div class="h-1 bg-surface-variant"><div class="h-full bg-error w-[44%]"></div></div>
-</div>
-<div>
-<div class="flex justify-between font-data-mono text-[10px] text-outline mb-1">
-<span>WINTER OPS GEAR</span>
-<span class="text-on-surface">100%</span>
-</div>
-<div class="h-1 bg-surface-variant"><div class="h-full bg-secondary w-[100%]"></div></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- Munitions Stockpile (Col Span 4) -->
-<div class="col-span-4 bg-surface-container border border-outline-variant p-panel-padding flex flex-col">
-<div class="flex justify-between items-center mb-4 pb-2 border-b border-outline-variant">
-<h3 class="font-label-caps text-label-caps text-primary uppercase">Strategic Munitions</h3>
-<span class="material-symbols-outlined text-[16px] text-outline">rocket</span>
-</div>
-<div class="space-y-5 flex-1">
-<!-- Meteor BVR -->
-<div class="group cursor-pointer hover:opacity-80 transition-opacity" onclick="AssetManager.showMunitionDetail('Meteor BVR')">
-<div class="flex justify-between items-end mb-1">
-<span class="font-data-mono text-data-mono text-on-surface font-bold uppercase">Meteor BVR</span>
-<span class="font-data-mono text-[10px] text-outline">LVL: OPTIMAL</span>
-</div>
-<div class="h-2 w-full bg-surface-variant flex border border-outline/20">
-<div class="h-full bg-primary/80 border-r border-background w-[85%]"></div>
-<div class="h-full bg-transparent w-[15%]"></div>
-</div>
-<div class="flex justify-between mt-1 font-data-mono text-[9px] text-outline-variant">
-<span>0</span>
-<span>CRIT</span>
-<span>MAX</span>
-</div>
-</div>
-<!-- IRIS-T -->
-<div class="group cursor-pointer hover:opacity-80 transition-opacity" onclick="AssetManager.showMunitionDetail('IRIS-T SRAAM')">
-<div class="flex justify-between items-end mb-1">
-<span class="font-data-mono text-data-mono text-on-surface font-bold uppercase">IRIS-T SRAAM</span>
-<span class="font-data-mono text-[10px] text-outline">LVL: NOMINAL</span>
-</div>
-<div class="h-2 w-full bg-surface-variant flex border border-outline/20">
-<div class="h-full bg-secondary/80 border-r border-background w-[70%]"></div>
-<div class="h-full bg-transparent w-[30%]"></div>
-</div>
-</div>
-<!-- GBU-39 -->
-<div class="group opacity-70 cursor-pointer hover:opacity-90 transition-opacity" onclick="AssetManager.showMunitionDetail('GBU-39 SDB')">
-<div class="flex justify-between items-end mb-1">
-<span class="font-data-mono text-data-mono text-on-surface font-bold uppercase">GBU-39 SDB</span>
-<span class="font-data-mono text-[10px] text-tertiary">LVL: REORDER</span>
-</div>
-<div class="h-2 w-full bg-surface-variant flex border border-outline/20">
-<div class="h-full bg-tertiary/80 border-r border-background w-[40%]"></div>
-<div class="h-full bg-transparent w-[60%]"></div>
-</div>
-</div>
-</div>
-</div>
-<!-- Upcoming Maintenance Table (Col Span 12) -->
-<div class="col-span-12 bg-surface-container border border-outline-variant mt-2 overflow-hidden">
-<div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex justify-between items-center">
-<h3 class="font-label-caps text-label-caps text-on-surface uppercase">Upcoming Maintenance Logs</h3>
-<div class="flex gap-2">
-<input id="asset-search" class="bg-surface-variant border border-outline/50 text-data-mono font-data-mono px-2 py-1 text-[10px] focus:outline-none focus:border-primary text-on-surface w-48" placeholder="SEARCH ASSET ID..." type="text"/>
-</div>
-</div>
-<div class="overflow-x-auto">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="border-b border-outline-variant bg-surface-container-low font-label-caps text-[10px] text-outline">
-<th class="py-2 px-4 font-normal tracking-widest cursor-pointer hover:text-primary" onclick="AssetManager.sort('assetId')">ASSET ID <span class="sort-dir" data-col="assetId"></span></th>
-<th class="py-2 px-4 font-normal tracking-widest cursor-pointer hover:text-primary" onclick="AssetManager.sort('base')">BASE <span class="sort-dir" data-col="base"></span></th>
-<th class="py-2 px-4 font-normal tracking-widest cursor-pointer hover:text-primary" onclick="AssetManager.sort('procedure')">PROCEDURE <span class="sort-dir" data-col="procedure"></span></th>
-<th class="py-2 px-4 font-normal tracking-widest cursor-pointer hover:text-primary" onclick="AssetManager.sort('downtime')">EST. DOWNTIME <span class="sort-dir" data-col="downtime"></span></th>
-<th class="py-2 px-4 font-normal tracking-widest cursor-pointer hover:text-primary" onclick="AssetManager.sort('status')">STATUS <span class="sort-dir" data-col="status"></span></th>
-</tr>
-</thead>
-<tbody class="font-data-mono text-[11px] text-on-surface" id="maintenance-body">
-<tr class="border-b border-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer" data-asset-id="A/C-391" data-base="F21 Luleå" data-procedure="Engine Hot Section Insp." data-downtime="48" data-status="AOG" onclick="AssetManager.showDetail('A/C-391')">
-<td class="py-3 px-4 font-bold text-primary">A/C-391</td>
-<td class="py-3 px-4">F21 Luleå</td>
-<td class="py-3 px-4 text-outline-variant">Engine Hot Section Insp.</td>
-<td class="py-3 px-4">48 HRS</td>
-<td class="py-3 px-4">
-<span class="px-2 py-0.5 bg-error/10 text-error border border-error/30 text-[9px]">AOG</span>
-</td>
-</tr>
-<tr class="border-b border-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer" data-asset-id="A/C-394" data-base="F21 Luleå" data-procedure="Radar Array Calibration" data-downtime="12" data-status="SCHED" onclick="AssetManager.showDetail('A/C-394')">
-<td class="py-3 px-4 font-bold text-primary">A/C-394</td>
-<td class="py-3 px-4">F21 Luleå</td>
-<td class="py-3 px-4 text-outline-variant">Radar Array Calibration</td>
-<td class="py-3 px-4">12 HRS</td>
-<td class="py-3 px-4">
-<span class="px-2 py-0.5 bg-tertiary/10 text-tertiary border border-tertiary/30 text-[9px]">SCHED</span>
-</td>
-</tr>
-<tr class="hover:bg-surface-container-high transition-colors cursor-pointer" data-asset-id="A/C-402" data-base="F7 Såtenäs" data-procedure="Standard 500H Check" data-downtime="999" data-status="PENDING" onclick="AssetManager.showDetail('A/C-402')">
-<td class="py-3 px-4 font-bold text-primary">A/C-402</td>
-<td class="py-3 px-4">F7 Såtenäs</td>
-<td class="py-3 px-4 text-outline-variant">Standard 500H Check</td>
-<td class="py-3 px-4">TBD</td>
-<td class="py-3 px-4">
-<span class="px-2 py-0.5 bg-outline/10 text-outline border border-outline/30 text-[9px]">PENDING</span>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-<!-- Live Asset Status (Col Span 12) -->
-<div class="col-span-12 bg-surface-container border border-outline-variant mt-2">
-<div class="p-panel-padding border-b border-outline-variant flex justify-between items-center">
-<h3 class="font-label-caps text-label-caps text-primary uppercase">LIVE ASSET STATUS</h3>
-<div class="flex items-center gap-2">
-<span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-<span class="font-data-mono text-[10px] text-outline">DATALINK ACTIVE</span>
-</div>
-</div>
-<div id="live-status-grid" class="grid grid-cols-4 gap-[1px] bg-outline-variant">
-<div class="bg-surface-container p-3 text-center">
-<div id="live-patrolling" class="font-headline-md text-headline-md text-primary font-bold">8</div>
-<div class="font-label-caps text-[9px] text-outline">PATROLLING</div>
-<div class="h-1 bg-primary mt-2 w-full"></div>
-</div>
-<div class="bg-surface-container p-3 text-center">
-<div id="live-standby" class="font-headline-md text-headline-md text-tertiary font-bold">12</div>
-<div class="font-label-caps text-[9px] text-outline">STANDBY</div>
-<div class="h-1 bg-tertiary mt-2 w-full"></div>
-</div>
-<div class="bg-surface-container p-3 text-center">
-<div id="live-grounded" class="font-headline-md text-headline-md text-error font-bold">3</div>
-<div class="font-label-caps text-[9px] text-outline">GROUNDED</div>
-<div class="h-1 bg-error mt-2 w-full"></div>
-</div>
-<div class="bg-surface-container p-3 text-center">
-<div id="live-scrambled" class="font-headline-md text-headline-md text-sky-400 font-bold">2</div>
-<div class="font-label-caps text-[9px] text-outline">SCRAMBLED</div>
-<div class="h-1 bg-sky-400 mt-2 w-full animate-pulse"></div>
-</div>
-</div>
-</div>
-</main>
-<script src="./ai-system.js"></script>
-<script src="./shared-components.js"></script>
-<script>
-const AssetManager = {
-    sortCol: null,
-    sortAsc: true,
-    searchQuery: '',
-    selectedQRA: null,
-    scrambledSlots: new Set(),
-    currentIncidents: [],
-    selectedIncidentId: null,
-    initialized: false,
-    qraData: {
-        1: { pilot: 'LT Berg',  aircraft: 'JAS 39C / 391' },
-        2: { pilot: 'LT Lind',  aircraft: 'JAS 39E / 394' }
-    },
-    munitionStock: {
-        'Meteor BVR': { qty: 42, threshold: 20, level: '85%', status: 'OPTIMAL' },
-        'IRIS-T SRAAM': { qty: 28, threshold: 15, level: '70%', status: 'NOMINAL' },
-        'GBU-39 SDB': { qty: 12, threshold: 30, level: '40%', status: 'REORDER' },
-        'AIM-120B': { qty: 32, threshold: 20, level: '75%', status: 'OPTIMAL' },
-        'KEP 500': { qty: 8, threshold: 5, level: '60%', status: 'NOMINAL' }
-    },
-
-    init: function() {
-        if (this.initialized) return;
-        this.initialized = true;
-        const searchInput = document.getElementById('asset-search');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                this.searchQuery = e.target.value.toLowerCase();
-                this.filterTable();
-            });
-        }
-        const firstIncident = document.querySelector('.incident-card[data-incident-id]');
-        if (firstIncident) this.setIncidentActive(firstIncident.dataset.incidentId);
-    },
-
-    showBaseDetail: function(baseName) {
-        const bases = {
-            'F7 Såtenäs':  { wing: 'Wing 7',  location: 'Västra Götaland', aircraft: 'JAS 39E/F', readiness: 75, qra: 'READY',    pilots: 18, status: 'OPERATIONAL' },
-            'F17 Kallinge': { wing: 'Wing 17', location: 'Blekinge',        aircraft: 'JAS 39C/D', readiness: 87, qra: 'NOMINAL',   pilots: 14, status: 'OPERATIONAL' },
-            'F21 Luleå':    { wing: 'Wing 21', location: 'Norrbotten',      aircraft: 'JAS 39C/D', readiness: 44, qra: 'DEGRADED',  pilots: 8,  status: 'LIMITED' }
-        };
-        const b = bases[baseName];
-        if (!b) return;
-
-        // Get grounded aircraft for this base
-        const tbody = document.getElementById('maintenance-body');
-        const groundedAC = Array.from(tbody.querySelectorAll('tr'))
-            .filter(row => row.dataset.base === baseName && (row.dataset.status === 'AOG' || row.dataset.status === 'SCHED'))
-            .map(row => ({ id: row.dataset.assetId, status: row.dataset.status }));
-
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
-        modal.innerHTML = `
-            <div class="bg-surface-container border border-outline-variant w-[450px] max-w-[90vw]">
-                <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-variant/30">
-                    <h3 class="font-headline-md text-headline-md text-primary">${baseName} - DETAIL</h3>
-                    <button onclick="this.closest('.fixed').remove()" class="text-outline hover:text-on-surface p-1"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="p-4 space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><span class="text-[10px] text-outline">WING</span><p class="text-on-surface font-bold">${b.wing}</p></div>
-                        <div><span class="text-[10px] text-outline">LOCATION</span><p class="text-on-surface">${b.location}</p></div>
-                        <div><span class="text-[10px] text-outline">AIRCRAFT TYPE</span><p class="text-on-surface">${b.aircraft}</p></div>
-                        <div><span class="text-[10px] text-outline">QRA STATUS</span><p class="font-bold ${b.qra === 'DEGRADED' ? 'text-error' : 'text-primary'}">${b.qra}</p></div>
+                        <span class="material-symbols-outlined text-outline text-[20px]">radar</span>
                     </div>
-                    <div class="border-t border-outline-variant pt-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><span class="text-[10px] text-outline">READINESS</span><p class="text-on-surface font-bold">${b.readiness}%</p></div>
-                            <div><span class="text-[10px] text-outline">AVAILABLE PILOTS</span><p class="text-on-surface">${b.pilots}</p></div>
-                        </div>
-                        <div class="mt-2"><span class="text-[10px] text-outline">SYSTEM STATUS</span>
-                            <p class="font-bold ${b.status === 'OPERATIONAL' ? 'text-green-500' : 'text-error'}">${b.status}</p>
-                        </div>
+                    <div class="flex items-baseline gap-3">
+                        <span class="font-headline-lg text-[40px] text-on-surface leading-none font-black font-['Orbitron']">4/4</span>
+                        <span class="font-data-mono text-data-mono text-outline font-bold">WINGS ARMED</span>
                     </div>
-                    ${groundedAC.length > 0 ? `
-                    <div class="border-t border-outline-variant pt-4">
-                        <span class="text-[10px] text-error">GROUNDED AIRCRAFT (${groundedAC.length})</span>
-                        <div class="mt-2 space-y-1">
-                            ${groundedAC.map(ac => `<p class="text-[10px] text-on-surface">${ac.id} - ${ac.status}</p>`).join('')}
-                        </div>
+                    <div class="mt-6 grid grid-cols-4 gap-1.5">
+                        <div class="h-1.5 bg-tertiary w-full shadow-[0_0_8px_#f1c100] rounded-sm"></div>
+                        <div class="h-1.5 bg-tertiary w-full shadow-[0_0_8px_#f1c100] rounded-sm"></div>
+                        <div class="h-1.5 bg-tertiary w-full shadow-[0_0_8px_#f1c100] rounded-sm"></div>
+                        <div class="h-1.5 bg-tertiary w-full shadow-[0_0_8px_#f1c100] rounded-sm"></div>
                     </div>
-                    ` : ''}
                 </div>
-                <div class="p-4 border-t border-outline-variant flex justify-end gap-2">
-                    <button onclick="this.closest('.fixed').remove(); AISystem.recommendAsset('${baseName}')" class="bg-surface-variant border border-outline px-4 py-2 text-[10px] font-bold uppercase">AI OPTIMIZE</button>
-                    <button onclick="this.closest('.fixed').remove()" class="bg-primary text-white px-4 py-2 text-[10px] font-bold uppercase">CLOSE</button>
+                <!-- Maintenance Cycle Card -->
+                <div class="glass-panel p-panel-padding relative overflow-hidden group">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase font-bold tracking-widest">Ground Alerts</span>
+                        <span class="material-symbols-outlined text-outline text-[20px]">build</span>
+                    </div>
+                    <div class="flex items-baseline gap-3">
+                        <span class="font-headline-lg text-[40px] text-error leading-none font-black font-['Orbitron']">3</span>
+                        <span class="font-data-mono text-data-mono text-outline font-bold uppercase">Units Grounded</span>
+                    </div>
+                    <div class="mt-6 flex gap-2">
+                        <span class="px-3 py-1 bg-error/10 text-error border border-error/30 font-data-mono text-[10px] rounded font-bold">A/C-391</span>
+                        <span class="px-3 py-1 bg-error/10 text-error border border-error/30 font-data-mono text-[10px] rounded font-bold">A/C-394</span>
+                        <span class="px-3 py-1 glass-panel text-on-surface border border-outline/50 font-data-mono text-[10px] rounded font-bold">+1 UNIT</span>
+                    </div>
                 </div>
-            </div>`;
-        document.body.appendChild(modal);
-    },
+            </div>
 
-    setIncidentActive: function(incidentId) {
-        this.selectedIncidentId = incidentId;
-        document.querySelectorAll('.incident-card').forEach(card => {
-            const isActive = card.dataset.incidentId === incidentId;
-            card.classList.toggle('ring-1', isActive);
-            card.classList.toggle('ring-sky-400', isActive);
-            card.classList.toggle('border-sky-500', isActive);
-        });
-    },
-
-    selectQRASlot: function(slotNum) {
-        document.querySelectorAll('.qra-slot').forEach(el => {
-            el.classList.remove('border-sky-500', 'bg-sky-950/30');
-            el.classList.add('border-outline-variant');
-        });
-        const slot = document.querySelector(`.qra-slot[data-slot="${slotNum}"]`);
-        if (slot) {
-            slot.classList.remove('border-outline-variant');
-            slot.classList.add('border-sky-500', 'bg-sky-950/30');
-            this.selectedQRA = slotNum;
-        }
-    },
-
-    scramble: function() {
-        if (!this.selectedQRA) {
-            window.SharedComponents?.showToast('SELECT QRA', 'Choose an aircraft first', 'warning', 'warning');
-            return;
-        }
-        // Guard against double-scramble
-        if (this.scrambledSlots.has(this.selectedQRA)) {
-            window.SharedComponents?.showToast('ALREADY AIRBORNE', `QRA-${this.selectedQRA} is already scrambled`, 'flight', 'warning');
-            return;
-        }
-        this.scrambledSlots.add(this.selectedQRA);
-        window.SharedComponents?.showToast('SCRAMBLING', `QRA-${this.selectedQRA} airborne!`, 'flight_takeoff', 'error');
-
-        const slot = document.querySelector(`.qra-slot[data-slot="${this.selectedQRA}"]`);
-        const statusEl = slot?.querySelector('.qra-status');
-        if (statusEl) {
-            statusEl.textContent = 'SCRAMBLED';
-            statusEl.classList.remove('text-tertiary', 'text-outline', 'text-amber-400');
-            statusEl.classList.add('text-sky-400');
-        }
-
-        const standbyEl  = document.getElementById('live-standby');
-        const scrambledEl = document.getElementById('live-scrambled');
-        if (standbyEl)  standbyEl.textContent  = Math.max(0, Number(standbyEl.textContent) - 1);
-        if (scrambledEl) scrambledEl.textContent = this.scrambledSlots.size;
-
-        this.createMissionFromIncident(this.selectedIncidentId || 'INC-2026-0423-01');
-    },
-
-    createMissionFromIncident: function(incId) {
-        this.setIncidentActive(incId);
-        window.SharedComponents?.showToast('MISSION TASKING', `Tasking QRA-${this.selectedQRA || '1'} to ${incId}`, 'military_tech', 'primary');
-    },
-
-    aiOptimizeScramble: function() {
-        // Find first available (non-scrambled) QRA slot
-        let bestSlot = null;
-        document.querySelectorAll('.qra-slot[onclick]').forEach(slot => {
-            const num = Number(slot.dataset.slot);
-            const statusEl = slot.querySelector('.qra-status');
-            if (statusEl && statusEl.textContent !== 'SCRAMBLED' && statusEl.textContent !== 'COLD' && bestSlot === null) {
-                bestSlot = num;
-            }
-        });
-        if (bestSlot !== null) this.selectQRASlot(bestSlot);
-        // Recommend highest-readiness QRA-READY base based on incident sector
-        if (window.AISystem) {
-            const incidentToSector = {
-                'INC-2026-0423-01': 'Baltic Sea'  // Sector 7 - Baltic
-            };
-            const sector = this.selectedIncidentId ? (incidentToSector[this.selectedIncidentId] || 'Baltic Sea') : 'Baltic Sea';
-            const bestBase = AISystem.recommendAsset(sector);
-            window.SharedComponents?.showToast('AI OPTIMIZE', `QRA-${bestSlot || 1} selected — ${bestBase.name} recommended`, 'psychology', 'primary');
-        }
-    },
-
-    showPreFlightChecklist: function() {
-        const qra  = this.selectedQRA;
-        const crew = this.qraData[qra] || { pilot: 'LT Berg', aircraft: 'JAS 39C / 391' };
-        const checklist = [
-            'Engine Start', 'Pitot Heat', 'Radar Check',
-            'Nav System', 'Comm Check', 'Weapons Arm', 'Fuel Check'
-        ];
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
-        modal.innerHTML = `
-            <div class="bg-surface-container border border-outline-variant w-[450px] max-w-[90vw]">
-                <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-variant/30">
-                    <h3 class="font-headline-md text-headline-md text-tertiary">PRE-FLIGHT CHECKLIST${qra ? ` — QRA-${qra}` : ''}</h3>
-                    <button onclick="this.closest('.fixed').remove()" class="text-outline hover:text-on-surface p-1"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="p-4 space-y-2">
-                    ${checklist.map(item => `
-                        <div class="checklist-item flex justify-between items-center p-2 bg-surface-variant/30 rounded-sm" data-status="PENDING">
-                            <span class="text-on-surface">${item}</span>
-                            <button data-action="toggle-check" class="bg-surface text-outline text-[10px] px-2 py-1 rounded">PENDING</button>
-                        </div>`).join('')}
-                </div>
-                <div class="p-4 border-t border-outline-variant">
-                    <div class="flex justify-between font-label-caps text-[10px] text-outline"><span>CREW:</span><span>${crew.pilot}</span></div>
-                    <div class="flex justify-between font-label-caps text-[10px] text-outline"><span>AIRCRAFT:</span><span>${crew.aircraft}</span></div>
-                </div>
-                <div class="p-4 border-t border-outline-variant flex justify-end">
-                    <button onclick="this.closest('.fixed').remove(); AssetManager.scramble();" class="bg-tertiary text-black px-4 py-2 text-[10px] font-bold uppercase">LAUNCH</button>
-                </div>
-            </div>`;
-        document.body.appendChild(modal);
-        modal.addEventListener('click', (event) => {
-            const button = event.target.closest('button[data-action="toggle-check"]');
-            if (!button) return;
-            const row = button.closest('.checklist-item');
-            const checked = row.dataset.status === 'CHECKED';
-            row.dataset.status = checked ? 'PENDING' : 'CHECKED';
-            row.classList.toggle('bg-green-900/30', !checked);
-            button.textContent = checked ? 'PENDING' : 'CHECKED';
-            button.className = checked
-                ? 'bg-surface text-outline text-[10px] px-2 py-1 rounded'
-                : 'bg-green-600 text-white text-[10px] px-2 py-1 rounded';
-        });
-    },
-
-    showLoadoutConfig: function() {
-        const weapons = [
-            { name: 'IRIS-T',   qty: 2, status: 'selected',  available: this.munitionStock['IRIS-T SRAAM'].qty },
-            { name: 'AIM-120B', qty: 4, status: 'selected',  available: this.munitionStock['AIM-120B'].qty },
-            { name: 'GBU-39',   qty: 2, status: 'available', available: this.munitionStock['GBU-39 SDB'].qty },
-            { name: 'KEP 500',  qty: 1, status: 'available', available: this.munitionStock['KEP 500'].qty }
-        ];
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
-        modal.innerHTML = `
-            <div class="bg-surface-container border border-outline-variant w-[400px] max-w-[90vw]">
-                <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-variant/30">
-                    <h3 class="font-headline-md text-headline-md text-primary">WEAPON LOADOUT</h3>
-                    <button onclick="this.closest('.fixed').remove()" class="text-outline hover:text-on-surface p-1"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="p-4 space-y-2">
-                    ${weapons.map(w => `
-                        <div class="loadout-item flex justify-between items-center p-2 ${w.status === 'selected' ? 'bg-primary-container/20 border border-primary/30' : 'bg-surface-variant/30'} rounded-sm" data-selected="${w.status === 'selected'}" data-qty="${w.qty}">
-                            <div>
-                                <div class="weapon-name text-on-surface font-bold">${w.name}</div>
-                                <div class="weapon-status text-[9px] text-outline">${w.status === 'selected' ? 'LOADED' : 'AVAILABLE'}</div>
+            <!-- Airbase Status -->
+            <div class="col-span-12 flex flex-col gap-gutter mt-4">
+                <h3 class="font-label-caps text-label-caps text-primary uppercase border-b border-outline-variant pb-2 font-bold tracking-widest">Tactical Wing Operational Status</h3>
+                <div class="grid grid-cols-3 gap-gutter">
+                    <!-- F7 Såtenäs -->
+                    <div id="base-f7-satenas" onclick="AssetManager.showBaseDetail('F7 Såtenäs')" class="base-card glass-panel p-panel-padding flex flex-col relative overflow-hidden group transition-all duration-500 cursor-pointer hover:border-primary hover:bg-primary/5">
+                        <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]"></div>
+                        <div class="relative z-10 flex-1">
+                            <div class="flex justify-between items-center mb-6 border-b border-outline-variant/30 pb-3">
+                                <span class="font-headline-md text-headline-md text-on-surface uppercase font-black tracking-tight">F7 Såtenäs</span>
+                                <span class="font-data-mono text-[9px] text-tertiary border border-tertiary/40 px-2 py-0.5 rounded-sm font-black">QRA-READY</span>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-on-surface font-data-mono">x${w.qty}</span>
-                                <button data-action="toggle-loadout" class="w-6 h-6 ${w.status === 'selected' ? 'bg-primary text-white' : 'bg-surface text-outline'} rounded text-[12px]">${w.status === 'selected' ? 'X' : '+'}</button>
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between font-data-mono text-[11px] text-outline mb-1.5 uppercase font-bold">
+                                        <span>Gripen E/F Availability</span>
+                                        <span class="text-on-surface">18 / 24</span>
+                                    </div>
+                                    <div class="h-1.5 bg-surface-variant rounded-full overflow-hidden">
+                                        <div class="h-full bg-primary glow-primary w-[75%] transition-all duration-1000"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between font-data-mono text-[11px] text-outline mb-1.5 uppercase font-bold">
+                                        <span>Munitions Inventory</span>
+                                        <span class="text-on-surface">92%</span>
+                                    </div>
+                                    <div class="h-1.5 bg-surface-variant rounded-full overflow-hidden">
+                                        <div class="h-full bg-secondary w-[92%] transition-all duration-1000"></div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>`).join('')}
-                </div>
-                <div class="p-4 border-t border-outline-variant bg-surface-variant/30 flex justify-between">
-                    <span class="text-outline text-[10px]">TOTAL LOAD:</span>
-                    <span id="loadout-total" class="text-primary font-bold">6 ITEMS</span>
-                </div>
-                <div class="p-4 border-t border-outline-variant flex justify-end gap-2">
-                    <button onclick="this.closest('.fixed').remove()" class="bg-surface-variant border border-outline px-4 py-2 text-[10px] font-bold uppercase">CANCEL</button>
-                    <button onclick="this.closest('.fixed').remove(); window.SharedComponents?.showToast('LOADOUT CONFIGURED', 'Weapons ready', 'check')" class="bg-primary text-white px-4 py-2 text-[10px] font-bold uppercase">CONFIRM</button>
-                </div>
-            </div>`;
-        document.body.appendChild(modal);
-
-        const updateTotal = () => {
-            const total = Array.from(modal.querySelectorAll('.loadout-item[data-selected="true"]'))
-                .reduce((sum, item) => sum + Number(item.dataset.qty || 0), 0);
-            const el = modal.querySelector('#loadout-total');
-            if (el) el.textContent = `${total} ITEMS`;
-        };
-        modal.addEventListener('click', (event) => {
-            const button = event.target.closest('button[data-action="toggle-loadout"]');
-            if (!button) return;
-            const item = button.closest('.loadout-item');
-            const selected = item.dataset.selected === 'true';
-            item.dataset.selected = selected ? 'false' : 'true';
-            item.classList.toggle('bg-primary-container/20', !selected);
-            item.classList.toggle('border', !selected);
-            item.classList.toggle('border-primary/30', !selected);
-            item.classList.toggle('bg-surface-variant/30', selected);
-            const status = item.querySelector('.weapon-status');
-            if (status) status.textContent = selected ? 'AVAILABLE' : 'LOADED';
-            button.textContent = selected ? '+' : 'X';
-            button.className = selected
-                ? 'w-6 h-6 bg-surface text-outline rounded text-[12px]'
-                : 'w-6 h-6 bg-primary text-white rounded text-[12px]';
-            updateTotal();
-        });
-        updateTotal();
-    },
-
-    sort: function(col) {
-        this.sortCol === col ? (this.sortAsc = !this.sortAsc) : (this.sortCol = col, this.sortAsc = true);
-        this.updateSortIndicators();
-        this.filterTable();
-    },
-
-    updateSortIndicators: function() {
-        document.querySelectorAll('.sort-dir').forEach(el => { el.textContent = ''; });
-        const indicator = document.querySelector(`.sort-dir[data-col="${this.sortCol}"]`);
-        if (indicator) indicator.textContent = this.sortAsc ? ' ▲' : ' ▼';
-    },
-
-    filterTable: function() {
-        const tbody = document.getElementById('maintenance-body');
-        if (!tbody) return;
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        const filtered = rows.filter(row => {
-            if (!this.searchQuery) return true;
-            const assetId   = row.dataset.assetId?.toLowerCase()   || '';
-            const base      = row.dataset.base?.toLowerCase()      || '';
-            const procedure = row.dataset.procedure?.toLowerCase() || '';
-            const status    = row.dataset.status?.toLowerCase()    || '';
-            return assetId.includes(this.searchQuery) || base.includes(this.searchQuery) ||
-                   procedure.includes(this.searchQuery) || status.includes(this.searchQuery);
-        });
-        if (this.sortCol) {
-            filtered.sort((a, b) => {
-                let va = a.dataset[this.sortCol] || '';
-                let vb = b.dataset[this.sortCol] || '';
-                if (this.sortCol === 'downtime') { va = parseInt(va, 10) || 999; vb = parseInt(vb, 10) || 999; }
-                if (va < vb) return this.sortAsc ? -1 : 1;
-                if (va > vb) return this.sortAsc ? 1 : -1;
-                return 0;
-            });
-        }
-        rows.forEach(row => row.classList.toggle('hidden', !filtered.includes(row)));
-        filtered.forEach(row => tbody.appendChild(row));
-    },
-
-    refreshData: function() {
-        const btn = document.querySelector('#btn-refresh');
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<span class="material-symbols-outlined text-[14px] animate-spin">sync</span> REFRESHING...';
-        }
-        window.SharedComponents?.showToast('REFRESHING', 'Updating asset status...', 'sync');
-
-        setTimeout(() => {
-            const statuses = ['HOT', 'WARM', 'COLD'];
-            document.querySelectorAll('.qra-slot').forEach((slot) => {
-                const statusEl = slot.querySelector('.qra-status');
-                if (!statusEl) return;
-                // Preserve scrambled slots — do not reset them
-                if (this.scrambledSlots.has(Number(slot.dataset.slot))) return;
-                const next = statuses[Math.floor(Math.random() * statuses.length)];
-                statusEl.textContent = next;
-                statusEl.classList.remove('text-tertiary', 'text-amber-400', 'text-outline', 'text-sky-400');
-                if (next === 'HOT')  statusEl.classList.add('text-tertiary');
-                if (next === 'WARM') statusEl.classList.add('text-amber-400');
-                if (next === 'COLD') statusEl.classList.add('text-outline');
-            });
-
-            const times = document.querySelectorAll('#incident-feed .font-data-mono');
-            times.forEach(el => {
-                const h = Math.floor(Math.random() * 2) + 14;
-                const m = Math.floor(Math.random() * 60);
-                el.textContent = `${h}:${m.toString().padStart(2, '0')}Z`;
-            });
-
-            // Preserve actual scrambled count from tracked state
-            const currentScrambled = this.scrambledSlots.size;
-            const grounded = 3;
-            const total    = 23;
-            const patrolling = 8;  // Fixed realistic value instead of random
-            const standby  = total - currentScrambled - grounded - patrolling;
-
-            const patrolEl   = document.getElementById('live-patrolling');
-            const standbyEl  = document.getElementById('live-standby');
-            const groundedEl = document.getElementById('live-grounded');
-            const scrambledEl = document.getElementById('live-scrambled');
-            if (patrolEl)   patrolEl.textContent   = patrolling;
-            if (standbyEl)  standbyEl.textContent  = Math.max(0, standby);
-            if (groundedEl) groundedEl.textContent = grounded;
-            if (scrambledEl) scrambledEl.textContent = currentScrambled;
-
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-outlined text-[14px]">sync</span> FORCE REFRESH';
-            }
-            window.SharedComponents?.showToast('DATA UPDATED', 'All systems refreshed', 'check', 'success');
-        }, 800);
-    },
-
-    exportCSV: function() {
-        const timestamp = new Date().toISOString().slice(0, 10);
-
-        // Maintenance data
-        const tbody = document.getElementById('maintenance-body');
-        const rows  = Array.from(tbody.querySelectorAll('tr'));
-        const maintenanceData = [['=== MAINTENANCE LOGS ==='], ['ASSET ID', 'BASE', 'PROCEDURE', 'EST. DOWNTIME', 'STATUS']];
-        rows.forEach(row => {
-            maintenanceData.push([
-                row.dataset.assetId   || '',
-                row.dataset.base      || '',
-                row.dataset.procedure || '',
-                row.dataset.downtime === '999' ? 'TBD' : row.dataset.downtime + ' HRS',
-                row.dataset.status    || ''
-            ]);
-        });
-
-        // Live status data
-        maintenanceData.push([]);
-        maintenanceData.push(['=== LIVE ASSET STATUS ===']);
-        maintenanceData.push(['STATUS', 'COUNT']);
-        maintenanceData.push(['Patrolling', document.getElementById('live-patrolling')?.textContent || '0']);
-        maintenanceData.push(['Standby', document.getElementById('live-standby')?.textContent || '0']);
-        maintenanceData.push(['Grounded', document.getElementById('live-grounded')?.textContent || '0']);
-        maintenanceData.push(['Scrambled', document.getElementById('live-scrambled')?.textContent || '0']);
-
-        // Munitions data
-        maintenanceData.push([]);
-        maintenanceData.push(['=== MUNITIONS STOCKPILE ===']);
-        maintenanceData.push(['WEAPON', 'STOCK', 'THRESHOLD', 'LEVEL', 'STATUS']);
-        Object.entries(this.munitionStock).forEach(([name, data]) => {
-            maintenanceData.push([name, data.qty, data.threshold, data.level, data.status]);
-        });
-
-        const blob = new Blob([maintenanceData.map(r => r.map(c => `"${c}"`).join(',')).join('\n')], { type: 'text/csv' });
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
-        a.href     = url;
-        a.download = `fleet_report_${timestamp}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
-    },
-
-    showDetail: function(assetId) {
-        const details = {
-            'A/C-391': { type: 'Gripen C', base: 'F21 Luleå',   flights: 1247, lastMaint: '2026-01-15', nextMaint: '2026-02-15', status: 'AOG',     issue: 'Hot section inspection required — turbine blade wear exceeded limits', parts: ['Turbine Blade Kit', 'Combustion Liner'], eta: '48 HRS' },
-            'A/C-394': { type: 'Gripen C', base: 'F21 Luleå',   flights: 892,  lastMaint: '2026-03-01', nextMaint: '2026-04-01', status: 'SCHED',   issue: 'Radar array calibration schedule — 6 month interval',               parts: ['AESA Module', 'waveguide'],              eta: '12 HRS' },
-            'A/C-402': { type: 'Gripen E', base: 'F7 Såtenäs',  flights: 543,  lastMaint: '2025-11-20', nextMaint: '2026-05-20', status: 'PENDING', issue: 'Standard 500 hour inspection',                                       parts: ['filters', 'hydraulic fluid'],            eta: 'TBD'    }
-        };
-        const d = details[assetId];
-        if (!d) return;
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
-        modal.innerHTML = `
-            <div class="bg-surface-container border border-outline-variant w-[500px] max-w-[90vw]">
-                <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-variant/30">
-                    <h3 class="font-headline-md text-headline-md text-primary">${assetId} - DETAIL</h3>
-                    <button onclick="this.closest('.fixed').remove()" class="text-outline hover:text-on-surface p-1"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="p-4 space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><span class="text-[10px] text-outline">AIRCRAFT TYPE</span><p class="text-on-surface font-bold">${d.type}</p></div>
-                        <div><span class="text-[10px] text-outline">CURRENT BASE</span><p class="text-on-surface font-bold">${d.base}</p></div>
-                        <div><span class="text-[10px] text-outline">FLIGHT HOURS</span><p class="text-on-surface font-bold">${d.flights}</p></div>
-                        <div><span class="text-[10px] text-outline">STATUS</span><p class="font-bold ${d.status === 'AOG' ? 'text-error' : 'text-tertiary'}">${d.status}</p></div>
+                        </div>
                     </div>
-                    <div class="border-t border-outline-variant pt-4">
-                        <span class="text-[10px] text-outline">ISSUE</span><p class="text-on-surface mt-1">${d.issue}</p>
+                    <!-- F17 Kallinge -->
+                    <div id="base-f17-kallinge" onclick="AssetManager.showBaseDetail('F17 Kallinge')" class="base-card glass-panel p-panel-padding flex flex-col relative overflow-hidden transition-all duration-500 cursor-pointer hover:border-primary hover:bg-primary/5">
+                        <div class="relative z-10 flex-1">
+                            <div class="flex justify-between items-center mb-6 border-b border-outline-variant/30 pb-3">
+                                <span class="font-headline-md text-headline-md text-on-surface uppercase font-black tracking-tight">F17 Kallinge</span>
+                                <span class="font-data-mono text-[9px] text-primary border border-primary/40 px-2 py-0.5 rounded-sm font-black">NOMINAL</span>
+                            </div>
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between font-data-mono text-[11px] text-outline mb-1.5 uppercase font-bold">
+                                        <span>Gripen C/D Availability</span>
+                                        <span class="text-on-surface">14 / 16</span>
+                                    </div>
+                                    <div class="h-1.5 bg-surface-variant rounded-full overflow-hidden">
+                                        <div class="h-full bg-primary glow-primary w-[87%] transition-all duration-1000"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between font-data-mono text-[11px] text-outline mb-1.5 uppercase font-bold">
+                                        <span>Munitions Inventory</span>
+                                        <span class="text-on-surface">88%</span>
+                                    </div>
+                                    <div class="h-1.5 bg-surface-variant rounded-full overflow-hidden">
+                                        <div class="h-full bg-secondary w-[88%] transition-all duration-1000"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><span class="text-[10px] text-outline">LAST MAINTENANCE</span><p class="text-on-surface">${d.lastMaint}</p></div>
-                        <div><span class="text-[10px] text-outline">NEXT MAINTENANCE</span><p class="text-on-surface">${d.nextMaint}</p></div>
-                    </div>
-                    <div><span class="text-[10px] text-outline">REQUIRED PARTS</span><p class="text-on-surface">${d.parts.join(', ')}</p></div>
-                    <div><span class="text-[10px] text-outline">EST. DOWNTIME</span><p class="text-on-surface font-bold">${d.eta}</p></div>
-                </div>
-                <div class="p-4 border-t border-outline-variant flex gap-2 justify-end">
-                    <button onclick="this.closest('.fixed').remove()" class="bg-surface-variant border border-outline px-4 py-2 text-[10px] font-bold uppercase">CLOSE</button>
-                    <button onclick="AssetManager.scheduleRepair('${assetId}'); this.closest('.fixed').remove();" class="bg-primary text-white px-4 py-2 text-[10px] font-bold uppercase">SCHEDULE REPAIR</button>
-                </div>
-            </div>`;
-        document.body.appendChild(modal);
-    },
-
-    scheduleRepair: function(assetId) {
-        window.SharedComponents?.showToast('REPAIR SCHEDULED', `${assetId} maintenance prioritized`, 'build', 'primary');
-        const row = document.querySelector(`[data-asset-id="${assetId}"]`);
-        if (!row) return;
-        const statusSpan = row.querySelector('td:last-child span');
-        if (statusSpan && statusSpan.textContent.trim() === 'PENDING') {
-            statusSpan.textContent = 'SCHED';
-            statusSpan.className = 'px-2 py-0.5 bg-tertiary/10 text-tertiary border border-tertiary/30 text-[9px]';
-            row.dataset.status = 'SCHED';
-        }
-    },
-
-    showMunitionDetail: function(name) {
-        // Map display names to stock keys
-        const nameMap = {
-            'Meteor BVR': 'Meteor BVR',
-            'IRIS-T SRAAM': 'IRIS-T SRAAM',
-            'GBU-39 SDB': 'GBU-39 SDB'
-        };
-        const stockKey = nameMap[name];
-        const m = stockKey ? this.munitionStock[stockKey] : null;
-        if (!m) return;
-
-        const isReorder = m.status === 'REORDER';
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
-        modal.innerHTML = `
-            <div class="bg-surface-container border border-outline-variant w-[380px] max-w-[90vw]">
-                <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-variant/30">
-                    <h3 class="font-headline-md text-headline-md ${isReorder ? 'text-tertiary' : 'text-primary'}">${name}</h3>
-                    <button onclick="this.closest('.fixed').remove()" class="text-outline hover:text-on-surface p-1"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="p-4 space-y-3">
-                    <div class="grid grid-cols-3 gap-3">
-                        <div><span class="text-[10px] text-outline">STOCK</span><p class="text-on-surface font-bold">${m.qty} UNITS</p></div>
-                        <div><span class="text-[10px] text-outline">THRESHOLD</span><p class="text-on-surface">${m.threshold} UNITS</p></div>
-                        <div><span class="text-[10px] text-outline">LEVEL</span><p class="font-bold ${isReorder ? 'text-tertiary' : 'text-primary'}">${m.level}</p></div>
-                    </div>
-                    <div class="border-t border-outline-variant pt-3">
-                        <span class="text-[10px] text-outline">STATUS</span>
-                        <p class="text-on-surface-variant text-sm mt-1">${m.status === 'OPTIMAL' ? 'Stock above operational threshold.' : (m.status === 'NOMINAL' ? 'Adequate for current mission tempo.' : 'Stock below threshold — immediate resupply required.')}</p>
+                    <!-- F21 Luleå -->
+                    <div id="base-f21-lulea" onclick="AssetManager.showBaseDetail('F21 Luleå')" class="base-card glass-panel border-error/50 p-panel-padding flex flex-col relative overflow-hidden transition-all duration-500 cursor-pointer hover:border-error hover:bg-error/5">
+                        <div class="absolute top-0 right-0 w-10 h-10 bg-error/10 border-l border-b border-error/30 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[20px] text-error animate-pulse">warning</span>
+                        </div>
+                        <div class="relative z-10 flex-1">
+                            <div class="flex justify-between items-center mb-6 border-b border-outline-variant/30 pb-3">
+                                <span class="font-headline-md text-headline-md text-on-surface uppercase font-black tracking-tight">F21 Luleå</span>
+                                <span class="font-data-mono text-[9px] text-error border border-error/40 px-2 py-0.5 rounded-sm mr-8 font-black">DEGRADED</span>
+                            </div>
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between font-data-mono text-[11px] text-outline mb-1.5 uppercase font-bold">
+                                        <span>Gripen C/D Availability</span>
+                                        <span class="text-error font-black font-['Orbitron']">8 / 18</span>
+                                    </div>
+                                    <div class="h-1.5 bg-surface-variant rounded-full overflow-hidden">
+                                        <div class="h-full bg-error glow-error w-[44%] transition-all duration-1000"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between font-data-mono text-[11px] text-outline mb-1.5 uppercase font-bold">
+                                        <span>Arctic Ops Readiness</span>
+                                        <span class="text-on-surface">100%</span>
+                                    </div>
+                                    <div class="h-1.5 bg-surface-variant rounded-full overflow-hidden">
+                                        <div class="h-full bg-secondary w-[100%] transition-all duration-1000"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="p-4 border-t border-outline-variant flex gap-2 justify-end">
-                    <button onclick="this.closest('.fixed').remove()" class="bg-surface-variant border border-outline px-4 py-2 text-[10px] font-bold uppercase">CLOSE</button>
-                    ${isReorder ? `<button onclick="this.closest('.fixed').remove(); window.SharedComponents?.showToast('REORDER RAISED', '${name} resupply requested', 'rocket', 'warning');" class="bg-tertiary text-black px-4 py-2 text-[10px] font-bold uppercase">REQUEST RESUPPLY</button>` : ''}
+            </div>
+
+            <!-- Maintenance Table -->
+            <div class="col-span-12 glass-panel mt-4 overflow-hidden rounded-lg">
+                <div class="p-5 border-b border-outline-variant/30 bg-surface-container-high/30 flex justify-between items-center backdrop-blur-xl">
+                    <h3 class="font-label-caps text-label-caps text-on-surface uppercase font-black tracking-widest">Mission Critical Maintenance Logs</h3>
+                    <div class="flex gap-2">
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-outline">search</span>
+                            <input id="asset-search" class="bg-surface-variant/40 border border-outline/30 text-data-mono font-data-mono pl-9 pr-3 py-1.5 text-[11px] focus:outline-none focus:border-primary text-on-surface w-64 rounded transition-all" placeholder="FILTER BY ASSET ID OR BASE..." type="text"/>
+                        </div>
+                    </div>
                 </div>
-            </div>`;
-        document.body.appendChild(modal);
-    }
-};
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-outline-variant/20 bg-surface-container-low/20 font-label-caps text-[11px] text-outline uppercase font-bold">
+                                <th class="py-4 px-8 tracking-widest cursor-pointer hover:text-primary transition-colors" onclick="AssetManager.sort('assetId')">Asset Designation <span class="sort-dir" data-col="assetId"></span></th>
+                                <th class="py-4 px-8 tracking-widest cursor-pointer hover:text-primary transition-colors" onclick="AssetManager.sort('base')">Station <span class="sort-dir" data-col="base"></span></th>
+                                <th class="py-4 px-8 tracking-widest cursor-pointer hover:text-primary transition-colors" onclick="AssetManager.sort('procedure')">Operational Procedure <span class="sort-dir" data-col="procedure"></span></th>
+                                <th class="py-4 px-8 tracking-widest cursor-pointer hover:text-primary transition-colors" onclick="AssetManager.sort('downtime')">Downtime Est. <span class="sort-dir" data-col="downtime"></span></th>
+                                <th class="py-4 px-8 tracking-widest cursor-pointer hover:text-primary transition-colors" onclick="AssetManager.sort('status')">Current Status <span class="sort-dir" data-col="status"></span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-data-mono text-[12px] text-on-surface" id="maintenance-body">
+                            <tr class="border-b border-outline-variant/10 hover:bg-primary/5 transition-colors cursor-pointer group" data-asset-id="A/C-391" data-base="F21 Luleå" data-procedure="Engine Hot Section Insp." data-downtime="48" data-status="AOG" onclick="AssetManager.showDetail('A/C-391')">
+                                <td class="py-5 px-8 font-black text-primary group-hover:text-sky-300 transition-colors">A/C-391</td>
+                                <td class="py-5 px-8">F21 Luleå Station</td>
+                                <td class="py-5 px-8 text-outline-variant font-medium">Engine Hot Section Inspection Required</td>
+                                <td class="py-5 px-8 font-bold">48 HRS</td>
+                                <td class="py-5 px-8">
+                                    <span class="px-3 py-1.5 bg-error/10 text-error border border-error/40 text-[10px] font-black rounded-sm shadow-[0_0_10px_rgba(255,82,82,0.15)]">AOG // CRITICAL</span>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-outline-variant/10 hover:bg-primary/5 transition-colors cursor-pointer group" data-asset-id="A/C-394" data-base="F21 Luleå" data-procedure="Radar Array Calibration" data-downtime="12" data-status="SCHED" onclick="AssetManager.showDetail('A/C-394')">
+                                <td class="py-5 px-8 font-black text-primary group-hover:text-sky-300 transition-colors">A/C-394</td>
+                                <td class="py-5 px-8">F21 Luleå Station</td>
+                                <td class="py-5 px-8 text-outline-variant font-medium">AESA Radar Array Calibration</td>
+                                <td class="py-5 px-8 font-bold">12 HRS</td>
+                                <td class="py-5 px-8">
+                                    <span class="px-3 py-1.5 bg-tertiary/10 text-tertiary border border-tertiary/40 text-[10px] font-black rounded-sm">SCHED // ROUTINE</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-primary/5 transition-colors cursor-pointer group" data-asset-id="A/C-402" data-base="F7 Såtenäs" data-procedure="Standard 500H Check" data-downtime="999" data-status="PENDING" onclick="AssetManager.showDetail('A/C-402')">
+                                <td class="py-5 px-8 font-black text-primary group-hover:text-sky-300 transition-colors">A/C-402</td>
+                                <td class="py-5 px-8">F7 Såtenäs Station</td>
+                                <td class="py-5 px-8 text-outline-variant font-medium">Standard 500-Hour Systems Check</td>
+                                <td class="py-5 px-8 text-outline font-bold">TBD</td>
+                                <td class="py-5 px-8">
+                                    <span class="px-3 py-1.5 bg-outline/10 text-outline border border-outline/40 text-[10px] font-black rounded-sm">PENDING QUEUE</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-window.AssetManager = AssetManager;
-
-if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', () => AssetManager.init(), { once: true });
-} else {
-    AssetManager.init();
-}
-</script>
-<script>
-const getBaseCardId = (baseName) => {
-    const slug = baseName
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '');
-    return `base-${slug}`;
-};
-
-if (window.__assetReadyAiRecommendationHandler) {
-    window.removeEventListener('ai-asset-recommendation', window.__assetReadyAiRecommendationHandler);
-}
-
-window.__assetReadyAiRecommendationHandler = (e) => {
-    document.querySelectorAll('.base-card').forEach(card => {
-        card.classList.remove('border-sky-500', 'shadow-[0_0_20px_rgba(130,207,255,0.4)]', 'scale-[1.02]', 'z-20');
-        card.classList.add('border-outline-variant');
-        card.querySelector('.ai-badge')?.remove();
-    });
-    const targetId = e.detail.baseId || getBaseCardId(e.detail.baseName);
-    const targetCard = document.getElementById(targetId);
-    if (targetCard) {
-        targetCard.classList.remove('border-outline-variant');
-        targetCard.classList.add('border-sky-500', 'shadow-[0_0_20px_rgba(130,207,255,0.4)]', 'scale-[1.02]', 'z-20');
-        if (!targetCard.querySelector('.ai-badge')) {
-            const badge = document.createElement('div');
-            badge.className = "ai-badge absolute top-0 left-0 bg-sky-500 text-slate-950 font-black text-[8px] px-2 py-0.5 z-30 uppercase tracking-tighter";
-            badge.textContent = "AI RECOMMENDED";
-            targetCard.appendChild(badge);
-        }
-    }
-};
-
-window.addEventListener('ai-asset-recommendation', window.__assetReadyAiRecommendationHandler);
-</script>
-</body></html>
+            <!-- Live Metrics Footer -->
+            <div class="col-span-12 glass-panel mt-4 mb-gutter overflow-hidden rounded-lg">
+                <div class="p-5 border-b border-outline-variant/30 flex justify-between items-center bg-primary/5">
+                    <h3 class="font-label-caps text-label-caps text-primary uppercase font-black tracking-widest">Real-Time Fleet Deployment Metrics</h3>
+                    <div class="flex items-center gap-3">
+                        <span class="w-2.5 h-2.5 bg-primary rounded-full animate-pulse glow-primary"></span>
+                        <span class="font-data-mono text-[11px] text-outline font-black uppercase tracking-widest">Datalink Status: Active</span>
+                    </div>
+                </div>
+                <div id="live-status-grid" class="grid grid-cols-4 gap-[2px] bg-outline-variant/20">
+                    <div class="bg-surface-container/30 p-6 text-center group hover:bg-primary/10 transition-all">
+                        <div id="live-patrolling" class="font-headline-md text-[42px] text-primary font-black mb-1 font-['Orbitron']">8</div>
+                        <div class="font-label-caps text-[10px] text-outline font-black tracking-widest uppercase">Patrolling</div>
+                        <div class="h-1.5 bg-primary mt-4 w-full rounded-full glow-primary"></div>
+                    </div>
+                    <div class="bg-surface-container/30 p-6 text-center group hover:bg-tertiary/10 transition-all">
+                        <div id="live-standby" class="font-headline-md text-[42px] text-tertiary font-black mb-1 font-['Orbitron']">12</div>
+                        <div class="font-label-caps text-[10px] text-outline font-black tracking-widest uppercase">Standby</div>
+                        <div class="h-1.5 bg-tertiary mt-4 w-full rounded-full glow-tertiary"></div>
+                    </div>
+                    <div class="bg-surface-container/30 p-6 text-center group hover:bg-error/10 transition-all">
+                        <div id="live-grounded" class="font-headline-md text-[42px] text-error font-black mb-1 font-['Orbitron']">3</div>
+                        <div class="font-label-caps text-[10px] text-outline font-black tracking-widest uppercase">Grounded</div>
+                        <div class="h-1.5 bg-error mt-4 w-full rounded-full glow-error"></div>
+                    </div>
+                    <div class="bg-surface-container/30 p-6 text-center group hover:bg-sky-400/10 transition-all">
+                        <div id="live-scrambled" class="font-headline-md text-[42px] text-sky-400 font-black mb-1 font-['Orbitron']">2</div>
+                        <div class="font-label-caps text-[10px] text-outline font-black tracking-widest uppercase">Scrambled</div>
+                        <div class="h-1.5 bg-sky-400 mt-4 w-full rounded-full animate-pulse shadow-[0_0_15px_#38bdf8]"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="./ai-system.js"></script>
+    <script src="./shared-components.js"></script>
+    <script src="./asset-ready.js"></script>
+</body>
+</html>
