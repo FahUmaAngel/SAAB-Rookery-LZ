@@ -1,8 +1,0 @@
-Exception calling "ReadLine" with "0" argument(s): "Unable to read data from the transport connection: An existing 
-connection was forcibly closed by the remote host."
-At C:\Users\tatsu\SAAB-Rookery-LZ\local-server.ps1:57 char:13
-+             $requestLine = $reader.ReadLine()
-+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (:) [], ParentContainsErrorRecordException
-    + FullyQualifiedErrorId : IOException
- 
