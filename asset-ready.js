@@ -641,7 +641,10 @@ const AssetManager = {
     }
 };
 
-// Initialize on page load
-addEventListener('DOMContentLoaded', () => {
+// Initialize on page load (direct) and on SPA navigation
+function _initAssetReady() {
+    AssetManager.initialized = false;
     AssetManager.init();
-});
+}
+addEventListener('DOMContentLoaded', _initAssetReady);
+addEventListener('spa-navigated', _initAssetReady);

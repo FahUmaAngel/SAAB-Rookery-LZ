@@ -196,6 +196,7 @@ const SharedComponents = {
     toggleSubmenu: (event, el) => {
         event.preventDefault();
         const submenu = el.nextElementSibling;
+        if (!submenu) return;
         const icon = el.querySelector('.absolute.right-1');
         const isExpanded = document.body.classList.contains('sidebar-expanded');
 
@@ -330,6 +331,9 @@ const SharedComponents = {
                     }
                 }
 
+                // Notify page modules that SPA navigation completed
+                dispatchEvent(new CustomEvent('spa-navigated', { detail: { url } }));
+
                 // Update active state in sidebar
                 SharedComponents.initSidebar(url);
             }
@@ -443,7 +447,7 @@ const SharedComponents = {
             REPORT:  { dot: '#34d399', label: 'AI: REPORTING' },
         };
 
-        window.addEventListener('ai-update', (e) => {
+        addEventListener('ai-update', (e) => {
             const { phase } = e.detail;
             const bar = document.getElementById('ai-threat-bar');
             const val = document.getElementById('ai-threat-value');
@@ -459,8 +463,8 @@ const SharedComponents = {
             }
 
             // Update threat bar
-            if (bar && val && window.AISystem) {
-                const score = window.AISystem.state.threatScore;
+            if (bar && val && globalThis.AISystem) {
+                const score = globalThis.AISystem.state.threatScore;
                 bar.style.width = `${score}%`;
                 val.textContent = `${score}%`;
                 if (score > 70) bar.className = 'absolute top-0 left-0 h-full bg-error transition-all duration-1000';
@@ -468,7 +472,7 @@ const SharedComponents = {
                 else bar.className = 'absolute top-0 left-0 h-full bg-sky-500 transition-all duration-1000';
             }
 
-            if (window.AISystem?.state.hitlPending) {
+            if (globalThis.AISystem?.state.hitlPending) {
                 SharedComponents.showHITLCard();
             }
         });
@@ -476,8 +480,9 @@ const SharedComponents = {
 
     showHITLCard: () => {
         if (document.getElementById('ai-hitl-card')) return;
-        
-        const suggestion = window.AISystem.state.suggestions[0];
+
+        const suggestion = globalThis.AISystem?.state.suggestions[0];
+        if (!suggestion) return;
         const card = document.createElement('div');
         card.id = 'ai-hitl-card';
         card.className = "fixed top-20 right-6 w-80 bg-slate-950 border-2 border-sky-500 shadow-[0_0_20px_rgba(130,207,255,0.2)] z-[100] p-4 animate-in slide-in-from-right fade-in";
@@ -523,7 +528,7 @@ const SharedComponents = {
         const isArmed = btn?.classList.contains('bg-red-600');
         
         if (isArmed) {
-            btn.classList.remove('bg-red-600', 'text-white');
+            btn.classList.remove('bg-red-600', 'text-white', 'animate-pulse');
             btn.classList.add('bg-slate-900', 'text-sky-500');
             SharedComponents.showToast('ARM SYS', 'WEAPONS DISENGAGED', 'lock', 'error');
         } else {
@@ -629,20 +634,20 @@ const SharedComponents = {
                 <div class="p-4 space-y-4">
                     <div class="flex justify-between items-center">
                         <span class="text-slate-400">Auto-refresh Data</span>
-                        <button class="w-12 h-6 bg-sky-600 rounded-full relative">
-                            <span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></span>
+                        <button onclick="SharedComponents._toggleSetting(this)" class="w-12 h-6 bg-sky-600 rounded-full relative transition-colors">
+                            <span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full transition-all"></span>
                         </button>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-slate-400">Sound Alerts</span>
-                        <button class="w-12 h-6 bg-slate-700 rounded-full relative">
-                            <span class="absolute left-1 top-1 w-4 h-4 bg-slate-500 rounded-full"></span>
+                        <button onclick="SharedComponents._toggleSetting(this)" class="w-12 h-6 bg-slate-700 rounded-full relative transition-colors">
+                            <span class="absolute left-1 top-1 w-4 h-4 bg-slate-500 rounded-full transition-all"></span>
                         </button>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-slate-400">Threat Overlay</span>
-                        <button class="w-12 h-6 bg-sky-600 rounded-full relative">
-                            <span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></span>
+                        <button onclick="SharedComponents._toggleSetting(this)" class="w-12 h-6 bg-sky-600 rounded-full relative transition-colors">
+                            <span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full transition-all"></span>
                         </button>
                     </div>
                     <div class="border-t border-slate-700 pt-4">
@@ -655,6 +660,19 @@ const SharedComponents = {
             </div>
         `;
         document.body.appendChild(modal);
+    },
+
+    _toggleSetting: (btn) => {
+        const isOn = btn.classList.contains('bg-sky-600');
+        btn.classList.toggle('bg-sky-600', !isOn);
+        btn.classList.toggle('bg-slate-700', isOn);
+        const dot = btn.querySelector('span');
+        if (dot) {
+            dot.classList.toggle('right-1', !isOn);
+            dot.classList.toggle('left-1', isOn);
+            dot.classList.toggle('bg-white', !isOn);
+            dot.classList.toggle('bg-slate-500', isOn);
+        }
     },
 
     saveState: () => {
@@ -686,6 +704,6 @@ window.addEventListener('DOMContentLoaded', () => {
     SharedComponents.init(currentPage);
 });
 
-window.onpopstate = () => {
+window.addEventListener('popstate', () => {
     SharedComponents.loadContent(window.location.pathname);
-};
+});
