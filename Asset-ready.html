@@ -418,7 +418,14 @@ const AssetManager = {
     initialized: false,
     qraData: {
         1: { pilot: 'LT Berg',  aircraft: 'JAS 39C / 391' },
-        2: { pilot: 'LT Lind',  aircraft: 'JAS 39E / 395' }
+        2: { pilot: 'LT Lind',  aircraft: 'JAS 39E / 394' }
+    },
+    munitionStock: {
+        'Meteor BVR': { qty: 42, threshold: 20, level: '85%', status: 'OPTIMAL' },
+        'IRIS-T SRAAM': { qty: 28, threshold: 15, level: '70%', status: 'NOMINAL' },
+        'GBU-39 SDB': { qty: 12, threshold: 30, level: '40%', status: 'REORDER' },
+        'AIM-120B': { qty: 32, threshold: 20, level: '75%', status: 'OPTIMAL' },
+        'KEP 500': { qty: 8, threshold: 5, level: '60%', status: 'NOMINAL' }
     },
 
     init: function() {
@@ -443,6 +450,13 @@ const AssetManager = {
         };
         const b = bases[baseName];
         if (!b) return;
+
+        // Get grounded aircraft for this base
+        const tbody = document.getElementById('maintenance-body');
+        const groundedAC = Array.from(tbody.querySelectorAll('tr'))
+            .filter(row => row.dataset.base === baseName && (row.dataset.status === 'AOG' || row.dataset.status === 'SCHED'))
+            .map(row => ({ id: row.dataset.assetId, status: row.dataset.status }));
+
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
         modal.innerHTML = `
@@ -467,6 +481,14 @@ const AssetManager = {
                             <p class="font-bold ${b.status === 'OPERATIONAL' ? 'text-green-500' : 'text-error'}">${b.status}</p>
                         </div>
                     </div>
+                    ${groundedAC.length > 0 ? `
+                    <div class="border-t border-outline-variant pt-4">
+                        <span class="text-[10px] text-error">GROUNDED AIRCRAFT (${groundedAC.length})</span>
+                        <div class="mt-2 space-y-1">
+                            ${groundedAC.map(ac => `<p class="text-[10px] text-on-surface">${ac.id} - ${ac.status}</p>`).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
                 </div>
                 <div class="p-4 border-t border-outline-variant flex justify-end gap-2">
                     <button onclick="this.closest('.fixed').remove(); AISystem.recommendAsset('${baseName}')" class="bg-surface-variant border border-outline px-4 py-2 text-[10px] font-bold uppercase">AI OPTIMIZE</button>
@@ -602,10 +624,10 @@ const AssetManager = {
 
     showLoadoutConfig: function() {
         const weapons = [
-            { name: 'IRIS-T',   qty: 2, status: 'selected'  },
-            { name: 'AIM-120B', qty: 4, status: 'selected'  },
-            { name: 'GBU-39',   qty: 2, status: 'available' },
-            { name: 'KEP 500',  qty: 1, status: 'available' }
+            { name: 'IRIS-T',   qty: 2, status: 'selected',  available: this.munitionStock['IRIS-T SRAAM'].qty },
+            { name: 'AIM-120B', qty: 4, status: 'selected',  available: this.munitionStock['AIM-120B'].qty },
+            { name: 'GBU-39',   qty: 2, status: 'available', available: this.munitionStock['GBU-39 SDB'].qty },
+            { name: 'KEP 500',  qty: 1, status: 'available', available: this.munitionStock['KEP 500'].qty }
         ];
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
@@ -739,15 +761,15 @@ const AssetManager = {
             const currentScrambled = this.scrambledSlots.size;
             const grounded = 3;
             const total    = 23;
-            const patrol   = Math.floor(Math.random() * 6) + 6;
-            const standby  = Math.max(0, total - currentScrambled - grounded - patrol);
+            const patrolling = 8;  // Fixed realistic value instead of random
+            const standby  = total - currentScrambled - grounded - patrolling;
 
             const patrolEl   = document.getElementById('live-patrolling');
             const standbyEl  = document.getElementById('live-standby');
             const groundedEl = document.getElementById('live-grounded');
             const scrambledEl = document.getElementById('live-scrambled');
-            if (patrolEl)   patrolEl.textContent   = patrol;
-            if (standbyEl)  standbyEl.textContent  = standby;
+            if (patrolEl)   patrolEl.textContent   = patrolling;
+            if (standbyEl)  standbyEl.textContent  = Math.max(0, standby);
             if (groundedEl) groundedEl.textContent = grounded;
             if (scrambledEl) scrambledEl.textContent = currentScrambled;
 
@@ -760,11 +782,14 @@ const AssetManager = {
     },
 
     exportCSV: function() {
+        const timestamp = new Date().toISOString().slice(0, 10);
+
+        // Maintenance data
         const tbody = document.getElementById('maintenance-body');
         const rows  = Array.from(tbody.querySelectorAll('tr'));
-        const data  = [['ASSET ID', 'BASE', 'PROCEDURE', 'EST. DOWNTIME', 'STATUS']];
+        const maintenanceData = [['=== MAINTENANCE LOGS ==='], ['ASSET ID', 'BASE', 'PROCEDURE', 'EST. DOWNTIME', 'STATUS']];
         rows.forEach(row => {
-            data.push([
+            maintenanceData.push([
                 row.dataset.assetId   || '',
                 row.dataset.base      || '',
                 row.dataset.procedure || '',
@@ -772,11 +797,29 @@ const AssetManager = {
                 row.dataset.status    || ''
             ]);
         });
-        const blob = new Blob([data.map(r => r.join(',')).join('\n')], { type: 'text/csv' });
+
+        // Live status data
+        maintenanceData.push([]);
+        maintenanceData.push(['=== LIVE ASSET STATUS ===']);
+        maintenanceData.push(['STATUS', 'COUNT']);
+        maintenanceData.push(['Patrolling', document.getElementById('live-patrolling')?.textContent || '0']);
+        maintenanceData.push(['Standby', document.getElementById('live-standby')?.textContent || '0']);
+        maintenanceData.push(['Grounded', document.getElementById('live-grounded')?.textContent || '0']);
+        maintenanceData.push(['Scrambled', document.getElementById('live-scrambled')?.textContent || '0']);
+
+        // Munitions data
+        maintenanceData.push([]);
+        maintenanceData.push(['=== MUNITIONS STOCKPILE ===']);
+        maintenanceData.push(['WEAPON', 'STOCK', 'THRESHOLD', 'LEVEL', 'STATUS']);
+        Object.entries(this.munitionStock).forEach(([name, data]) => {
+            maintenanceData.push([name, data.qty, data.threshold, data.level, data.status]);
+        });
+
+        const blob = new Blob([maintenanceData.map(r => r.map(c => `"${c}"`).join(',')).join('\n')], { type: 'text/csv' });
         const url  = URL.createObjectURL(blob);
         const a    = document.createElement('a');
         a.href     = url;
-        a.download = `maintenance_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.download = `fleet_report_${timestamp}.csv`;
         a.click();
         URL.revokeObjectURL(url);
     },
@@ -835,13 +878,16 @@ const AssetManager = {
     },
 
     showMunitionDetail: function(name) {
-        const munitions = {
-            'Meteor BVR':   { level: '85%', status: 'OPTIMAL', stock: 42, threshold: 20, note: 'Long-range BVR missile. Stock above operational threshold.' },
-            'IRIS-T SRAAM': { level: '70%', status: 'NOMINAL', stock: 28, threshold: 15, note: 'Short-range air-to-air missile. Adequate for current mission tempo.' },
-            'GBU-39 SDB':   { level: '40%', status: 'REORDER', stock: 12, threshold: 30, note: 'Small diameter bomb. Stock below threshold — immediate resupply required.' }
+        // Map display names to stock keys
+        const nameMap = {
+            'Meteor BVR': 'Meteor BVR',
+            'IRIS-T SRAAM': 'IRIS-T SRAAM',
+            'GBU-39 SDB': 'GBU-39 SDB'
         };
-        const m = munitions[name];
+        const stockKey = nameMap[name];
+        const m = stockKey ? this.munitionStock[stockKey] : null;
         if (!m) return;
+
         const isReorder = m.status === 'REORDER';
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
@@ -853,13 +899,13 @@ const AssetManager = {
                 </div>
                 <div class="p-4 space-y-3">
                     <div class="grid grid-cols-3 gap-3">
-                        <div><span class="text-[10px] text-outline">STOCK</span><p class="text-on-surface font-bold">${m.stock} UNITS</p></div>
+                        <div><span class="text-[10px] text-outline">STOCK</span><p class="text-on-surface font-bold">${m.qty} UNITS</p></div>
                         <div><span class="text-[10px] text-outline">THRESHOLD</span><p class="text-on-surface">${m.threshold} UNITS</p></div>
                         <div><span class="text-[10px] text-outline">LEVEL</span><p class="font-bold ${isReorder ? 'text-tertiary' : 'text-primary'}">${m.level}</p></div>
                     </div>
                     <div class="border-t border-outline-variant pt-3">
-                        <span class="text-[10px] text-outline">STATUS NOTE</span>
-                        <p class="text-on-surface-variant text-sm mt-1">${m.note}</p>
+                        <span class="text-[10px] text-outline">STATUS</span>
+                        <p class="text-on-surface-variant text-sm mt-1">${m.status === 'OPTIMAL' ? 'Stock above operational threshold.' : (m.status === 'NOMINAL' ? 'Adequate for current mission tempo.' : 'Stock below threshold — immediate resupply required.')}</p>
                     </div>
                 </div>
                 <div class="p-4 border-t border-outline-variant flex gap-2 justify-end">
