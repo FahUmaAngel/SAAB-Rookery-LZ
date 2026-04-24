@@ -57,3 +57,17 @@ body {
 .animate-spin {
     animation: spin 1s linear infinite;
 }
+
+/* Spectrum Bar Pulse */
+@keyframes spectrum-pulse {
+    0%, 100% { 
+        box-shadow: 0 0 0px rgba(241, 193, 0, 0);
+    }
+    50% { 
+        box-shadow: 0 0 8px rgba(241, 193, 0, 0.8);
+    }
+}
+.spectrum-active {
+    animation: spectrum-pulse 1s ease-in-out infinite;
+    background: linear-gradient(to top, rgba(241, 193, 0, 0.8), rgba(130, 207, 255, 0.3)) !important;
+}

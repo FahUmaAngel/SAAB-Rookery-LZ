@@ -174,38 +174,41 @@
                             ACTIVE INTERCEPT SPECTRUM [VHF/UHF]
                         </h3>
                         <div class="flex gap-2">
-                            <span class="font-data-mono text-[10px] text-primary border border-primary px-1">SWEEP: ACTIVE</span>
+                            <button onclick="CommsManager.toggleSweep()" class="text-[10px] border border-outline px-2 py-1 hover:bg-surface-container-high">
+                                <span id="sweep-status">STOP</span>
+                            </button>
+                            <span id="sweep-indicator" class="font-data-mono text-[10px] text-tertiary border border-tertiary px-1">SWEEP: ACTIVE</span>
+                            <span id="tuned-freq-display" class="font-data-mono text-[10px] text-primary border border-primary px-1 hidden">TUNED: --</span>
                         </div>
                     </div>
                     <!-- Visualization Area -->
-                    <div class="flex-1 tactical-grid relative flex items-end justify-center pb-8 px-4 gap-[2px]">
-                        <!-- Dummy Spectrum Bars -->
-                        <div class="w-1 bg-primary-fixed/20 h-[10%]"></div>
-                        <div class="w-1 bg-primary-fixed/30 h-[25%]"></div>
-                        <div class="w-1 bg-primary-fixed/20 h-[15%]"></div>
-                        <div class="w-1 bg-primary-fixed/40 h-[40%]"></div>
-                        <div class="w-1 bg-primary-fixed/20 h-[20%]"></div>
-                        <div class="w-1 bg-primary-fixed/50 h-[30%]"></div>
-                        <div class="w-1 bg-primary-fixed/30 h-[45%]"></div>
-                        <div class="w-1 bg-primary-fixed/60 h-[60%] relative group">
+                    <div id="spectrum-container" class="flex-1 tactical-grid relative flex items-end justify-center pb-8 px-4 gap-[2px]">
+                        <!-- Bar elements with IDs for dynamic updates -->
+                        <div onclick="CommsManager.tuneToSignal('100.0')" class="spectrum-bar w-1 bg-primary-fixed/20 h-[10%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('102.5')" class="spectrum-bar w-1 bg-primary-fixed/30 h-[25%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('105.0')" class="spectrum-bar w-1 bg-primary-fixed/20 h-[15%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('107.5')" class="spectrum-bar w-1 bg-primary-fixed/40 h-[40%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('110.0')" class="spectrum-bar w-1 bg-primary-fixed/20 h-[20%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('112.5')" class="spectrum-bar w-1 bg-primary-fixed/50 h-[30%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('115.0')" class="spectrum-bar w-1 bg-primary-fixed/30 h-[45%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div id="bar-118" onclick="CommsManager.tuneToSignal('118.2')" class="spectrum-bar w-1 bg-primary-fixed/60 h-[60%] relative group cursor-pointer hover:bg-tertiary transition-all">
                             <div class="absolute -top-6 left-1/2 -translate-x-1/2 font-data-mono text-[10px] text-primary hidden group-hover:block whitespace-nowrap bg-surface px-1 border border-outline-variant">118.2 MHz</div>
                         </div>
-                        <div class="w-1 bg-primary-fixed/40 h-[35%]"></div>
-                        <div class="w-1 bg-primary-fixed/20 h-[15%]"></div>
-                        <!-- Target Spike (Guard Freq) -->
-                        <div class="w-1.5 bg-tertiary h-[85%] relative shadow-[0_0_8px_#f1c100]">
+                        <div onclick="CommsManager.tuneToSignal('120.0')" class="spectrum-bar w-1 bg-primary-fixed/40 h-[35%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <!-- GUARD Frequency - Key one! -->
+                        <div id="bar-guard" onclick="CommsManager.showGuardOptions()" class="spectrum-bar w-1.5 bg-tertiary h-[85%] relative shadow-[0_0_8px_#f1c100] cursor-pointer hover:bg-error transition-all hover:scale-110">
                             <div class="absolute -top-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
                                 <span class="font-data-mono text-[10px] text-tertiary bg-surface px-1 border border-tertiary whitespace-nowrap">121.500 MHz</span>
                                 <div class="w-px h-3 bg-tertiary"></div>
                             </div>
                         </div>
-                        <div class="w-1 bg-primary-fixed/20 h-[20%]"></div>
-                        <div class="w-1 bg-primary-fixed/30 h-[40%]"></div>
-                        <div class="w-1 bg-primary-fixed/50 h-[55%]"></div>
-                        <div class="w-1 bg-primary-fixed/20 h-[10%]"></div>
-                        <div class="w-1 bg-primary-fixed/40 h-[30%]"></div>
-                        <div class="w-1 bg-primary-fixed/20 h-[15%]"></div>
-                        <div class="w-1 bg-primary-fixed/30 h-[25%]"></div>
+                        <div onclick="CommsManager.tuneToSignal('125.0')" class="spectrum-bar w-1 bg-primary-fixed/20 h-[20%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('127.5')" class="spectrum-bar w-1 bg-primary-fixed/30 h-[40%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('130.0')" class="spectrum-bar w-1 bg-primary-fixed/50 h-[55%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('132.5')" class="spectrum-bar w-1 bg-primary-fixed/20 h-[10%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('135.0')" class="spectrum-bar w-1 bg-primary-fixed/40 h-[30%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('137.5')" class="spectrum-bar w-1 bg-primary-fixed/20 h-[15%] cursor-pointer hover:bg-tertiary transition-all"></div>
+                        <div onclick="CommsManager.tuneToSignal('140.0')" class="spectrum-bar w-1 bg-primary-fixed/30 h-[25%] cursor-pointer hover:bg-tertiary transition-all"></div>
                         <div class="w-1 bg-primary-fixed/10 h-[5%]"></div>
                         <!-- X-Axis Labels -->
                         <div class="absolute bottom-2 left-4 right-4 flex justify-between font-data-mono text-[10px] text-on-surface-variant border-t border-outline-variant pt-1">
@@ -242,7 +245,7 @@
                                 </tr>
                             </thead>
                             <tbody id="sigint-body" class="font-data-mono text-data-mono text-on-surface" onclick="CommsManager.handleTableClick(event)">
-                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high cursor-pointer transition-colors">
                                     <td class="py-2 px-4 text-on-surface-variant">12:44:02</td>
                                     <td class="py-2 px-4 text-primary">118.250</td>
                                     <td class="py-2 px-4">184° / 45NM</td>
@@ -250,7 +253,7 @@
                                     <td class="py-2 px-4">CLEAR VOICE</td>
                                     <td class="py-2 px-4 text-on-surface-variant">CIV_ATC_STOCKHOLM</td>
                                 </tr>
-                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high cursor-pointer transition-colors">
                                     <td class="py-2 px-4 text-on-surface-variant">12:44:15</td>
                                     <td class="py-2 px-4 text-primary">UHF_SAT_4</td>
                                     <td class="py-2 px-4">N/A (ORBITAL)</td>
@@ -258,7 +261,7 @@
                                     <td class="py-2 px-4 text-primary">ENCRYPTED_L16</td>
                                     <td class="py-2 px-4 text-on-surface-variant">SWAF_AWACS_01</td>
                                 </tr>
-                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high cursor-pointer transition-colors">
                                     <td class="py-2 px-4 text-on-surface-variant">12:44:30</td>
                                     <td class="py-2 px-4 text-primary">243.000</td>
                                     <td class="py-2 px-4">045° / 110NM</td>
@@ -267,7 +270,7 @@
                                     <td class="py-2 px-4 text-on-surface-variant">UNKNOWN_MARINE</td>
                                 </tr>
                                 <!-- Target Row -->
-                                <tr class="bg-tertiary/10 border-l-2 border-l-tertiary border-b border-outline-variant/30 hover:bg-tertiary/20 transition-colors">
+                                <tr class="bg-tertiary/10 border-l-2 border-l-tertiary border-b border-outline-variant/30 hover:bg-tertiary/20 cursor-pointer transition-colors">
                                     <td class="py-2 px-4 text-tertiary">12:44:58</td>
                                     <td class="py-2 px-4 text-tertiary font-bold">121.500</td>
                                     <td class="py-2 px-4 text-tertiary">092° / 68NM</td>
@@ -275,7 +278,7 @@
                                     <td class="py-2 px-4 text-tertiary">UNMODULATED CARRIER</td>
                                     <td class="py-2 px-4 text-tertiary font-bold">Bogey_Golf_42</td>
                                 </tr>
-                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high cursor-pointer transition-colors">
                                     <td class="py-2 px-4 text-on-surface-variant">12:45:01</td>
                                     <td class="py-2 px-4 text-primary">134.100</td>
                                     <td class="py-2 px-4">210° / 30NM</td>
@@ -283,7 +286,7 @@
                                     <td class="py-2 px-4">CLEAR VOICE</td>
                                     <td class="py-2 px-4 text-on-surface-variant">CIV_ATC_GOT</td>
                                 </tr>
-                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high cursor-pointer transition-colors">
                                     <td class="py-2 px-4 text-on-surface-variant">12:45:05</td>
                                     <td class="py-2 px-4 text-primary">UHF_LINK_B</td>
                                     <td class="py-2 px-4">GROUND_NODE_7</td>
@@ -314,9 +317,11 @@ const CommsManager = {
     signals: [],
     txLog: [],
     liveUpdateTimer: null,
+    sweepTimer: null,
     initialized: false,
     aiThreatListenerLoaded: false,
     aiSigintListenerLoaded: false,
+    currentFreq: null,
     templates: {
         fighter: 'UNIDENTIFIED MILITARY AIRCRAFT. YOU ARE APPROACHING SWEDISH RESTRICTED AIRSPACE. IDENTIFY YOURSELF AND SQUAWK 7000 IMMEDIATELY. TURN 180 DEGREES OR YOU WILL BE INTERCEPTED.',
         cargo: 'CARGO VESSEL [NAME]. YOU ARE IN RESTRICTED SWEDISH WATERS. STATE YOUR INTENDED COURSE AND PORT OF CALL IMMEDIATELY. THIS IS A WARNING.',
@@ -328,9 +333,25 @@ const CommsManager = {
     init: function() {
         if (this.initialized) return;
         this.initialized = true;
+        this.startZuluClock();
         this.startLiveUpdates();
+        this.startSweepAnimation();
         this.loadAIThreatListener();
         this.loadAISigintListener();
+    },
+
+    startZuluClock: function() {
+        const update = () => {
+            const el = document.getElementById('shared-zulu-clock');
+            if (!el) return;
+            const now = new Date();
+            const h = String(now.getUTCHours()).padStart(2, '0');
+            const m = String(now.getUTCMinutes()).padStart(2, '0');
+            const s = String(now.getUTCSeconds()).padStart(2, '0');
+            el.textContent = `ZULU ${h}:${m}:${s}`;
+        };
+        update();
+        setInterval(update, 1000);
     },
 
     loadTemplate: function(type) {
@@ -343,20 +364,45 @@ const CommsManager = {
     emergencyBroadcast: function() {
         const confirmed = confirm('CONFIRM DISTRESS BROADCAST - Will transmit on ALL channels. Continue?');
         if (!confirmed) return;
-        
-        window.SharedComponents?.showToast('DISTRESS', 'Emergency broadcast on ALL channels', 'warning', 'error');
-        
-        // Log to TX log
-        this.logTransmission({
-            time: new Date().toUTCString().slice(17, 25),
-            channel: 'ALL CHANNELS',
-            type: 'DISTRESS',
-            message: 'EMERGENCY BROADCAST',
-            status: 'SENT'
-        });
+
         const textarea = document.getElementById('tx-message');
         if (textarea && !textarea.value.trim()) {
             textarea.value = 'MAYDAY MAYDAY MAYDAY - SWAF DISTRESS RELAY ACTIVE - ALL STATIONS MAINTAIN RADIO SILENCE AND STAND BY FOR TRAFFIC.';
+        }
+
+        window.SharedComponents?.showToast('DISTRESS', 'Emergency broadcast on ALL channels', 'warning', 'error');
+
+        const now = new Date().toUTCString().slice(17, 25);
+        this.logTransmission({
+            time: now,
+            channel: 'ALL CHANNELS',
+            type: 'DISTRESS',
+            message: textarea?.value || 'EMERGENCY BROADCAST',
+            status: 'SENT'
+        });
+
+        this.addSigintEntry({
+            time: now,
+            freq: '121.500',
+            bearing: 'BROADCAST',
+            sigStrength: '-10 dBm',
+            decode: 'DISTRESS BURST',
+            entity: 'SWAF_DISTRESS_TX'
+        });
+        this.addSigintEntry({
+            time: now,
+            freq: 'L16_DATA',
+            bearing: 'TDMA_NET',
+            sigStrength: '-10 dBm',
+            decode: 'DISTRESS ENCRYPTED',
+            entity: 'SWAF_DISTRESS_TX'
+        });
+
+        // Spike guard bar to visualize emergency broadcast
+        const guardBar = document.getElementById('bar-guard');
+        if (guardBar) {
+            guardBar.style.height = '98%';
+            setTimeout(() => { guardBar.style.height = (75 + Math.random() * 20) + '%'; }, 1200);
         }
     },
 
@@ -364,7 +410,7 @@ const CommsManager = {
         this.txLog.unshift(data);
         const tbody = document.getElementById('tx-log-body');
         if (!tbody) return;
-        
+
         const row = document.createElement('tr');
         row.className = 'border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors';
         row.innerHTML = `
@@ -375,7 +421,7 @@ const CommsManager = {
             <td class="py-2 px-4 text-green-500">SENT</td>
         `;
         tbody.insertBefore(row, tbody.firstChild);
-        
+
         while (tbody.children.length > 20) {
             tbody.removeChild(tbody.lastChild);
         }
@@ -383,7 +429,7 @@ const CommsManager = {
 
     showTxLog: function() {
         if (document.getElementById('tx-log-modal')) return;
-        
+
         const modal = document.createElement('div');
         modal.id = 'tx-log-modal';
         modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-[100]';
@@ -433,18 +479,18 @@ const CommsManager = {
             window.SharedComponents?.showToast('NO LOG', 'No transmissions to export', 'warning', 'warning');
             return;
         }
-        
+
         const csv = [['TIME', 'CHANNEL', 'TYPE', 'MESSAGE', 'STATUS']];
         this.txLog.forEach(tx => csv.push([tx.time, tx.channel, tx.type, tx.message, tx.status]));
-        
+
         const blob = new Blob([csv.map(r => r.join(',')).join('\n')], { type: 'text/csv' });
         const a = document.createElement('a');
         const url = URL.createObjectURL(blob);
         a.href = url;
-        a.download = `tx_log_${new Date().toISOString().slice(0,10)}.csv`;
+        a.download = `tx_log_${new Date().toISOString().slice(0, 10)}.csv`;
         a.click();
         URL.revokeObjectURL(url);
-        
+
         window.SharedComponents?.showToast('EXPORTED', 'TX log downloaded', 'download');
     },
 
@@ -477,13 +523,13 @@ const CommsManager = {
     showQuickAlert: function() {
         const existing = document.getElementById('quick-alert');
         if (existing) return;
-        
+
         const threat = window.AISystem?.state.threatScore || 0;
-        
-        const alert = document.createElement('div');
-        alert.id = 'quick-alert';
-        alert.className = 'fixed top-20 left-1/2 -translate-x-1/2 w-96 bg-error-container border-2 border-error z-[100] p-4 animate-pulse';
-        alert.innerHTML = `
+
+        const alertEl = document.createElement('div');
+        alertEl.id = 'quick-alert';
+        alertEl.className = 'fixed top-20 left-1/2 -translate-x-1/2 w-96 bg-error-container border-2 border-error z-[100] p-4 animate-pulse';
+        alertEl.innerHTML = `
             <div class="flex items-center gap-2 mb-2">
                 <span class="material-symbols-outlined text-error">warning</span>
                 <span class="text-error font-bold uppercase">THREAT DETECTED</span>
@@ -495,31 +541,30 @@ const CommsManager = {
             </button>
             <button onclick="document.getElementById('quick-alert').remove()" class="text-on-surface text-xs mt-2 w-full text-center">DISMISS</button>
         `;
-        document.body.appendChild(alert);
+        document.body.appendChild(alertEl);
     },
 
     quickAlert: function() {
         const msg = 'AUTOMATED WARNING - UNIDENTIFIED CONTACT APPROACHING SWEDISH AIRSPACE. IDENTIFY AND SQUAWK 7000 IMMEDIATELY OR INTERCEPT IS IMMINENT.';
         const textarea = document.getElementById('tx-message');
         if (textarea) textarea.value = msg;
-        
-        const alert = document.getElementById('quick-alert');
-        if (alert) alert.remove();
-        
+
+        const alertEl = document.getElementById('quick-alert');
+        if (alertEl) alertEl.remove();
+
         this.transmitGuard();
     },
 
     toggleAudio: function(channel) {
         this.audioMuted[channel] = !this.audioMuted[channel];
-        const icon = document.querySelector(`[onclick*="toggleAudio('${channel}')"] span`);
-        if (icon) {
-            icon.textContent = this.audioMuted[channel] ? 'volume_off' : 'volume_up';
-        }
-        window.SharedComponents?.showToast(
-            this.audioMuted[channel] ? 'AUDIO MUTED' : 'AUDIO LIVE',
-            `${channel.toUpperCase()} monitor ${this.audioMuted[channel] ? 'disabled' : 'enabled'}`,
-            this.audioMuted[channel] ? 'volume_off' : 'volume_up'
-        );
+
+        const buttons = document.querySelectorAll(`[onclick*="toggleAudio('${channel}')"]`);
+        buttons.forEach(btn => {
+            const icon = btn.querySelector('span');
+            if (icon) {
+                icon.textContent = this.audioMuted[channel] ? 'volume_off' : 'volume_up';
+            }
+        });
     },
 
     transmitGuard: function() {
@@ -528,12 +573,19 @@ const CommsManager = {
             window.SharedComponents?.showToast('NO MESSAGE', 'Enter a message first', 'warning', 'warning');
             return;
         }
-        
+
         window.SharedComponents?.showToast('TX: GUARD 121.5', 'Message transmitted', 'podcasts', 'error');
-        
-        // Simulate transmission log
+
+        // Spike guard bar to visualize transmission
+        const guardBar = document.getElementById('bar-guard');
+        if (guardBar) {
+            guardBar.style.height = '98%';
+            setTimeout(() => { guardBar.style.height = (75 + Math.random() * 20) + '%'; }, 800);
+        }
+
+        const now = new Date().toUTCString().slice(17, 25);
         this.addSigintEntry({
-            time: new Date().toUTCString().slice(17, 25),
+            time: now,
             freq: '121.500',
             bearing: 'BROADCAST',
             sigStrength: '-25 dBm',
@@ -541,12 +593,16 @@ const CommsManager = {
             entity: 'SWAF_GUARD_TX'
         });
         this.logTransmission({
-            time: new Date().toUTCString().slice(17, 25),
+            time: now,
             channel: '121.500 MHz',
             type: 'GUARD',
             message: msg,
             status: 'SENT'
         });
+
+        // Reset template select so same option can be re-selected
+        const sel = document.querySelector('select[onchange*="loadTemplate"]');
+        if (sel) sel.value = '';
     },
 
     transmitL16: function() {
@@ -555,11 +611,22 @@ const CommsManager = {
             window.SharedComponents?.showToast('NO MESSAGE', 'Enter a message first', 'warning', 'warning');
             return;
         }
-        
+
         window.SharedComponents?.showToast('TX: LINK 16', 'Encrypted burst sent', 'enhanced_encryption', 'primary');
-        
+
+        // Simulate L16 TDMA burst across spectrum
+        document.querySelectorAll('.spectrum-bar:not(#bar-guard)').forEach(bar => {
+            if (bar.classList.contains('bg-tertiary')) return;
+            if (Math.random() > 0.4) {
+                const origH = bar.style.height;
+                bar.style.height = (50 + Math.random() * 45) + '%';
+                setTimeout(() => { bar.style.height = origH || (10 + Math.random() * 30) + '%'; }, 600);
+            }
+        });
+
+        const now = new Date().toUTCString().slice(17, 25);
         this.addSigintEntry({
-            time: new Date().toUTCString().slice(17, 25),
+            time: now,
             freq: 'L16_DATA',
             bearing: 'TDMA_NET',
             sigStrength: '-40 dBm',
@@ -567,12 +634,16 @@ const CommsManager = {
             entity: 'SWAF_AWACS'
         });
         this.logTransmission({
-            time: new Date().toUTCString().slice(17, 25),
+            time: now,
             channel: 'LINK 16',
-            type: 'DATA',
+            type: 'L16',
             message: msg,
             status: 'SENT'
         });
+
+        // Reset template select so same option can be re-selected
+        const sel = document.querySelector('select[onchange*="loadTemplate"]');
+        if (sel) sel.value = '';
     },
 
     showChannelDetail: function(channel) {
@@ -582,10 +653,23 @@ const CommsManager = {
             'SAT': { name: 'SAT UPLINK', freq: 'UHF 243-400 MHz', type: 'Satellite Comm', status: 'STANDBY', encryption: 'TRANSOMET' },
             'SECURE': { name: 'SECURE GROUND', freq: 'Fiber Optic', type: 'Land Line', status: 'ACTIVE', encryption: 'TYPE 1' }
         };
-        
+
         const c = channels[channel];
         if (!c) return;
-        
+
+        const tuneSection = channel !== 'SECURE'
+            ? `<div class="bg-surface-variant/30 p-2 rounded-sm">
+                <span class="text-[10px] text-outline">TUNE FREQUENCY</span>
+                <div class="flex gap-2 mt-1">
+                    <input id="tune-input-${channel}" class="bg-surface border border-outline px-2 py-1 text-on-surface w-full font-data-mono text-sm" placeholder="Enter frequency..." value="${c.freq}"/>
+                    <button onclick="CommsManager.tuneToSignal(document.getElementById('tune-input-${channel}').value || '${c.freq}'); this.closest('.fixed').remove();" class="bg-primary text-white px-3 py-1 text-sm font-bold">TUNE</button>
+                </div>
+               </div>`
+            : `<div class="bg-surface-variant/30 p-2 rounded-sm">
+                <span class="text-[10px] text-outline">CHANNEL TYPE</span>
+                <p class="text-on-surface-variant text-sm mt-1">Secure fiber backbone — frequency tuning not applicable</p>
+               </div>`;
+
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
         modal.innerHTML = `
@@ -603,13 +687,7 @@ const CommsManager = {
                         <div><span class="text-[10px] text-outline">TYPE</span><p class="text-on-surface">${c.type}</p></div>
                         <div><span class="text-[10px] text-outline">ENCRYPTION</span><p class="text-tertiary font-bold">${c.encryption}</p></div>
                     </div>
-                    <div class="bg-surface-variant/30 p-2 rounded-sm">
-                        <span class="text-[10px] text-outline">TUNE FREQUENCY</span>
-                        <div class="flex gap-2 mt-1">
-                            <input class="bg-surface border border-outline px-2 py-1 text-on-surface w-full font-data-mono text-sm" placeholder="Enter frequency..." value="${c.freq}"/>
-                            <button onclick="CommsManager.tuneToSignal(this.previousElementSibling.value || '${c.freq}')" class="bg-primary text-white px-3 py-1 text-sm font-bold">TUNE</button>
-                        </div>
-                    </div>
+                    ${tuneSection}
                 </div>
                 <div class="p-4 border-t border-outline-variant flex justify-end">
                     <button onclick="this.closest('.fixed').remove()" class="bg-surface-variant border border-outline px-4 py-2 text-[10px] font-bold uppercase">CLOSE</button>
@@ -655,50 +733,78 @@ const CommsManager = {
     },
 
     tuneToSignal: function(freq) {
-        const safeFreq = (freq || '').trim();
-        if (!safeFreq) {
-            window.SharedComponents?.showToast('NO FREQ', 'Enter a frequency first', 'warning', 'warning');
-            return;
+        if (!freq || freq === '--') return;
+        this.currentFreq = freq;
+
+        // Highlight matching spectrum bar; clear previous highlight
+        document.querySelectorAll('.spectrum-bar').forEach(bar => {
+            bar.classList.remove('bg-tertiary');
+            bar.style.opacity = '';
+        });
+        document.querySelectorAll('.spectrum-bar[onclick]').forEach(bar => {
+            if ((bar.getAttribute('onclick') || '').includes(freq.replace(' MHz', '').trim())) {
+                bar.classList.add('bg-tertiary');
+                bar.style.height = '80%';
+                bar.style.opacity = '1';
+            }
+        });
+
+        const display = document.getElementById('tuned-freq-display');
+        if (display) {
+            display.textContent = `TUNED: ${freq}`;
+            display.classList.remove('hidden');
         }
-        const textarea = document.getElementById('tx-message');
-        if (textarea && !textarea.value.trim()) {
-            textarea.value = `MONITORING ${safeFreq} - STAND BY FOR CHALLENGE AND RESPONSE.`;
-        }
-        window.SharedComponents?.showToast('TUNING', `Locked to ${safeFreq}`, 'graphic_eq');
+
+        window.SharedComponents?.showToast('TUNING', `Locked to ${freq}`, 'graphic_eq', 'primary');
     },
 
     handleTableClick: function(e) {
         const row = e.target.closest('tr');
         if (!row || !row.cells || row.cells.length < 6) return;
-        
+
+        // Skip header rows and "waiting" rows
+        if (row.closest('thead') || row.cells[1].textContent.trim() === '--') return;
+
         const data = {
-            time: row.cells[0].textContent,
-            freq: row.cells[1].textContent,
-            bearing: row.cells[2].textContent,
-            sigStr: row.cells[3].textContent,
-            decode: row.cells[4].textContent,
-            entity: row.cells[5].textContent
+            time: row.cells[0].textContent.trim(),
+            freq: row.cells[1].textContent.trim(),
+            bearing: row.cells[2].textContent.trim(),
+            sigStr: row.cells[3].textContent.trim(),
+            decode: row.cells[4].textContent.trim(),
+            entity: row.cells[5].textContent.trim()
         };
+
         this.showSigintDetail(data);
     },
 
     addSigintEntry: function(data) {
-        const tbody = document.querySelector('#sigint-body');
+        const tbody = document.getElementById('sigint-body');
         if (!tbody) return;
-        
+
+        // Prevent duplicate entries (same time + freq)
+        const duplicate = Array.from(tbody.querySelectorAll('tr')).find(tr =>
+            tr.cells[0]?.textContent.trim() === data.time &&
+            tr.cells[1]?.textContent.trim() === data.freq
+        );
+        if (duplicate) return;
+
         const row = document.createElement('tr');
-        row.className = 'bg-primary/10 border-l-2 border-l-primary border-b border-outline-variant/30';
+        row.className = 'bg-primary/10 border-l-2 border-l-primary border-b border-outline-variant/30 hover:bg-surface-container-high cursor-pointer transition-colors';
         row.innerHTML = `
-            <td class="py-2 px-4 text-primary font-bold">${data.time}</td>
-            <td class="py-2 px-4 text-primary font-bold">${data.freq}</td>
-            <td class="py-2 px-4">${data.bearing}</td>
-            <td class="py-2 px-4">${data.sigStrength}</td>
-            <td class="py-2 px-4 text-primary">${data.decode}</td>
-            <td class="py-2 px-4 text-primary font-bold">${data.entity}</td>
+            <td class="py-2 px-4 text-primary font-bold">${data.time || '--'}</td>
+            <td class="py-2 px-4 text-primary font-bold">${data.freq || '--'}</td>
+            <td class="py-2 px-4">${data.bearing || '--'}</td>
+            <td class="py-2 px-4">${data.sigStrength || '--'}</td>
+            <td class="py-2 px-4 text-primary">${data.decode || '--'}</td>
+            <td class="py-2 px-4 text-primary font-bold">${data.entity || '--'}</td>
         `;
-        tbody.insertBefore(row, tbody.firstChild);
-        
-        // Keep max 50 rows
+
+        if (tbody.firstChild) {
+            tbody.insertBefore(row, tbody.firstChild);
+        } else {
+            tbody.appendChild(row);
+        }
+
         while (tbody.children.length > 50) {
             tbody.removeChild(tbody.lastChild);
         }
@@ -706,38 +812,153 @@ const CommsManager = {
 
     startLiveUpdates: function() {
         if (this.liveUpdateTimer) return;
+
         const sources = [
             { freq: '118.250', bearing: '185°/42NM', decode: 'CLEAR VOICE', entity: 'CIV_ATC_STHLM' },
             { freq: '134.100', bearing: '210°/28NM', decode: 'CLEAR VOICE', entity: 'CIV_ATC_GOT' },
             { freq: '243.000', bearing: '045°/95NM', decode: 'PULSE_BEACON', entity: 'UNKNOWN_MARINE' },
             { freq: 'UHF_SAT_2', bearing: 'N/A(ORBITAL)', decode: 'ENCRYPTED_DATA', entity: 'SWAF_AWACS' }
         ];
+        const strengths = ['-65 dBm', '-70 dBm', '-75 dBm', '-80 dBm', '-55 dBm'];
 
         this.liveUpdateTimer = setInterval(() => {
-            const sig = sources[Math.floor(Math.random() * sources.length)];
-            const now = new Date().toUTCString().slice(17, 25);
-            const strengths = ['-65 dBm', '-70 dBm', '-75 dBm', '-80 dBm', '-55 dBm'];
-            const str = strengths[Math.floor(Math.random() * strengths.length)];
-            
-            // Randomly show new signal (20% chance)
+            if (Math.random() > 0.7) {
+                this.simulateSignalDetection();
+            }
+
             if (Math.random() > 0.8) {
+                const sig = sources[Math.floor(Math.random() * sources.length)];
                 this.addSigintEntry({
-                    time: now,
+                    time: new Date().toUTCString().slice(17, 25),
                     freq: sig.freq,
                     bearing: sig.bearing,
-                    sigStrength: str,
+                    sigStrength: strengths[Math.floor(Math.random() * strengths.length)],
                     decode: sig.decode,
                     entity: sig.entity
                 });
             }
         }, 5000);
+    },
+
+    toggleSweep: function() {
+        const btn = document.getElementById('sweep-status');
+        const indicator = document.getElementById('sweep-indicator');
+        const isActive = indicator?.textContent === 'SWEEP: ACTIVE';
+
+        if (isActive) {
+            if (btn) btn.textContent = 'START';
+            if (indicator) {
+                indicator.textContent = 'SWEEP: STOPPED';
+                indicator.className = 'font-data-mono text-[10px] text-outline border border-outline px-1';
+            }
+            if (this.sweepTimer) {
+                clearInterval(this.sweepTimer);
+                this.sweepTimer = null;
+            }
+            window.SharedComponents?.showToast('RADAR SWEEP', 'Stopped', 'radar', 'warning');
+        } else {
+            if (btn) btn.textContent = 'STOP';
+            if (indicator) {
+                indicator.textContent = 'SWEEP: ACTIVE';
+                indicator.className = 'font-data-mono text-[10px] text-tertiary border border-tertiary px-1';
+            }
+            this.startSweepAnimation();
+            window.SharedComponents?.showToast('RADAR SWEEP', 'Active', 'radar', 'primary');
+        }
+    },
+
+    startSweepAnimation: function() {
+        if (this.sweepTimer) return;
+
+        const bars = document.querySelectorAll('.spectrum-bar');
+
+        this.sweepTimer = setInterval(() => {
+            bars.forEach(bar => {
+                // Don't override a tuned-frequency highlight
+                if (bar.classList.contains('bg-tertiary')) return;
+                bar.style.height = (10 + Math.random() * 70) + '%';
+                bar.style.opacity = 0.3 + Math.random() * 0.5;
+            });
+
+            if (Math.random() > 0.85) {
+                const guardBar = document.getElementById('bar-guard');
+                if (guardBar) {
+                    guardBar.style.height = (75 + Math.random() * 20) + '%';
+                }
+            }
+        }, 200);
+    },
+
+    simulateSignalDetection: function() {
+        const bars = document.querySelectorAll('.spectrum-bar');
+        if (!bars.length) return;
+
+        const randomBar = bars[Math.floor(Math.random() * bars.length)];
+        if (!randomBar || randomBar.classList.contains('bg-tertiary')) return;
+
+        randomBar.style.height = (50 + Math.random() * 40) + '%';
+        randomBar.classList.add('bg-tertiary');
+
+        setTimeout(() => {
+            randomBar.style.height = (10 + Math.random() * 30) + '%';
+            randomBar.classList.remove('bg-tertiary');
+        }, 1500);
+    },
+
+    showGuardOptions: function() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-surface-container border border-tertiary w-[350px] max-w-[90vw]">
+                <div class="p-4 border-b border-tertiary flex justify-between items-center bg-tertiary/20">
+                    <h3 class="font-headline-md text-tertiary">GUARD 121.5 MHz</h3>
+                    <button onclick="this.closest('.fixed').remove()" class="text-tertiary hover:text-on-surface">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-4 space-y-3">
+                    <div class="text-center mb-4">
+                        <div class="text-[10px] text-outline">DETECTED SIGNAL</div>
+                        <div class="text-2xl text-tertiary font-bold">-52 dBm</div>
+                        <div class="text-tertiary text-[9px]">UNMODULATED CARRIER</div>
+                    </div>
+                    <button onclick="this.closest('.fixed').remove(); document.getElementById('tx-message').value = CommsManager.templates.fighter; CommsManager.transmitGuard();" class="w-full bg-tertiary text-black py-3 font-bold uppercase flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">podcasts</span>
+                        TRANSMIT WARNING
+                    </button>
+                    <button onclick="this.closest('.fixed').remove(); CommsManager.tuneToSignal('121.500');" class="w-full border border-primary text-primary py-3 font-bold uppercase flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">graphic_eq</span>
+                        TUNE TO FREQUENCY
+                    </button>
+                    <button onclick="this.closest('.fixed').remove(); var t=document.getElementById('tx-message'); if(t)t.value='MAYDAY MAYDAY MAYDAY - '+CommsManager.templates.mayday; CommsManager.transmitGuard();" class="w-full border border-error text-error py-3 font-bold uppercase flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">warning</span>
+                        SEND DISTRESS
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
     }
 };
 
 window.CommsManager = CommsManager;
 
+CommsManager.reinit = function() {
+    this.initialized = false;
+    this.init();
+};
+
+window.addEventListener('popstate', () => {
+    setTimeout(() => {
+        if (window.CommsManager && window.location.pathname.includes('comms.html')) {
+            CommsManager.reinit();
+        }
+    }, 100);
+});
+
+// Reliable init: works regardless of script-load timing
 if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', () => CommsManager.init(), { once: true });
+    document.addEventListener('DOMContentLoaded', () => CommsManager.init());
 } else {
     CommsManager.init();
 }
