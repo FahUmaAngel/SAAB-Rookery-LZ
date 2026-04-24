@@ -114,13 +114,23 @@
                         </div>
                         <!-- QRA Slot 3 -->
                         <div class="qra-slot glass-panel p-4 rounded-sm cursor-pointer hover:border-primary transition-all group opacity-60 hover:opacity-100" data-slot="3" onclick="AssetManager.selectQRASlot(3)">
-                            <div class="flex justify-between items-center mb-2">
+                            <div class="flex justify-between items-center mb-4">
                                 <span class="font-label-caps text-[12px] text-outline uppercase font-black group-hover:text-primary transition-colors">QRA-3</span>
                                 <span class="w-3 h-3 bg-outline rounded-full group-hover:bg-primary transition-colors"></span>
                             </div>
-                            <div class="text-[10px] text-outline text-center py-6 group-hover:text-primary transition-colors font-bold uppercase tracking-widest">
-                                Standby<br/>
-                                <span class="text-[7px] font-medium">Click to Initiate</span>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-[10px]">
+                                    <span class="text-outline uppercase font-bold">Pilot:</span>
+                                    <span class="text-outline font-medium">TBD</span>
+                                </div>
+                                <div class="flex justify-between text-[10px]">
+                                    <span class="text-outline uppercase font-bold">A/C:</span>
+                                    <span class="text-outline">—</span>
+                                </div>
+                                <div class="flex justify-between text-[10px] pt-1 border-t border-outline-variant/20">
+                                    <span class="text-outline uppercase font-bold">Status:</span>
+                                    <span class="qra-status text-outline font-black uppercase tracking-widest">STANDBY</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -141,8 +151,8 @@
                 </div>
             </div>
 
-            <!-- KPIs Row (Col Span 12) -->
-            <div class="col-span-12 grid grid-cols-3 gap-gutter mt-2">
+            <!-- KPIs Row -->
+            <div class="grid grid-cols-3 gap-gutter mt-2">
                 <!-- Total Fleet Card -->
                 <div class="glass-panel p-panel-padding relative overflow-hidden group">
                     <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -169,14 +179,13 @@
                         <span class="material-symbols-outlined text-outline text-[20px]">radar</span>
                     </div>
                     <div class="flex items-baseline gap-3">
-                        <span class="font-headline-lg text-[40px] text-on-surface leading-none font-black font-['Orbitron']">4/4</span>
-                        <span class="font-data-mono text-data-mono text-outline font-bold">WINGS ARMED</span>
+                        <span id="kpi-qra-count" class="font-headline-lg text-[40px] text-on-surface leading-none font-black font-['Orbitron']">2/3</span>
+                        <span class="font-data-mono text-data-mono text-outline font-bold">SLOTS READY</span>
                     </div>
-                    <div class="mt-6 grid grid-cols-4 gap-1.5">
+                    <div id="kpi-qra-bars" class="mt-6 grid grid-cols-3 gap-1.5">
                         <div class="h-1.5 bg-tertiary w-full shadow-[0_0_8px_#f1c100] rounded-sm"></div>
                         <div class="h-1.5 bg-tertiary w-full shadow-[0_0_8px_#f1c100] rounded-sm"></div>
-                        <div class="h-1.5 bg-tertiary w-full shadow-[0_0_8px_#f1c100] rounded-sm"></div>
-                        <div class="h-1.5 bg-tertiary w-full shadow-[0_0_8px_#f1c100] rounded-sm"></div>
+                        <div class="h-1.5 bg-outline/30 w-full rounded-sm"></div>
                     </div>
                 </div>
                 <!-- Maintenance Cycle Card -->
@@ -186,10 +195,10 @@
                         <span class="material-symbols-outlined text-outline text-[20px]">build</span>
                     </div>
                     <div class="flex items-baseline gap-3">
-                        <span class="font-headline-lg text-[40px] text-error leading-none font-black font-['Orbitron']">3</span>
+                        <span id="kpi-ground-count" class="font-headline-lg text-[40px] text-error leading-none font-black font-['Orbitron']">3</span>
                         <span class="font-data-mono text-data-mono text-outline font-bold uppercase">Units Grounded</span>
                     </div>
-                    <div class="mt-6 flex gap-2">
+                    <div id="kpi-ground-badges" class="mt-6 flex gap-2">
                         <span class="px-3 py-1 bg-error/10 text-error border border-error/30 font-data-mono text-[10px] rounded font-bold">A/C-391</span>
                         <span class="px-3 py-1 bg-error/10 text-error border border-error/30 font-data-mono text-[10px] rounded font-bold">A/C-394</span>
                         <span class="px-3 py-1 glass-panel text-on-surface border border-outline/50 font-data-mono text-[10px] rounded font-bold">+1 UNIT</span>
@@ -198,7 +207,7 @@
             </div>
 
             <!-- Airbase Status -->
-            <div class="col-span-12 flex flex-col gap-gutter mt-4">
+            <div class="flex flex-col gap-gutter mt-4">
                 <h3 class="font-label-caps text-label-caps text-primary uppercase border-b border-outline-variant pb-2 font-bold tracking-widest">Tactical Wing Operational Status</h3>
                 <div class="grid grid-cols-3 gap-gutter">
                     <!-- F7 Såtenäs -->
@@ -296,7 +305,7 @@
             </div>
 
             <!-- Maintenance Table -->
-            <div class="col-span-12 glass-panel mt-4 overflow-hidden rounded-lg">
+            <div class="glass-panel mt-4 overflow-hidden rounded-lg">
                 <div class="p-5 border-b border-outline-variant/30 bg-surface-container-high/30 flex justify-between items-center backdrop-blur-xl">
                     <h3 class="font-label-caps text-label-caps text-on-surface uppercase font-black tracking-widest">Mission Critical Maintenance Logs</h3>
                     <div class="flex gap-2">
@@ -351,7 +360,7 @@
             </div>
 
             <!-- Live Metrics Footer -->
-            <div class="col-span-12 glass-panel mt-4 mb-gutter overflow-hidden rounded-lg">
+            <div class="glass-panel mt-4 mb-gutter overflow-hidden rounded-lg">
                 <div class="p-5 border-b border-outline-variant/30 flex justify-between items-center bg-primary/5">
                     <h3 class="font-label-caps text-label-caps text-primary uppercase font-black tracking-widest">Real-Time Fleet Deployment Metrics</h3>
                     <div class="flex items-center gap-3">
@@ -376,7 +385,7 @@
                         <div class="h-1.5 bg-error mt-4 w-full rounded-full glow-error"></div>
                     </div>
                     <div class="bg-surface-container/30 p-6 text-center group hover:bg-sky-400/10 transition-all">
-                        <div id="live-scrambled" class="font-headline-md text-[42px] text-sky-400 font-black mb-1 font-['Orbitron']">2</div>
+                        <div id="live-scrambled" class="font-headline-md text-[42px] text-sky-400 font-black mb-1 font-['Orbitron']">0</div>
                         <div class="font-label-caps text-[10px] text-outline font-black tracking-widest uppercase">Scrambled</div>
                         <div class="h-1.5 bg-sky-400 mt-4 w-full rounded-full animate-pulse shadow-[0_0_15px_#38bdf8]"></div>
                     </div>

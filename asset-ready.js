@@ -42,7 +42,25 @@ const AssetManager = {
 
         // Start Live Telemetry Simulation
         this.startTelemetry();
-        
+
+        // Sync KPIs with real data on load
+        this.updateKPIs();
+
+        // Listen for AI base recommendation → highlight recommended base card
+        addEventListener('ai-asset-recommendation', (e) => {
+            const baseIdMap = {
+                'F7 Såtenäs':  'base-f7-satenas',
+                'F17 Kallinge': 'base-f17-kallinge',
+                'F21 Luleå':    'base-f21-lulea'
+            };
+            document.querySelectorAll('.base-card').forEach(c => c.classList.remove('ring-2', 'ring-sky-400'));
+            const card = document.getElementById(baseIdMap[e.detail.baseName]);
+            if (card) {
+                card.classList.add('ring-2', 'ring-sky-400');
+                globalThis.SharedComponents?.showToast('AI RECOMMENDATION', `${e.detail.baseName} — optimal for deployment`, 'psychology', 'primary');
+            }
+        });
+
         // Add entry animations to cards
         this.applyEntryAnimations();
     },
@@ -174,11 +192,11 @@ const AssetManager = {
 
     scramble: function() {
         if (!this.selectedQRA) {
-            window.SharedComponents?.showToast('SELECT QRA', 'Choose an aircraft first', 'warning', 'warning');
+            globalThis.SharedComponents?.showToast('SELECT QRA', 'Choose an aircraft first', 'warning', 'warning');
             return;
         }
         if (this.scrambledSlots.has(this.selectedQRA)) {
-            window.SharedComponents?.showToast('ALREADY AIRBORNE', `QRA-${this.selectedQRA} is already scrambled`, 'flight', 'warning');
+            globalThis.SharedComponents?.showToast('ALREADY AIRBORNE', `QRA-${this.selectedQRA} is already scrambled`, 'flight', 'warning');
             return;
         }
         
@@ -186,12 +204,12 @@ const AssetManager = {
         const slot = document.querySelector(`.qra-slot[data-slot="${this.selectedQRA}"]`);
         const statusEl = slot?.querySelector('.qra-status');
         if (statusEl && (statusEl.textContent === 'COLD' || statusEl.textContent === 'STANDBY')) {
-            window.SharedComponents?.showToast('SYSTEM COLD', `QRA-${this.selectedQRA} must be HOT for launch`, 'error', 'error');
+            globalThis.SharedComponents?.showToast('SYSTEM COLD', `QRA-${this.selectedQRA} must be HOT for launch`, 'error', 'error');
             return;
         }
 
         this.scrambledSlots.add(this.selectedQRA);
-        window.SharedComponents?.showToast('SCRAMBLING', `QRA-${this.selectedQRA} airborne!`, 'flight_takeoff', 'error');
+        globalThis.SharedComponents?.showToast('SCRAMBLING', `QRA-${this.selectedQRA} airborne!`, 'flight_takeoff', 'error');
 
         if (statusEl) {
             statusEl.textContent = 'SCRAMBLED';
@@ -205,11 +223,12 @@ const AssetManager = {
         if (scrambledEl) scrambledEl.textContent = this.scrambledSlots.size;
 
         this.createMissionFromIncident(this.selectedIncidentId || 'INC-2026-0423-01');
+        this.updateKPIs();
     },
 
     createMissionFromIncident: function(incId) {
         this.setIncidentActive(incId);
-        window.SharedComponents?.showToast('MISSION TASKING', `Tasking QRA-${this.selectedQRA || '1'} to ${incId}`, 'military_tech', 'primary');
+        globalThis.SharedComponents?.showToast('MISSION TASKING', `Tasking QRA-${this.selectedQRA || '1'} to ${incId}`, 'military_tech', 'primary');
     },
 
     aiOptimizeScramble: function() {
@@ -217,16 +236,16 @@ const AssetManager = {
         document.querySelectorAll('.qra-slot[onclick]').forEach(slot => {
             const num = Number(slot.dataset.slot);
             const statusEl = slot.querySelector('.qra-status');
-            if (statusEl && statusEl.textContent !== 'SCRAMBLED' && statusEl.textContent !== 'COLD' && bestSlot === null) {
+            if (statusEl && statusEl.textContent !== 'SCRAMBLED' && statusEl.textContent !== 'COLD' && statusEl.textContent !== 'STANDBY' && bestSlot === null) {
                 bestSlot = num;
             }
         });
         if (bestSlot !== null) this.selectQRASlot(bestSlot);
         
-        if (window.AISystem) {
+        if (globalThis.AISystem) {
             const sector = 'Baltic Sea';
             const bestBase = AISystem.recommendAsset(sector);
-            window.SharedComponents?.showToast('AI OPTIMIZE', `QRA-${bestSlot || 1} selected — ${bestBase.name} recommended`, 'psychology', 'primary');
+            globalThis.SharedComponents?.showToast('AI OPTIMIZE', `QRA-${bestSlot || 1} selected — ${bestBase.name} recommended`, 'psychology', 'primary');
         }
     },
 
@@ -266,10 +285,21 @@ const AssetManager = {
                     </div>
                 </div>
                 <div class="p-4 border-t border-outline-variant/30 flex justify-end">
-                    <button onclick="this.closest('.fixed').remove(); AssetManager.scramble();" class="bg-tertiary text-black px-8 py-2 text-[10px] font-black uppercase hover:opacity-90 transition-opacity glow-tertiary">Initiate Launch</button>
+                    <button data-action="launch" class="bg-tertiary text-black px-8 py-2 text-[10px] font-black uppercase hover:opacity-90 transition-opacity glow-tertiary">Initiate Launch</button>
                 </div>
             </div>`;
         document.body.appendChild(modal);
+
+        modal.querySelector('[data-action="launch"]').addEventListener('click', () => {
+            const total = checklist.length;
+            const checked = modal.querySelectorAll('.checklist-item[data-status="CHECKED"]').length;
+            if (checked < total) {
+                globalThis.SharedComponents?.showToast('CHECKLIST INCOMPLETE', `${total - checked} item(s) pending`, 'warning', 'warning');
+                return;
+            }
+            modal.remove();
+            AssetManager.scramble();
+        });
 
         modal.addEventListener('click', (event) => {
             const row = event.target.closest('.checklist-item');
@@ -300,10 +330,11 @@ const AssetManager = {
 
     showLoadoutConfig: function() {
         const weapons = [
-            { name: 'IRIS-T',   qty: 2, status: 'selected',  available: this.munitionStock['IRIS-T SRAAM'].qty },
-            { name: 'AIM-120B', qty: 4, status: 'selected',  available: this.munitionStock['AIM-120B'].qty },
-            { name: 'GBU-39',   qty: 2, status: 'available', available: this.munitionStock['GBU-39 SDB'].qty },
-            { name: 'KEP 500',  qty: 1, status: 'available', available: this.munitionStock['KEP 500'].qty }
+            { name: 'Meteor BVR', qty: 2, status: 'selected',  available: this.munitionStock['Meteor BVR'].qty },
+            { name: 'IRIS-T',     qty: 2, status: 'selected',  available: this.munitionStock['IRIS-T SRAAM'].qty },
+            { name: 'AIM-120B',   qty: 4, status: 'selected',  available: this.munitionStock['AIM-120B'].qty },
+            { name: 'GBU-39',     qty: 2, status: 'available', available: this.munitionStock['GBU-39 SDB'].qty },
+            { name: 'KEP 500',    qty: 1, status: 'available', available: this.munitionStock['KEP 500'].qty }
         ];
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50';
@@ -322,7 +353,7 @@ const AssetManager = {
                                 </div>
                                 <div>
                                     <div class="weapon-name text-on-surface font-bold text-sm">${w.name}</div>
-                                    <div class="weapon-status text-[9px] text-outline font-bold uppercase tracking-tighter">${w.status === 'selected' ? 'Loaded' : 'Available'}</div>
+                                    <div class="weapon-status text-[9px] text-outline font-bold uppercase tracking-tighter">${w.status === 'selected' ? 'Loaded' : 'Available'} <span class="text-outline/60">· Stock: ${w.available}</span></div>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4">
@@ -339,7 +370,7 @@ const AssetManager = {
                 </div>
                 <div class="p-4 border-t border-outline-variant/30 flex justify-end gap-3">
                     <button onclick="this.closest('.fixed').remove()" class="px-6 py-2 text-[10px] font-bold uppercase text-outline hover:text-on-surface transition-colors">Cancel</button>
-                    <button onclick="this.closest('.fixed').remove(); window.SharedComponents?.showToast('LOADOUT CONFIGURED', 'Weapons ready', 'check', 'success')" class="bg-primary text-on-primary px-8 py-2 text-[10px] font-black uppercase glow-primary">Confirm Configuration</button>
+                    <button onclick="this.closest('.fixed').remove(); globalThis.SharedComponents?.showToast('LOADOUT CONFIGURED', 'Weapons ready', 'check', 'success')" class="bg-primary text-on-primary px-8 py-2 text-[10px] font-black uppercase glow-primary">Confirm Configuration</button>
                 </div>
             </div>`;
         document.body.appendChild(modal);
@@ -363,7 +394,11 @@ const AssetManager = {
             button.classList.toggle('border-transparent', selected);
             
             const status = button.querySelector('.weapon-status');
-            if (status) status.textContent = selected ? 'Available' : 'Loaded';
+            if (status) {
+                const stockSpan = status.querySelector('span');
+                const stockHtml = stockSpan ? ` ${stockSpan.outerHTML}` : '';
+                status.innerHTML = (selected ? 'Available' : 'Loaded') + stockHtml;
+            }
             
             const iconBtn = button.querySelector('button');
             const icon = iconBtn.querySelector('.material-symbols-outlined');
@@ -380,7 +415,12 @@ const AssetManager = {
     },
 
     sort: function(col) {
-        this.sortCol === col ? (this.sortAsc = !this.sortAsc) : (this.sortCol = col, this.sortAsc = true);
+        if (this.sortCol === col) {
+            this.sortAsc = !this.sortAsc;
+        } else {
+            this.sortCol = col;
+            this.sortAsc = true;
+        }
         this.updateSortIndicators();
         this.filterTable();
     },
@@ -408,7 +448,7 @@ const AssetManager = {
             filtered.sort((a, b) => {
                 let va = a.dataset[this.sortCol] || '';
                 let vb = b.dataset[this.sortCol] || '';
-                if (this.sortCol === 'downtime') { va = parseInt(va, 10) || 999; vb = parseInt(vb, 10) || 999; }
+                if (this.sortCol === 'downtime') { va = Number.parseInt(va, 10) || 999; vb = Number.parseInt(vb, 10) || 999; }
                 if (va < vb) return this.sortAsc ? -1 : 1;
                 if (va > vb) return this.sortAsc ? 1 : -1;
                 return 0;
@@ -424,7 +464,7 @@ const AssetManager = {
             btn.disabled = true;
             btn.innerHTML = '<span class="material-symbols-outlined text-[14px] animate-spin">sync</span> REFRESHING...';
         }
-        window.SharedComponents?.showToast('REFRESHING', 'Updating asset status...', 'sync');
+        globalThis.SharedComponents?.showToast('REFRESHING', 'Updating asset status...', 'sync');
 
         setTimeout(() => {
             const statuses = ['HOT', 'WARM', 'COLD'];
@@ -452,25 +492,25 @@ const AssetManager = {
             });
 
             const currentScrambled = this.scrambledSlots.size;
-            const grounded = 3;
-            const total    = 23;
+            const groundedCount = Array.from(document.getElementById('maintenance-body')?.querySelectorAll('tr') || [])
+                .filter(r => r.dataset.status === 'AOG' || r.dataset.status === 'SCHED').length;
+            const total      = 23;
             const patrolling = 8;
-            const standby  = total - currentScrambled - grounded - patrolling;
+            const standby    = Math.max(0, total - currentScrambled - groundedCount - patrolling);
 
-            const patrolEl   = document.getElementById('live-patrolling');
-            const standbyEl  = document.getElementById('live-standby');
-            const groundedEl = document.getElementById('live-grounded');
+            const patrolEl    = document.getElementById('live-patrolling');
+            const standbyEl   = document.getElementById('live-standby');
             const scrambledEl = document.getElementById('live-scrambled');
-            if (patrolEl)   patrolEl.textContent   = patrolling;
-            if (standbyEl)  standbyEl.textContent  = Math.max(0, standby);
-            if (groundedEl) groundedEl.textContent = grounded;
+            if (patrolEl)    patrolEl.textContent    = patrolling;
+            if (standbyEl)   standbyEl.textContent   = standby;
             if (scrambledEl) scrambledEl.textContent = currentScrambled;
 
+            this.updateKPIs();
             if (btn) {
                 btn.disabled = false;
                 btn.innerHTML = '<span class="material-symbols-outlined text-[14px]">sync</span> FORCE REFRESH';
             }
-            window.SharedComponents?.showToast('DATA UPDATED', 'All systems refreshed', 'check', 'success');
+            globalThis.SharedComponents?.showToast('DATA UPDATED', 'All systems refreshed', 'check', 'success');
         }, 800);
     },
 
@@ -496,12 +536,112 @@ const AssetManager = {
         link.setAttribute("download", `SWAF_Asset_Readiness_${timestamp}.csv`);
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
-        window.SharedComponents?.showToast('EXPORT SUCCESS', 'CSV file generated', 'download', 'success');
+        link.remove();
+        globalThis.SharedComponents?.showToast('EXPORT SUCCESS', 'CSV file generated', 'download', 'success');
+    },
+
+    showDetail: function(assetId) {
+        const tbody = document.getElementById('maintenance-body');
+        if (!tbody) return;
+        const row = Array.from(tbody.querySelectorAll('tr')).find(r => r.dataset.assetId === assetId);
+        if (!row) return;
+
+        const downtime = row.dataset.downtime === '999' ? 'TBD' : row.dataset.downtime + ' HRS';
+        const status   = row.dataset.status;
+        const isAOG    = status === 'AOG';
+        const isSched  = status === 'SCHED';
+        let statusColor, statusLabel;
+        if (isAOG)        { statusColor = 'text-error';    statusLabel = 'AOG // CRITICAL'; }
+        else if (isSched) { statusColor = 'text-tertiary'; statusLabel = 'SCHED // ROUTINE'; }
+        else              { statusColor = 'text-outline';  statusLabel = 'PENDING QUEUE'; }
+
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-300';
+        modal.innerHTML = `
+            <div class="glass-panel w-[420px] max-w-[90vw] overflow-hidden rounded-lg">
+                <div class="p-4 border-b border-outline-variant flex justify-between items-center ${isAOG ? 'bg-error/10' : 'bg-primary/10'}">
+                    <h3 class="font-['Space_Grotesk'] text-lg font-bold ${isAOG ? 'text-error' : 'text-primary'} uppercase tracking-wider">${assetId} — Maintenance Intel</h3>
+                    <button onclick="this.closest('.fixed').remove()" class="text-outline hover:text-on-surface p-1 transition-colors"><span class="material-symbols-outlined">close</span></button>
+                </div>
+                <div class="p-6 space-y-5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <span class="text-[10px] text-outline font-bold uppercase tracking-widest">Asset ID</span>
+                            <p class="${isAOG ? 'text-error' : 'text-primary'} font-black text-lg font-['Orbitron']">${assetId}</p>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[10px] text-outline font-bold uppercase tracking-widest">Station</span>
+                            <p class="text-on-surface font-medium">${row.dataset.base}</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 pt-4 border-t border-outline-variant/30">
+                        <span class="text-[10px] text-outline font-bold uppercase tracking-widest">Operational Procedure</span>
+                        <p class="text-on-surface font-medium">${row.dataset.procedure}</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 bg-surface-variant/20 rounded border border-outline-variant/20">
+                            <span class="text-[9px] text-outline uppercase block mb-1">Est. Downtime</span>
+                            <span class="font-bold text-on-surface font-['Orbitron']">${downtime}</span>
+                        </div>
+                        <div class="p-3 bg-surface-variant/20 rounded border border-outline-variant/20">
+                            <span class="text-[9px] text-outline uppercase block mb-1">Current Status</span>
+                            <span class="font-bold ${statusColor}">${statusLabel}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-outline-variant/30 flex justify-end bg-black/20">
+                    <button onclick="this.closest('.fixed').remove()" class="bg-primary text-on-primary px-6 py-2 text-[10px] font-bold uppercase hover:opacity-90 transition-opacity glow-primary">Close Intel</button>
+                </div>
+            </div>`;
+        document.body.appendChild(modal);
+    },
+
+    updateKPIs: function() {
+        const tbody = document.getElementById('maintenance-body');
+        if (!tbody) return;
+
+        // Ground Alerts — count from actual maintenance table
+        const groundedRows = Array.from(tbody.querySelectorAll('tr')).filter(r =>
+            r.dataset.status === 'AOG' || r.dataset.status === 'SCHED'
+        );
+        const groundCountEl  = document.getElementById('kpi-ground-count');
+        const groundBadgesEl = document.getElementById('kpi-ground-badges');
+        if (groundCountEl) groundCountEl.textContent = groundedRows.length;
+        if (groundBadgesEl) {
+            const shown = groundedRows.slice(0, 2);
+            const extra = groundedRows.length - 2;
+            groundBadgesEl.innerHTML =
+                shown.map(r => `<span class="px-3 py-1 bg-error/10 text-error border border-error/30 font-data-mono text-[10px] rounded font-bold">${r.dataset.assetId}</span>`).join('') +
+                (extra > 0 ? `<span class="px-3 py-1 glass-panel text-on-surface border border-outline/50 font-data-mono text-[10px] rounded font-bold">+${extra} UNIT</span>` : '');
+        }
+
+        // QRA Ready Status — count HOT/WARM slots
+        let activeQRA = 0;
+        document.querySelectorAll('.qra-slot').forEach(slot => {
+            const statusEl = slot.querySelector('.qra-status');
+            if (statusEl) {
+                const t = statusEl.textContent.trim().toUpperCase();
+                if (t === 'HOT' || t === 'WARM') activeQRA++;
+            }
+        });
+        const qraCountEl = document.getElementById('kpi-qra-count');
+        const qraBarsEl  = document.getElementById('kpi-qra-bars');
+        if (qraCountEl) qraCountEl.textContent = `${activeQRA}/3`;
+        if (qraBarsEl) {
+            Array.from(qraBarsEl.children).forEach((bar, i) => {
+                bar.className = i < activeQRA
+                    ? 'h-1.5 bg-tertiary w-full shadow-[0_0_8px_#f1c100] rounded-sm'
+                    : 'h-1.5 bg-outline/30 w-full rounded-sm';
+            });
+        }
+
+        // Keep live-grounded in sync
+        const liveGroundedEl = document.getElementById('live-grounded');
+        if (liveGroundedEl) liveGroundedEl.textContent = groundedRows.length;
     }
 };
 
 // Initialize on page load
-window.addEventListener('DOMContentLoaded', () => {
+addEventListener('DOMContentLoaded', () => {
     AssetManager.init();
 });
