@@ -191,7 +191,7 @@ LOADOUT
 <h3 class="font-label-caps text-label-caps text-primary uppercase border-b border-outline-variant pb-2">Tactical Wing Status</h3>
 <div class="grid grid-cols-3 gap-gutter h-full">
 <!-- F7 Såtenäs -->
-<div id="base-f7-såtenäs" class="base-card bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden group transition-all duration-500">
+<div id="base-f7-såtenäs" onclick="AssetManager.showBaseDetail('F7 Såtenäs')" class="base-card bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden group transition-all duration-500 cursor-pointer hover:border-primary">
 <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]"></div>
 <div class="relative z-10 flex-1">
 <div class="flex justify-between items-center mb-6 border-b border-surface-variant pb-2">
@@ -217,7 +217,7 @@ LOADOUT
 </div>
 </div>
 <!-- F17 Kallinge -->
-<div id="base-f17-kallinge" class="base-card bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden transition-all duration-500">
+<div id="base-f17-kallinge" onclick="AssetManager.showBaseDetail('F17 Kallinge')" class="base-card bg-surface-container-low border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden transition-all duration-500 cursor-pointer hover:border-primary">
 <div class="relative z-10 flex-1">
 <div class="flex justify-between items-center mb-6 border-b border-surface-variant pb-2">
 <span class="font-headline-md text-headline-md text-on-surface uppercase">F17 Kallinge</span>
@@ -242,7 +242,7 @@ LOADOUT
 </div>
 </div>
 <!-- F21 Luleå -->
-<div id="base-f21-luleå" class="base-card bg-surface-container-low border border-error/50 p-panel-padding flex flex-col relative overflow-hidden transition-all duration-500">
+<div id="base-f21-luleå" onclick="AssetManager.showBaseDetail('F21 Luleå')" class="base-card bg-surface-container-low border border-error/50 p-panel-padding flex flex-col relative overflow-hidden transition-all duration-500 cursor-pointer hover:border-error">
 <div class="absolute top-0 right-0 w-8 h-8 bg-error/10 border-l border-b border-error/30 flex items-center justify-center">
 <span class="material-symbols-outlined text-[16px] text-error">warning</span>
 </div>
@@ -431,6 +431,77 @@ const AssetManager = {
         if (firstIncident) {
             this.setIncidentActive(firstIncident.dataset.incidentId);
         }
+    },
+
+    showBaseDetail: function(baseName) {
+        const bases = {
+            'F7 Såtenäs': { 
+                wing: 'Wing 7', 
+                location: 'Västra Götaland', 
+                aircraft: 'JAS 39E/F', 
+                readiness: 75, 
+                qra: 'READY',
+                pilots: 18,
+                status: 'OPERATIONAL'
+            },
+            'F17 Kallinge': { 
+                wing: 'Wing 17', 
+                location: 'Blekinge', 
+                aircraft: 'JAS 39C/D', 
+                readiness: 87, 
+                qra: 'NOMINAL',
+                pilots: 14,
+                status: 'OPERATIONAL'
+            },
+            'F21 Luleå': { 
+                wing: 'Wing 21', 
+                location: 'Norrbotten', 
+                aircraft: 'JAS 39C/D', 
+                readiness: 44, 
+                qra: 'DEGRADED',
+                pilots: 8,
+                status: 'LIMITED'
+            }
+        };
+        
+        const b = bases[baseName];
+        if (!b) return;
+        
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-surface-container border border-outline-variant w-[450px] max-w-[90vw]">
+                <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-variant/30">
+                    <h3 class="font-headline-md text-headline-md text-primary">${baseName} - DETAIL</h3>
+                    <button onclick="this.closest('.fixed').remove()" class="text-outline hover:text-on-surface p-1">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><span class="text-[10px] text-outline">WING</span><p class="text-on-surface font-bold">${b.wing}</p></div>
+                        <div><span class="text-[10px] text-outline">LOCATION</span><p class="text-on-surface">${b.location}</p></div>
+                        <div><span class="text-[10px] text-outline">AIRCRAFT TYPE</span><p class="text-on-surface">${b.aircraft}</p></div>
+                        <div><span class="text-[10px] text-outline">QRA STATUS</span><p class="font-bold ${b.qra === 'DEGRADED' ? 'text-error' : 'text-primary'}">${b.qra}</p></div>
+                    </div>
+                    <div class="border-t border-outline-variant pt-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><span class="text-[10px] text-outline">READINESS</span><p class="text-on-surface font-bold">${b.readiness}%</p></div>
+                            <div><span class="text-[10px] text-outline">AVAILABLE PILOTS</span><p class="text-on-surface">${b.pilots}</p></div>
+                        </div>
+                        <div class="mt-2">
+                            <span class="text-[10px] text-outline">SYSTEM STATUS</span>
+                            <p class="font-bold ${b.status === 'OPERATIONAL' ? 'text-green-500' : 'text-error'}">${b.status}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-outline-variant flex justify-end gap-2">
+                    <button onclick="this.closest('.fixed').remove(); AISystem.recommendAsset('${baseName}')" class="bg-surface-variant border border-outline px-4 py-2 text-[10px] font-bold uppercase">AI OPTIMIZE</button>
+                    <button onclick="this.closest('.fixed').remove()" class="bg-primary text-white px-4 py-2 text-[10px] font-bold uppercase">CLOSE</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
     },
 
     setIncidentActive: function(incidentId) {
