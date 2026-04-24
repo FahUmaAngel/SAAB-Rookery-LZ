@@ -43,6 +43,7 @@
       <div class="border border-slate-800 bg-surface-container-high p-3">
         <div class="font-label-caps text-[8px] text-slate-500 uppercase">T+ Elapsed</div>
         <div id="live-elapsed" class="font-data-mono text-[13px] text-error mt-1">T+00:00</div>
+        <div id="live-zulu" class="font-data-mono text-[9px] text-slate-600 mt-0.5">ZULU --:--:--</div>
       </div>
     </div>
   </header>
@@ -74,8 +75,40 @@
             <!-- Cardinal axis lines -->
             <line x1="50" y1="6" x2="50" y2="94" stroke="rgba(130,207,255,0.09)" stroke-width="0.3"/>
             <line x1="6"  y1="50" x2="94" y2="50" stroke="rgba(130,207,255,0.09)" stroke-width="0.3"/>
+            <!-- Diagonal grid lines (45°) -->
+            <line x1="18.9" y1="18.9" x2="81.1" y2="81.1" stroke="rgba(130,207,255,0.05)" stroke-width="0.25"/>
+            <line x1="81.1" y1="18.9" x2="18.9" y2="81.1" stroke="rgba(130,207,255,0.05)" stroke-width="0.25"/>
             <!-- Outer border ring -->
             <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(130,207,255,0.22)" stroke-width="0.5"/>
+            <!-- Compass labels -->
+            <text x="50" y="4.5" font-family="monospace" font-size="3.2" fill="rgba(130,207,255,0.38)" text-anchor="middle">N</text>
+            <text x="50" y="98.5" font-family="monospace" font-size="3.2" fill="rgba(130,207,255,0.38)" text-anchor="middle">S</text>
+            <text x="97" y="52" font-family="monospace" font-size="3.2" fill="rgba(130,207,255,0.38)" text-anchor="start">E</text>
+            <text x="3" y="52" font-family="monospace" font-size="3.2" fill="rgba(130,207,255,0.38)" text-anchor="end">W</text>
+            <!-- NM ring labels (right of N axis) -->
+            <text x="52" y="38" font-family="monospace" font-size="2.2" fill="rgba(130,207,255,0.22)" text-anchor="start">15NM</text>
+            <text x="52" y="23" font-family="monospace" font-size="2.2" fill="rgba(130,207,255,0.22)" text-anchor="start">30NM</text>
+            <!-- Track history trail (JS-driven, oldest→newest = trail-0→trail-4) -->
+            <circle id="trail-0" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.05)"/>
+            <circle id="trail-1" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.12)"/>
+            <circle id="trail-2" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.20)"/>
+            <circle id="trail-3" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.30)"/>
+            <circle id="trail-4" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.42)"/>
+            <!-- Enemy formation: TU-22M3 + 2x SU-27 (JS-animated, bearing ~310°, r≈38) -->
+            <rect id="pip-tu22"  x="19.25" y="24.25" width="3.5" height="3.5" fill="rgba(255,60,60,0.20)" stroke="rgba(255,90,90,0.95)" stroke-width="0.6" transform="rotate(45 21 26)" style="animation:blink 1.1s infinite"/>
+            <rect id="pip-su27a" x="21.70" y="23.00" width="2.8" height="2.8" fill="rgba(255,60,60,0.15)" stroke="rgba(255,90,90,0.80)" stroke-width="0.5" transform="rotate(45 23.1 24.4)" style="animation:blink 1.4s infinite"/>
+            <rect id="pip-su27b" x="17.50" y="26.20" width="2.8" height="2.8" fill="rgba(255,60,60,0.15)" stroke="rgba(255,90,90,0.80)" stroke-width="0.5" transform="rotate(45 18.9 27.6)" style="animation:blink 1.6s infinite"/>
+            <!-- Enemy approach vector (JS-animated start point) -->
+            <line id="pip-vec" x1="21" y1="26" x2="50" y2="50" stroke="rgba(255,90,90,0.18)" stroke-width="0.35" stroke-dasharray="1.5 1.5"/>
+            <!-- Enemy label (JS-animated) -->
+            <text id="pip-bogey-lbl" x="9" y="22" font-family="monospace" font-size="2.8" fill="rgba(255,90,90,0.75)" letter-spacing="0.2">BOGEY</text>
+            <!-- Friendly: 2x JAS-39 Gripen (SSE intercept, bearing ~160°, r≈24) -->
+            <polygon points="59,71.5 57,75.5 61,75.5" fill="rgba(130,207,255,0.20)" stroke="rgba(130,207,255,0.90)" stroke-width="0.45"/>
+            <polygon points="55,69.5 53,73.5 57,73.5" fill="rgba(130,207,255,0.20)" stroke="rgba(130,207,255,0.90)" stroke-width="0.45"/>
+            <!-- Intercept vector -->
+            <line x1="57" y1="72" x2="32" y2="38" stroke="rgba(130,207,255,0.18)" stroke-width="0.3" stroke-dasharray="1 2"/>
+            <!-- Friendly label -->
+            <text x="62" y="78" font-family="monospace" font-size="2.8" fill="rgba(130,207,255,0.75)" letter-spacing="0.2">QRA</text>
             <!-- Center pip -->
             <circle cx="50" cy="50" r="1.2" fill="rgba(130,207,255,0.70)" filter="url(#pip-glow)"/>
           </svg>
@@ -104,21 +137,23 @@
         </div>
         <div class="absolute left-[50%] top-[58%] w-[20%] h-px bg-primary rotate-[16deg] origin-left shadow-[0_0_8px_rgba(130,207,255,0.8)]"></div>
         <div class="absolute bottom-6 left-6 right-6 grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-          <div class="border border-slate-800 bg-black/40 p-2"><div class="font-label-caps text-[8px] text-slate-500">IFF</div><div class="font-data-mono text-error">NO REPLY</div></div>
-          <div class="border border-slate-800 bg-black/40 p-2"><div class="font-label-caps text-[8px] text-slate-500">FLIGHT PLAN</div><div class="font-data-mono text-error">NONE</div></div>
-          <div class="border border-slate-800 bg-black/40 p-2"><div class="font-label-caps text-[8px] text-slate-500">COMMS</div><div class="font-data-mono text-tertiary">GUARD 121.5</div></div>
-          <div class="border border-slate-800 bg-black/40 p-2"><div class="font-label-caps text-[8px] text-slate-500">DIST TO 12NM</div><div id="live-dist-mini" class="font-data-mono text-error">11.8 NM</div></div>
+          <div class="border border-error/30 bg-error/5 p-2"><div class="font-label-caps text-[8px] text-slate-500 flex items-center gap-1"><span class="w-1 h-1 rounded-full bg-error inline-block" style="animation:blink 1.4s infinite"></span>IFF</div><div class="font-data-mono text-error text-[11px]">NO REPLY</div></div>
+          <div class="border border-error/30 bg-error/5 p-2"><div class="font-label-caps text-[8px] text-slate-500">FLIGHT PLAN</div><div class="font-data-mono text-error text-[11px]">NONE FILED</div></div>
+          <div class="border border-slate-800 bg-black/40 p-2"><div class="font-label-caps text-[8px] text-slate-500">GUARD FREQ</div><div class="font-data-mono text-tertiary text-[11px]">121.5 MHz</div></div>
+          <div class="border border-error/30 bg-error/5 p-2"><div class="font-label-caps text-[8px] text-slate-500 flex items-center gap-1"><span class="w-1 h-1 rounded-full bg-error inline-block" style="animation:blink 0.8s infinite"></span>DIST 12NM</div><div id="live-dist-mini" class="font-data-mono text-error text-[11px]">11.8 NM</div></div>
         </div>
       </div>
     </div>
 
     <aside class="border border-outline-variant bg-surface-container-low flex flex-col overflow-hidden w-full xl:w-[320px] xl:min-w-[320px] xl:max-w-[320px] min-h-[360px] xl:h-full">
       <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between shrink-0">
-        <h2 class="font-headline-md text-headline-md uppercase">Source Summary</h2>
+        <div class="flex flex-col gap-0.5">
+          <span class="font-label-caps text-[8px] text-slate-500 uppercase tracking-widest">Intel Feed</span>
+          <span class="font-data-mono text-[11px] text-on-surface uppercase tracking-wider">LIVE // STRIL C2</span>
+        </div>
         <div class="flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-primary inline-block" style="animation:blink 1.4s infinite"></span>
-          <span class="font-data-mono text-[9px] text-primary">LIVE INTEL</span>
-          <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+          <span class="font-data-mono text-[9px] text-primary">DATALINK ACTIVE</span>
         </div>
       </div>
       <!-- Live scrolling intel feed -->
@@ -131,6 +166,8 @@
           <div><span class="text-slate-500">Escort: </span><span class="text-error">2x SU-27</span></div>
           <div><span class="text-slate-500">Speed: </span><span id="live-speed" class="text-tertiary">980 km/h</span></div>
           <div><span class="text-slate-500">Dist: </span><span id="live-dist" class="text-tertiary">11.8 NM</span></div>
+          <div><span class="text-slate-500">Alt: </span><span id="live-alt" class="text-tertiary">8200 m</span></div>
+          <div><span class="text-slate-500">Hdg: </span><span class="text-slate-400">127°</span></div>
         </div>
       </div>
     </aside>
@@ -148,13 +185,13 @@
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-2">
 
       <!-- Phase 1 -->
-      <article class="border border-primary/40 bg-surface-container-low flex flex-col">
-        <div class="p-3 border-b border-primary/20 bg-primary/5 flex items-center justify-between">
-          <div class="flex items-center gap-2 text-primary">
+      <article class="border border-emerald-500/30 bg-surface-container-low flex flex-col">
+        <div class="p-3 border-b border-emerald-500/20 bg-emerald-500/5 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-emerald-300">
             <span class="material-symbols-outlined text-[18px]">sensors</span>
             <span class="font-label-caps text-label-caps uppercase">1 Detection</span>
           </div>
-          <span class="font-data-mono text-[9px] text-primary border border-primary/30 px-1">ASSESS</span>
+          <span class="font-data-mono text-[9px] text-emerald-400 border border-emerald-500/40 bg-emerald-950/30 px-1.5 flex items-center gap-1">✓ DONE</span>
         </div>
         <div class="p-3 flex flex-col gap-2 flex-1">
           <div class="flex flex-col gap-1.5 font-data-mono text-[10px]">
@@ -171,13 +208,13 @@
       </article>
 
       <!-- Phase 2 -->
-      <article class="border border-tertiary/30 bg-surface-container-low flex flex-col">
-        <div class="p-3 border-b border-tertiary/20 bg-tertiary/5 flex items-center justify-between">
-          <div class="flex items-center gap-2 text-tertiary">
+      <article class="border border-emerald-500/30 bg-surface-container-low flex flex-col">
+        <div class="p-3 border-b border-emerald-500/20 bg-emerald-500/5 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-emerald-300">
             <span class="material-symbols-outlined text-[18px]">flight_takeoff</span>
             <span class="font-label-caps text-label-caps uppercase">2 Alpha Scramble</span>
           </div>
-          <span class="font-data-mono text-[9px] text-tertiary border border-tertiary/30 px-1">SCRAMBLE</span>
+          <span class="font-data-mono text-[9px] text-emerald-400 border border-emerald-500/40 bg-emerald-950/30 px-1.5 flex items-center gap-1">✓ DONE</span>
         </div>
         <div class="p-3 flex flex-col gap-2 flex-1">
           <div class="flex flex-col gap-1.5 font-data-mono text-[10px]">
@@ -194,13 +231,13 @@
       </article>
 
       <!-- Phase 3 -->
-      <article class="border border-sky-500/30 bg-surface-container-low flex flex-col">
-        <div class="p-3 border-b border-sky-500/20 bg-sky-500/5 flex items-center justify-between">
-          <div class="flex items-center gap-2 text-sky-300">
+      <article class="border border-emerald-500/30 bg-surface-container-low flex flex-col">
+        <div class="p-3 border-b border-emerald-500/20 bg-emerald-500/5 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-emerald-300">
             <span class="material-symbols-outlined text-[18px]">visibility</span>
             <span class="font-label-caps text-label-caps uppercase">3 Visual ID</span>
           </div>
-          <span class="font-data-mono text-[9px] text-sky-300 border border-sky-500/30 px-1">VID</span>
+          <span class="font-data-mono text-[9px] text-emerald-400 border border-emerald-500/40 bg-emerald-950/30 px-1.5 flex items-center gap-1">✓ DONE</span>
         </div>
         <div class="p-3 flex flex-col gap-2 flex-1">
           <div class="flex flex-col gap-1.5 font-data-mono text-[10px]">
@@ -217,13 +254,15 @@
       </article>
 
       <!-- Phase 4 -->
-      <article class="border border-error/30 bg-surface-container-low flex flex-col">
-        <div class="p-3 border-b border-error/20 bg-error/5 flex items-center justify-between">
+      <article class="border border-error/50 bg-surface-container-low flex flex-col" style="box-shadow:0 0 12px rgba(255,180,171,0.08)">
+        <div class="p-3 border-b border-error/30 bg-error/8 flex items-center justify-between">
           <div class="flex items-center gap-2 text-error">
             <span class="material-symbols-outlined text-[18px]">campaign</span>
             <span class="font-label-caps text-label-caps uppercase">4 Warning</span>
           </div>
-          <span class="font-data-mono text-[9px] text-error border border-error/30 px-1">ROE</span>
+          <span class="font-data-mono text-[9px] text-error border border-error/50 bg-error/10 px-1.5 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-error inline-block" style="animation:blink 0.9s infinite"></span>ACTIVE
+          </span>
         </div>
         <div class="p-3 flex flex-col gap-3 flex-1">
           <div>
@@ -252,13 +291,13 @@
       </article>
 
       <!-- Phase 5 -->
-      <article class="border border-emerald-500/30 bg-surface-container-low flex flex-col">
-        <div class="p-3 border-b border-emerald-500/20 bg-emerald-500/5 flex items-center justify-between">
-          <div class="flex items-center gap-2 text-emerald-300">
+      <article class="border border-slate-700/50 bg-surface-container-low flex flex-col opacity-60">
+        <div class="p-3 border-b border-slate-700/30 bg-slate-800/20 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-slate-500">
             <span class="material-symbols-outlined text-[18px]">task_alt</span>
             <span class="font-label-caps text-label-caps uppercase">5 Escort &amp; Report</span>
           </div>
-          <span class="font-data-mono text-[9px] text-emerald-300 border border-emerald-500/30 px-1">CLOSE</span>
+          <span class="font-data-mono text-[9px] text-slate-500 border border-slate-700 px-1.5">PENDING</span>
         </div>
         <div class="p-3 flex flex-col gap-2 flex-1">
           <div class="flex flex-col gap-1.5 font-data-mono text-[10px]">
@@ -309,7 +348,7 @@
         </div>
         <div>
           <div class="font-label-caps text-[8px] text-sky-300 uppercase mb-1 flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-sky-300 inline-block"></span> Contextual &amp; External
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-300 inline-block"></span> EXT / SPACE
           </div>
           <div class="grid grid-cols-1 gap-1 font-data-mono text-data-mono">
             <div class="border border-slate-800 p-2 flex items-center justify-between"><span>ICEYE / SSC SAR</span><span class="text-sky-300 text-[9px]">TASKED</span></div>
@@ -328,29 +367,29 @@
       </div>
       <div class="p-panel-padding flex flex-col gap-4 font-data-mono text-data-mono">
         <div>
-          <div class="flex justify-between mb-1"><span>Uncooperative track</span><span class="text-error">HIGH</span></div>
+          <div class="flex justify-between mb-1"><span>UNCOOPERATIVE TRK</span><span class="text-error">HIGH</span></div>
           <div class="h-1 bg-slate-900"><div class="h-1 bg-error w-[92%]"></div></div>
-          <div class="text-[9px] text-slate-600 mt-1">Transponder off · No flight plan · No comms</div>
+          <div class="text-[9px] text-slate-600 mt-1">xpdr OFF · no FPL · no comms</div>
         </div>
         <div>
-          <div class="flex justify-between mb-1"><span>Airspace breach probability</span><span class="text-tertiary">MED</span></div>
+          <div class="flex justify-between mb-1"><span>AIRSPACE BREACH PROB</span><span class="text-tertiary">MED</span></div>
           <div class="h-1 bg-slate-900"><div class="h-1 bg-tertiary w-[64%]"></div></div>
-          <div class="text-[9px] text-slate-600 mt-1">Predictive trajectory 11.8 NM closing</div>
+          <div class="text-[9px] text-slate-600 mt-1">Predictive traj · 11.8 NM closing</div>
         </div>
         <div>
-          <div class="flex justify-between mb-1"><span>Strategic asset exposure</span><span class="text-primary">TRACK</span></div>
+          <div class="flex justify-between mb-1"><span>STRATEGIC EXPOSURE</span><span class="text-primary">TRACK</span></div>
           <div class="h-1 bg-slate-900"><div class="h-1 bg-primary w-[48%]"></div></div>
-          <div class="text-[9px] text-slate-600 mt-1">Tu-22M3 bomber — ISR &amp; strike capable</div>
+          <div class="text-[9px] text-slate-600 mt-1">TU-22M3 · ISR + strike capable</div>
         </div>
         <div>
-          <div class="flex justify-between mb-1"><span>ISR collection value</span><span class="text-emerald-300">HIGH</span></div>
+          <div class="flex justify-between mb-1"><span>ISR COLLECTION</span><span class="text-emerald-300">HIGH</span></div>
           <div class="h-1 bg-slate-900"><div class="h-1 bg-emerald-300 w-[86%]"></div></div>
-          <div class="text-[9px] text-slate-600 mt-1">ICEYE SAR + EO/IR imagery package</div>
+          <div class="text-[9px] text-slate-600 mt-1">ICEYE SAR + EO/IR sealed</div>
         </div>
         <div>
-          <div class="flex justify-between mb-1"><span>Diplomatic package readiness</span><span class="text-sky-300">READY</span></div>
+          <div class="flex justify-between mb-1"><span>DIPLO PKG</span><span class="text-sky-300">READY</span></div>
           <div class="h-1 bg-slate-900"><div class="h-1 bg-sky-300 w-[78%]"></div></div>
-          <div class="text-[9px] text-slate-600 mt-1">Evidence sealed — protest queued to MFA</div>
+          <div class="text-[9px] text-slate-600 mt-1">Evidence sealed · protest → MFA</div>
         </div>
       </div>
     </div>
@@ -636,7 +675,7 @@
 
 <script>
 /* ── Live Telemetry ── */
-const liveState = { distance: 11.8, speed: 980, elapsed: 0, dotLeft: 18 };
+const liveState = { distance: 11.8, speed: 980, alt: 8200, elapsed: 0, dotLeft: 18 };
 const activeModalIds = ['scan-modal', 'diplo-modal', 'checklist-modal', 'diplo-progress-modal'];
 let scanInProgress = false;
 let scanRunId = 0;
@@ -669,6 +708,28 @@ function setScanButtonBusy(isBusy) {
   btn.setAttribute('aria-busy', String(isBusy));
 }
 
+const trackHistory = [];
+function updateRadarPips() {
+  const d = liveState.distance;
+  const r = Math.max(10, 38 - (11.8 - d) * 3.27);
+  const cx = 50 - r * 0.766;
+  const cy = 50 - r * 0.643;
+  const setRect = (id, rcx, rcy, w) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('x', (rcx - w / 2).toFixed(2));
+    el.setAttribute('y', (rcy - w / 2).toFixed(2));
+    el.setAttribute('transform', `rotate(45 ${rcx.toFixed(2)} ${rcy.toFixed(2)})`);
+  };
+  setRect('pip-tu22',  cx,       cy,       3.5);
+  setRect('pip-su27a', cx + 2.1, cy - 1.6, 2.8);
+  setRect('pip-su27b', cx - 2.1, cy + 1.6, 2.8);
+  const vec = document.getElementById('pip-vec');
+  if (vec) { vec.setAttribute('x1', cx.toFixed(2)); vec.setAttribute('y1', cy.toFixed(2)); }
+  const lbl = document.getElementById('pip-bogey-lbl');
+  if (lbl) { lbl.setAttribute('x', (cx - 12).toFixed(2)); lbl.setAttribute('y', (cy - 4).toFixed(2)); }
+}
+
 function startLiveData() {
   setInterval(() => {
     liveState.elapsed++;
@@ -687,6 +748,11 @@ function startLiveData() {
     set('live-speed', liveState.speed + ' km/h');
     set('live-dist', distStr, distCls);
     set('live-dist-mini', distStr, distCls);
+    liveState.alt = 8200 + Math.round((Math.random() - 0.5) * 120);
+    set('live-alt', liveState.alt + ' m');
+    const _z = new Date();
+    set('live-zulu', `ZULU ${String(_z.getUTCHours()).padStart(2,'0')}:${String(_z.getUTCMinutes()).padStart(2,'0')}:${String(_z.getUTCSeconds()).padStart(2,'0')}`);
+    updateRadarPips();
 
     const dot = document.getElementById('live-track-dot');
     if (dot) dot.style.left = liveState.dotLeft + '%';
@@ -723,7 +789,7 @@ function initFeed() {
   setInterval(() => {
     if (_feedIdx >= INTEL_ITEMS.length) _feedIdx = 0;
     addFeedItem(INTEL_ITEMS[_feedIdx++]);
-  }, 60000);
+  }, 12000);
 }
 
 function makeFeedItem(item, timeLabel) {
@@ -993,6 +1059,19 @@ document.addEventListener('keydown', (event) => {
   closeScanModal();
 });
 
-document.addEventListener('DOMContentLoaded', () => { startLiveData(); initFeed(); });
+document.addEventListener('DOMContentLoaded', () => {
+  startLiveData();
+  initFeed();
+  setInterval(() => {
+    const d = liveState.distance;
+    const r = Math.max(10, 38 - (11.8 - d) * 3.27);
+    trackHistory.push({ x: +(50 - r * 0.766).toFixed(2), y: +(50 - r * 0.643).toFixed(2) });
+    if (trackHistory.length > 5) trackHistory.shift();
+    trackHistory.forEach((pt, i) => {
+      const el = document.getElementById('trail-' + i);
+      if (el) { el.setAttribute('cx', pt.x); el.setAttribute('cy', pt.y); }
+    });
+  }, 5000);
+});
 </script>
 </body></html>
