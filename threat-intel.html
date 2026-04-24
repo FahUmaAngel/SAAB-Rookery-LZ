@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Threat Intel - Baltic Air Domain</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="tailwind.config.js"></script>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<div id="header-placeholder"></div>
+<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+<div id="sidebar-placeholder"></div>
+
+<main class="h-full overflow-y-auto p-gutter flex flex-col gap-gutter">
+
+  <header class="border border-outline-variant bg-surface-container p-panel-padding flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div class="flex flex-col gap-2">
+      <span class="font-label-caps text-label-caps text-error uppercase flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">warning</span>
+        THREAT INTEL // MAP VIEW
+      </span>
+      <h1 class="font-headline-lg text-headline-lg text-on-surface uppercase">Baltic Air Domain — Threat Assessment</h1>
+      <p class="font-body-sm text-body-sm text-on-surface-variant max-w-4xl">
+        Current threat analysis for Russian air power projection over the Baltic Sea and approaches. Aircraft profiles, probing vectors, and ISR collection patterns based on open-source and Försvarsmakten reporting.
+      </p>
+    </div>
+    <div class="grid grid-cols-3 gap-2 min-w-[320px]">
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Threat Level</div>
+        <div class="font-data-mono text-[13px] text-error mt-1">ALPHA</div>
+      </div>
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Active Tracks</div>
+        <div class="font-data-mono text-[13px] text-tertiary mt-1">3 BOGEY</div>
+      </div>
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Intel Age</div>
+        <div class="font-data-mono text-[13px] text-primary mt-1">&lt; 6 HRS</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Threat Track Table + Detail -->
+  <section class="grid grid-cols-1 xl:grid-cols-[1fr_1.4fr] gap-gutter">
+
+    <!-- Active Threat List -->
+    <div class="border border-outline-variant bg-surface-container-low flex flex-col">
+      <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+        <h2 class="font-headline-md text-headline-md uppercase">Active Threat Tracks</h2>
+        <span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+      </div>
+      <div class="flex-1 overflow-y-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="sticky top-0 bg-surface-container-high border-b border-slate-800 text-slate-500 font-label-caps text-label-caps uppercase z-10">
+            <tr>
+              <th class="py-2 px-4 font-normal">Track ID</th>
+              <th class="py-2 px-4 font-normal">Type</th>
+              <th class="py-2 px-4 font-normal">Origin</th>
+              <th class="py-2 px-4 font-normal text-right">Threat</th>
+            </tr>
+          </thead>
+          <tbody class="font-data-mono text-data-mono divide-y divide-slate-800">
+            <tr class="hover:bg-slate-800/50 cursor-pointer border-l-2 border-error bg-error/5">
+              <td class="py-3 px-4 text-error">BOGEY-ALFA-01</td>
+              <td class="py-3 px-4">Tu-22M3 Backfire</td>
+              <td class="py-3 px-4 text-slate-400">Kaliningrad</td>
+              <td class="py-3 px-4 text-right text-error">HIGH</td>
+            </tr>
+            <tr class="hover:bg-slate-800/50 cursor-pointer border-l-2 border-error">
+              <td class="py-3 px-4 text-error">BOGEY-ALFA-02</td>
+              <td class="py-3 px-4">Su-27 Flanker</td>
+              <td class="py-3 px-4 text-slate-400">Kaliningrad</td>
+              <td class="py-3 px-4 text-right text-error">HIGH</td>
+            </tr>
+            <tr class="hover:bg-slate-800/50 cursor-pointer border-l-2 border-tertiary">
+              <td class="py-3 px-4 text-tertiary">BOGEY-BRAVO-01</td>
+              <td class="py-3 px-4">IL-20 Coot-A</td>
+              <td class="py-3 px-4 text-slate-400">Pskov</td>
+              <td class="py-3 px-4 text-right text-tertiary">MED</td>
+            </tr>
+            <tr class="hover:bg-slate-800/50 cursor-pointer border-l-2 border-transparent">
+              <td class="py-3 px-4 text-slate-400">TRACK-CHAR-11</td>
+              <td class="py-3 px-4">Tu-95 Bear</td>
+              <td class="py-3 px-4 text-slate-400">Murmansk</td>
+              <td class="py-3 px-4 text-right text-slate-500">LOW</td>
+            </tr>
+            <tr class="hover:bg-slate-800/50 cursor-pointer border-l-2 border-transparent">
+              <td class="py-3 px-4 text-slate-400">TRACK-DELT-04</td>
+              <td class="py-3 px-4">Su-24 Fencer</td>
+              <td class="py-3 px-4 text-slate-400">Leningrad OB</td>
+              <td class="py-3 px-4 text-right text-slate-500">LOW</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Aircraft Profile Cards -->
+    <div class="flex flex-col gap-gutter">
+
+      <!-- Tu-22M3 Profile -->
+      <div class="border border-error/30 bg-surface-container-low">
+        <div class="p-panel-padding border-b border-error/20 bg-error/5 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-error text-[18px]">flight</span>
+            <h3 class="font-label-caps text-label-caps uppercase text-error">Tu-22M3 Backfire-C — Strategic Bomber</h3>
+          </div>
+          <span class="font-data-mono text-[9px] text-error border border-error/30 px-2 py-0.5">PRIMARY THREAT</span>
+        </div>
+        <div class="p-panel-padding grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2 font-data-mono text-data-mono">
+            <div class="flex justify-between border-b border-slate-800 pb-1"><span class="text-slate-500">Max Speed</span><span>Mach 1.88</span></div>
+            <div class="flex justify-between border-b border-slate-800 pb-1"><span class="text-slate-500">Range</span><span>6,800 km</span></div>
+            <div class="flex justify-between border-b border-slate-800 pb-1"><span class="text-slate-500">Ceiling</span><span>FL430</span></div>
+            <div class="flex justify-between border-b border-slate-800 pb-1"><span class="text-slate-500">Payload</span><span>24,000 kg</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">IFF Posture</span><span class="text-error">OFF / UNCOOPERATIVE</span></div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <div class="font-label-caps text-[8px] text-slate-500 uppercase mb-1">Capability Assessment</div>
+            <div class="flex flex-col gap-1 font-body-sm text-[11px] text-on-surface-variant">
+              <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-error rounded-full shrink-0"></span>Kh-22 / Kh-32 anti-ship missile capable</div>
+              <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-error rounded-full shrink-0"></span>Kh-101 / Kh-555 cruise missile standoff strike</div>
+              <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-tertiary rounded-full shrink-0"></span>ISR collection during probing flight</div>
+              <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-tertiary rounded-full shrink-0"></span>Tests Swedish QRA reaction time and vector</div>
+              <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-primary rounded-full shrink-0"></span>Kaliningrad basing enables Baltic coverage</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IL-20 Profile -->
+      <div class="border border-tertiary/30 bg-surface-container-low">
+        <div class="p-panel-padding border-b border-tertiary/20 bg-tertiary/5 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-tertiary text-[18px]">travel_explore</span>
+            <h3 class="font-label-caps text-label-caps uppercase text-tertiary">IL-20 Coot-A — ELINT / Reconnaissance</h3>
+          </div>
+          <span class="font-data-mono text-[9px] text-tertiary border border-tertiary/30 px-2 py-0.5">ISR THREAT</span>
+        </div>
+        <div class="p-panel-padding grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2 font-data-mono text-data-mono">
+            <div class="flex justify-between border-b border-slate-800 pb-1"><span class="text-slate-500">Role</span><span>ELINT / SIGINT</span></div>
+            <div class="flex justify-between border-b border-slate-800 pb-1"><span class="text-slate-500">Endurance</span><span>12+ hours</span></div>
+            <div class="flex justify-between border-b border-slate-800 pb-1"><span class="text-slate-500">Collection</span><span>COMINT / ELINT</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">IFF Posture</span><span class="text-tertiary">VARIED</span></div>
+          </div>
+          <div class="font-body-sm text-[11px] text-on-surface-variant leading-relaxed">
+            Primary Russian Baltic SIGINT platform. Maps Swedish radar emissions, communication frequencies, and NATO C2 network signatures during probing operations. Often accompanies strike aircraft.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Probing Vector Analysis -->
+  <section class="border border-outline-variant bg-surface-container-low">
+    <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+      <h3 class="font-label-caps text-label-caps uppercase text-slate-400">Known Probing Vectors — Baltic Domain</h3>
+      <span class="font-data-mono text-[10px] text-slate-500">SOURCE: OPEN / FÖRSVARSMAKTEN</span>
+    </div>
+    <div class="p-panel-padding grid grid-cols-1 md:grid-cols-3 gap-4 font-data-mono text-data-mono">
+      <div class="border border-slate-800 p-3 flex flex-col gap-2">
+        <div class="font-label-caps text-[8px] text-error uppercase">Vector Alpha — Gotland Approach</div>
+        <p class="font-body-sm text-[11px] text-on-surface-variant">Kaliningrad departure, northeast track, probe toward Gotland sovereign airspace boundary. Primary Tu-22M3 + escort pattern. Tests QRA at F17 Blekinge / Ämari Estonia.</p>
+      </div>
+      <div class="border border-slate-800 p-3 flex flex-col gap-2">
+        <div class="font-label-caps text-[8px] text-tertiary uppercase">Vector Bravo — Finnish Gulf Transit</div>
+        <p class="font-body-sm text-[11px] text-on-surface-variant">Pskov / Leningrad OB departure, westbound transit through Finnish Gulf international airspace. IL-20 ELINT pattern. Maps Finnish and Estonian air defense emissions.</p>
+      </div>
+      <div class="border border-slate-800 p-3 flex flex-col gap-2">
+        <div class="font-label-caps text-[8px] text-primary uppercase">Vector Charlie — High North Arc</div>
+        <p class="font-body-sm text-[11px] text-on-surface-variant">Murmansk departure, arc across Norwegian Sea toward GIUK Gap. Tu-95 Bear long-range probing. Tests Norwegian and UK QRA. Periodic NATO intercept exercise.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+</div>
+<script src="./ai-system.js"></script>
+<script src="./shared-components.js"></script>
+</body></html>

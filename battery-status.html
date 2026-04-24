@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Battery Status - Air Defense Systems</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="tailwind.config.js"></script>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<div id="header-placeholder"></div>
+<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+<div id="sidebar-placeholder"></div>
+
+<main class="h-full overflow-y-auto p-gutter flex flex-col gap-gutter">
+
+  <header class="border border-outline-variant bg-surface-container p-panel-padding flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div class="flex flex-col gap-2">
+      <span class="font-label-caps text-label-caps text-primary uppercase flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">battery_charging_full</span>
+        BATTERY STATUS // MAP VIEW
+      </span>
+      <h1 class="font-headline-lg text-headline-lg text-on-surface uppercase">Air Defense Battery — Readiness Status</h1>
+      <p class="font-body-sm text-body-sm text-on-surface-variant max-w-4xl">
+        Real-time readiness status for Swedish air defense batteries. Includes SHORAD, medium-range SAM, and radar coverage sectors for Baltic and North Sea approaches.
+      </p>
+    </div>
+    <div class="grid grid-cols-3 gap-2 min-w-[320px]">
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Systems Online</div>
+        <div class="font-data-mono text-[13px] text-primary mt-1">8 / 9</div>
+      </div>
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Coverage</div>
+        <div class="font-data-mono text-[13px] text-tertiary mt-1">87%</div>
+      </div>
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Alert State</div>
+        <div class="font-data-mono text-[13px] text-error mt-1">AMBER</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Battery Grid -->
+  <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+
+    <!-- Patriot Battery -->
+    <div class="border border-primary/40 bg-surface-container-low flex flex-col">
+      <div class="p-3 border-b border-primary/20 bg-primary/5 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-primary">
+          <span class="material-symbols-outlined text-[18px]">security</span>
+          <span class="font-label-caps text-label-caps uppercase">PATRIOT PAC-3</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class="font-data-mono text-[9px] text-primary">ACTIVE</span>
+        </div>
+      </div>
+      <div class="p-3 flex flex-col gap-2">
+        <div class="grid grid-cols-2 gap-2 font-data-mono text-[10px]">
+          <div><span class="text-slate-500">Site:</span> <span>Arlanda Sector</span></div>
+          <div><span class="text-slate-500">Missiles:</span> <span class="text-primary">32 / 32</span></div>
+          <div><span class="text-slate-500">Range:</span> <span>160 km</span></div>
+          <div><span class="text-slate-500">Altitude:</span> <span>FL600+</span></div>
+        </div>
+        <div class="mt-1">
+          <div class="flex justify-between font-label-caps text-[8px] text-slate-500 mb-1"><span>Readiness</span><span class="text-primary">100%</span></div>
+          <div class="h-1 bg-slate-900"><div class="h-1 bg-primary w-full"></div></div>
+        </div>
+        <div class="mt-1">
+          <div class="flex justify-between font-label-caps text-[8px] text-slate-500 mb-1"><span>Radar Status</span><span class="text-primary">TRACKING</span></div>
+          <div class="h-1 bg-slate-900"><div class="h-1 bg-primary w-[95%]"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHORAD Battery Alpha -->
+    <div class="border border-tertiary/30 bg-surface-container-low flex flex-col">
+      <div class="p-3 border-b border-tertiary/20 bg-tertiary/5 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-tertiary">
+          <span class="material-symbols-outlined text-[18px]">gps_fixed</span>
+          <span class="font-label-caps text-label-caps uppercase">RBS 70 NG — ALPHA</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+          <span class="font-data-mono text-[9px] text-tertiary">ACTIVE</span>
+        </div>
+      </div>
+      <div class="p-3 flex flex-col gap-2">
+        <div class="grid grid-cols-2 gap-2 font-data-mono text-[10px]">
+          <div><span class="text-slate-500">Site:</span> <span>Gotland South</span></div>
+          <div><span class="text-slate-500">Missiles:</span> <span class="text-tertiary">18 / 24</span></div>
+          <div><span class="text-slate-500">Range:</span> <span>9 km</span></div>
+          <div><span class="text-slate-500">Altitude:</span> <span>FL050</span></div>
+        </div>
+        <div class="mt-1">
+          <div class="flex justify-between font-label-caps text-[8px] text-slate-500 mb-1"><span>Readiness</span><span class="text-tertiary">75%</span></div>
+          <div class="h-1 bg-slate-900"><div class="h-1 bg-tertiary w-3/4"></div></div>
+        </div>
+        <div class="mt-1">
+          <div class="flex justify-between font-label-caps text-[8px] text-slate-500 mb-1"><span>Crew Status</span><span class="text-tertiary">ON WATCH</span></div>
+          <div class="h-1 bg-slate-900"><div class="h-1 bg-tertiary w-[100%]"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHORAD Battery Bravo -->
+    <div class="border border-tertiary/30 bg-surface-container-low flex flex-col">
+      <div class="p-3 border-b border-tertiary/20 bg-tertiary/5 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-tertiary">
+          <span class="material-symbols-outlined text-[18px]">gps_fixed</span>
+          <span class="font-label-caps text-label-caps uppercase">RBS 70 NG — BRAVO</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+          <span class="font-data-mono text-[9px] text-tertiary">ACTIVE</span>
+        </div>
+      </div>
+      <div class="p-3 flex flex-col gap-2">
+        <div class="grid grid-cols-2 gap-2 font-data-mono text-[10px]">
+          <div><span class="text-slate-500">Site:</span> <span>Gotland North</span></div>
+          <div><span class="text-slate-500">Missiles:</span> <span class="text-tertiary">24 / 24</span></div>
+          <div><span class="text-slate-500">Range:</span> <span>9 km</span></div>
+          <div><span class="text-slate-500">Altitude:</span> <span>FL050</span></div>
+        </div>
+        <div class="mt-1">
+          <div class="flex justify-between font-label-caps text-[8px] text-slate-500 mb-1"><span>Readiness</span><span class="text-primary">100%</span></div>
+          <div class="h-1 bg-slate-900"><div class="h-1 bg-primary w-full"></div></div>
+        </div>
+        <div class="mt-1">
+          <div class="flex justify-between font-label-caps text-[8px] text-slate-500 mb-1"><span>Crew Status</span><span class="text-primary">ON WATCH</span></div>
+          <div class="h-1 bg-slate-900"><div class="h-1 bg-primary w-full"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HAWK System -->
+    <div class="border border-slate-700 bg-surface-container-low flex flex-col">
+      <div class="p-3 border-b border-slate-700/50 bg-slate-800/30 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-slate-400">
+          <span class="material-symbols-outlined text-[18px]">radar</span>
+          <span class="font-label-caps text-label-caps uppercase">HAWK — CHARLIE</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+          <span class="font-data-mono text-[9px] text-tertiary">MAINT</span>
+        </div>
+      </div>
+      <div class="p-3 flex flex-col gap-2">
+        <div class="grid grid-cols-2 gap-2 font-data-mono text-[10px]">
+          <div><span class="text-slate-500">Site:</span> <span>Skåne Sector</span></div>
+          <div><span class="text-slate-500">Missiles:</span> <span class="text-tertiary">12 / 18</span></div>
+          <div><span class="text-slate-500">Range:</span> <span>40 km</span></div>
+          <div><span class="text-slate-500">ETA Ready:</span> <span class="text-tertiary">~2 hrs</span></div>
+        </div>
+        <div class="mt-1">
+          <div class="flex justify-between font-label-caps text-[8px] text-slate-500 mb-1"><span>Readiness</span><span class="text-tertiary">60%</span></div>
+          <div class="h-1 bg-slate-900"><div class="h-1 bg-tertiary w-[60%]"></div></div>
+        </div>
+        <div class="border border-tertiary/30 bg-tertiary/5 p-2 mt-1">
+          <span class="font-data-mono text-[9px] text-tertiary">SCHEDULED MAINTENANCE — ILS RADAR CALIBRATION</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Radar Coverage Sector -->
+    <div class="border border-sky-500/30 bg-surface-container-low flex flex-col">
+      <div class="p-3 border-b border-sky-500/20 bg-sky-500/5 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sky-300">
+          <span class="material-symbols-outlined text-[18px]">track_changes</span>
+          <span class="font-label-caps text-label-caps uppercase">EWR — Baltic Sector</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class="font-data-mono text-[9px] text-primary">SCANNING</span>
+        </div>
+      </div>
+      <div class="p-3 flex flex-col gap-3">
+        <div class="grid grid-cols-2 gap-2 font-data-mono text-[10px]">
+          <div><span class="text-slate-500">Type:</span> <span>PS-890 Erieye</span></div>
+          <div><span class="text-slate-500">Range:</span> <span>450 km</span></div>
+          <div><span class="text-slate-500">Tracks:</span> <span class="text-primary">247 active</span></div>
+          <div><span class="text-slate-500">Update Rate:</span> <span>6 sec</span></div>
+        </div>
+        <div>
+          <div class="flex justify-between font-label-caps text-[8px] text-slate-500 mb-1"><span>Coverage Integrity</span><span class="text-primary">94%</span></div>
+          <div class="h-1 bg-slate-900"><div class="h-1 bg-primary w-[94%]"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between font-label-caps text-[8px] text-slate-500 mb-1"><span>Link 16 Connectivity</span><span class="text-primary">NATO</span></div>
+          <div class="h-1 bg-slate-900"><div class="h-1 bg-sky-300 w-full"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ammunition Status -->
+    <div class="border border-outline-variant bg-surface-container-low flex flex-col">
+      <div class="p-3 border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+        <div class="flex items-center gap-2 text-slate-400">
+          <span class="material-symbols-outlined text-[18px]">inventory_2</span>
+          <span class="font-label-caps text-label-caps uppercase">Ammunition Overview</span>
+        </div>
+      </div>
+      <div class="p-3 flex flex-col gap-2">
+        <div class="flex flex-col gap-2 font-data-mono text-[10px]">
+          <div class="flex justify-between border-b border-slate-800 pb-1"><span class="text-slate-500">PAC-3 Interceptors</span><span class="text-primary">32 / 32</span></div>
+          <div class="flex justify-between border-b border-slate-800 pb-1"><span class="text-slate-500">RBS 70 NG Missiles</span><span class="text-tertiary">42 / 48</span></div>
+          <div class="flex justify-between border-b border-slate-800 pb-1"><span class="text-slate-500">HAWK Missiles</span><span class="text-tertiary">12 / 18</span></div>
+          <div class="flex justify-between border-b border-slate-800 pb-1"><span class="text-slate-500">IRIS-T SLS (Reserve)</span><span class="text-primary">24 / 24</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">Gripen A-Darter (QRA)</span><span class="text-primary">8 / 8</span></div>
+        </div>
+        <div class="mt-2 border border-primary/20 bg-primary/5 p-2">
+          <div class="font-label-caps text-[8px] text-primary uppercase">Resupply Status</div>
+          <div class="font-data-mono text-[10px] text-slate-400 mt-1">Next scheduled resupply: T+48 hrs via FMTS logistics chain</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+</div>
+<script src="./ai-system.js"></script>
+<script src="./shared-components.js"></script>
+</body></html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Asset Tracking - QRA Status</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="tailwind.config.js"></script>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<div id="header-placeholder"></div>
+<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+<div id="sidebar-placeholder"></div>
+
+<main class="h-full overflow-y-auto p-gutter flex flex-col gap-gutter">
+
+  <header class="border border-outline-variant bg-surface-container p-panel-padding flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div class="flex flex-col gap-2">
+      <span class="font-label-caps text-label-caps text-primary uppercase flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">navigation</span>
+        ASSET TRACKING // LOGS &amp; INTEL
+      </span>
+      <h1 class="font-headline-lg text-headline-lg text-on-surface uppercase">QRA Asset Tracking — Live Status</h1>
+      <p class="font-body-sm text-body-sm text-on-surface-variant max-w-4xl">
+        Real-time tracking of Swedish QRA assets. JAS 39 Gripen readiness, airborne position, fuel state, and weapons load across all assigned bases. Data linked via Stril C2 network.
+      </p>
+    </div>
+    <div class="grid grid-cols-3 gap-2 min-w-[320px]">
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Airborne</div>
+        <div class="font-data-mono text-[13px] text-tertiary mt-1">2 GRIPEN</div>
+      </div>
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">QRA Standby</div>
+        <div class="font-data-mono text-[13px] text-primary mt-1">4 READY</div>
+      </div>
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">In Maintenance</div>
+        <div class="font-data-mono text-[13px] text-slate-400 mt-1">2 OFFLINE</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Airborne Assets -->
+  <section class="flex flex-col gap-2">
+    <div class="flex items-center gap-2 border-b border-outline-variant pb-2">
+      <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+      <h2 class="font-label-caps text-label-caps uppercase text-slate-400">Airborne Assets — Live Track</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+
+      <div class="border border-primary/40 bg-surface-container-low">
+        <div class="p-3 border-b border-primary/20 bg-primary/5 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-primary">
+            <span class="material-symbols-outlined text-[18px]">flight</span>
+            <span class="font-label-caps text-label-caps uppercase">Gripen 01 — ALPHA FLIGHT</span>
+          </div>
+          <span class="font-data-mono text-[9px] text-primary border border-primary/30 px-1">INTERCEPT</span>
+        </div>
+        <div class="p-3 grid grid-cols-2 gap-3 font-data-mono text-[10px]">
+          <div><span class="text-slate-500">Callsign:</span> <span class="text-primary">SABER 01</span></div>
+          <div><span class="text-slate-500">Pilot:</span> <span>CAPT. LINDQVIST</span></div>
+          <div><span class="text-slate-500">Altitude:</span> <span>FL350</span></div>
+          <div><span class="text-slate-500">Speed:</span> <span>Mach 0.92</span></div>
+          <div><span class="text-slate-500">Fuel:</span> <span class="text-tertiary">62%</span></div>
+          <div><span class="text-slate-500">Weapons:</span> <span>IRIS-T × 2</span></div>
+          <div><span class="text-slate-500">Position:</span> <span>57°N 018°E</span></div>
+          <div><span class="text-slate-500">Mission:</span> <span class="text-primary">VID ACTIVE</span></div>
+          <div class="col-span-2">
+            <div class="flex justify-between mb-1"><span class="text-slate-500">Fuel State</span><span class="text-tertiary">62%</span></div>
+            <div class="h-1 bg-slate-900"><div class="h-1 bg-tertiary w-[62%]"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border border-primary/40 bg-surface-container-low">
+        <div class="p-3 border-b border-primary/20 bg-primary/5 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-primary">
+            <span class="material-symbols-outlined text-[18px]">flight</span>
+            <span class="font-label-caps text-label-caps uppercase">Gripen 02 — ALPHA FLIGHT</span>
+          </div>
+          <span class="font-data-mono text-[9px] text-primary border border-primary/30 px-1">INTERCEPT</span>
+        </div>
+        <div class="p-3 grid grid-cols-2 gap-3 font-data-mono text-[10px]">
+          <div><span class="text-slate-500">Callsign:</span> <span class="text-primary">SABER 02</span></div>
+          <div><span class="text-slate-500">Pilot:</span> <span>LT. KARLSSON</span></div>
+          <div><span class="text-slate-500">Altitude:</span> <span>FL340</span></div>
+          <div><span class="text-slate-500">Speed:</span> <span>Mach 0.91</span></div>
+          <div><span class="text-slate-500">Fuel:</span> <span class="text-tertiary">59%</span></div>
+          <div><span class="text-slate-500">Weapons:</span> <span>IRIS-T × 2</span></div>
+          <div><span class="text-slate-500">Position:</span> <span>57°N 018°E</span></div>
+          <div><span class="text-slate-500">Mission:</span> <span class="text-primary">ESCORT</span></div>
+          <div class="col-span-2">
+            <div class="flex justify-between mb-1"><span class="text-slate-500">Fuel State</span><span class="text-tertiary">59%</span></div>
+            <div class="h-1 bg-slate-900"><div class="h-1 bg-tertiary w-[59%]"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- QRA Standby Roster -->
+  <section class="border border-outline-variant bg-surface-container-low">
+    <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+      <h2 class="font-headline-md text-headline-md uppercase">QRA Standby Roster</h2>
+      <span class="font-data-mono text-[10px] text-slate-500">STRIL LINK ACTIVE</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-surface-container-high border-b border-slate-800 text-slate-500 font-label-caps text-label-caps uppercase">
+          <tr>
+            <th class="py-2 px-4 font-normal">Callsign</th>
+            <th class="py-2 px-4 font-normal">Base</th>
+            <th class="py-2 px-4 font-normal">Pilot</th>
+            <th class="py-2 px-4 font-normal">Weapons</th>
+            <th class="py-2 px-4 font-normal">Fuel</th>
+            <th class="py-2 px-4 font-normal">QRA T+</th>
+            <th class="py-2 px-4 font-normal text-right">Status</th>
+          </tr>
+        </thead>
+        <tbody class="font-data-mono text-data-mono text-on-surface-variant divide-y divide-slate-800">
+          <tr class="hover:bg-slate-800/50 border-l-2 border-primary">
+            <td class="py-3 px-4 text-primary">SABER 03</td>
+            <td class="py-3 px-4">F17 Blekinge</td>
+            <td class="py-3 px-4">MAJ. ANDERSSON</td>
+            <td class="py-3 px-4">IRIS-T × 4 / RB-99</td>
+            <td class="py-3 px-4 text-primary">100%</td>
+            <td class="py-3 px-4 text-primary">&lt; 15 min</td>
+            <td class="py-3 px-4 text-right text-primary">READY</td>
+          </tr>
+          <tr class="hover:bg-slate-800/50 border-l-2 border-primary">
+            <td class="py-3 px-4 text-primary">SABER 04</td>
+            <td class="py-3 px-4">F17 Blekinge</td>
+            <td class="py-3 px-4">LT. HOLM</td>
+            <td class="py-3 px-4">IRIS-T × 4 / RB-99</td>
+            <td class="py-3 px-4 text-primary">100%</td>
+            <td class="py-3 px-4 px-4 text-primary">&lt; 15 min</td>
+            <td class="py-3 px-4 text-right text-primary">READY</td>
+          </tr>
+          <tr class="hover:bg-slate-800/50 border-l-2 border-tertiary">
+            <td class="py-3 px-4 text-tertiary">VIKING 01</td>
+            <td class="py-3 px-4">Ämari, Estonia</td>
+            <td class="py-3 px-4">MAJ. BERG</td>
+            <td class="py-3 px-4">IRIS-T × 2 / GBU-49</td>
+            <td class="py-3 px-4 text-primary">100%</td>
+            <td class="py-3 px-4 text-tertiary">&lt; 15 min</td>
+            <td class="py-3 px-4 text-right text-tertiary">QRA DUTY</td>
+          </tr>
+          <tr class="hover:bg-slate-800/50 border-l-2 border-tertiary">
+            <td class="py-3 px-4 text-tertiary">VIKING 02</td>
+            <td class="py-3 px-4">Ämari, Estonia</td>
+            <td class="py-3 px-4">LT. ERIKSSON</td>
+            <td class="py-3 px-4">IRIS-T × 2 / GBU-49</td>
+            <td class="py-3 px-4 text-primary">100%</td>
+            <td class="py-3 px-4 text-tertiary">&lt; 15 min</td>
+            <td class="py-3 px-4 text-right text-tertiary">QRA DUTY</td>
+          </tr>
+          <tr class="hover:bg-slate-800/50 border-l-2 border-transparent opacity-50">
+            <td class="py-3 px-4 text-slate-500">STORM 01</td>
+            <td class="py-3 px-4">F21 Luleå</td>
+            <td class="py-3 px-4">CAPT. NILSSON</td>
+            <td class="py-3 px-4">—</td>
+            <td class="py-3 px-4">—</td>
+            <td class="py-3 px-4">~4 hrs</td>
+            <td class="py-3 px-4 text-right text-slate-500">MAINTENANCE</td>
+          </tr>
+          <tr class="hover:bg-slate-800/50 border-l-2 border-transparent opacity-50">
+            <td class="py-3 px-4 text-slate-500">STORM 02</td>
+            <td class="py-3 px-4">F21 Luleå</td>
+            <td class="py-3 px-4">LT. PERSSON</td>
+            <td class="py-3 px-4">—</td>
+            <td class="py-3 px-4">—</td>
+            <td class="py-3 px-4">~6 hrs</td>
+            <td class="py-3 px-4 text-right text-slate-500">MAINTENANCE</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+</div>
+<script src="./ai-system.js"></script>
+<script src="./shared-components.js"></script>
+</body></html>

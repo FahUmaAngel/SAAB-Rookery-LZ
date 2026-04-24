@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Telemetry — Live Sensor Feed</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="tailwind.config.js"></script>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<div id="header-placeholder"></div>
+<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+<div id="sidebar-placeholder"></div>
+
+<main class="h-full overflow-y-auto p-gutter flex flex-col gap-gutter">
+
+  <header class="border border-outline-variant bg-surface-container p-panel-padding flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div class="flex flex-col gap-2">
+      <span class="font-label-caps text-label-caps text-primary uppercase flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">query_stats</span>
+        TELEMETRY // LOGS &amp; INTEL
+      </span>
+      <h1 class="font-headline-lg text-headline-lg text-on-surface uppercase">Live Sensor Telemetry Feed</h1>
+      <p class="font-body-sm text-body-sm text-on-surface-variant max-w-4xl">
+        Aggregated sensor telemetry across the Baltic domain. Active radar returns, passive ESM intercepts, SAR scheduling, and meteorological overlays — all fused into the C2 picture via Stril data network.
+      </p>
+    </div>
+    <div class="grid grid-cols-3 gap-2 min-w-[320px]">
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Data Rate</div>
+        <div class="font-data-mono text-[13px] text-primary mt-1" id="data-rate">1,247 msg/s</div>
+      </div>
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Active Tracks</div>
+        <div class="font-data-mono text-[13px] text-tertiary mt-1" id="active-tracks">247</div>
+      </div>
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Link Quality</div>
+        <div class="font-data-mono text-[13px] text-primary mt-1">SECURE</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Telemetry Feed + Sensor Status -->
+  <section class="grid grid-cols-1 xl:grid-cols-[1fr_1.5fr] gap-gutter">
+
+    <!-- Sensor Status Panel -->
+    <div class="border border-outline-variant bg-surface-container-low flex flex-col">
+      <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+        <h2 class="font-headline-md text-headline-md uppercase">Sensor Network Status</h2>
+        <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+      </div>
+      <div class="p-panel-padding flex flex-col gap-3">
+
+        <div>
+          <div class="font-label-caps text-[8px] text-primary uppercase mb-2 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span> Active Sensors
+          </div>
+          <div class="flex flex-col gap-1">
+            <div class="border border-slate-800 p-2 flex items-center justify-between font-data-mono text-[10px]">
+              <span>Early Warning Radar — PS-890 Erieye</span>
+              <div class="flex items-center gap-2"><span class="text-primary">ONLINE</span><span class="text-slate-600">450km / 6s</span></div>
+            </div>
+            <div class="border border-slate-800 p-2 flex items-center justify-between font-data-mono text-[10px]">
+              <span>Fire Control Radar — GIRAFFE AMB</span>
+              <div class="flex items-center gap-2"><span class="text-primary">TRACKING</span><span class="text-slate-600">120km / 2s</span></div>
+            </div>
+            <div class="border border-slate-800 p-2 flex items-center justify-between font-data-mono text-[10px]">
+              <span>Naval Radar — HE-200</span>
+              <div class="flex items-center gap-2"><span class="text-primary">ONLINE</span><span class="text-slate-600">200km / 4s</span></div>
+            </div>
+            <div class="border border-slate-800 p-2 flex items-center justify-between font-data-mono text-[10px]">
+              <span>Ground Surveillance — Arthur</span>
+              <div class="flex items-center gap-2"><span class="text-tertiary">STANDBY</span><span class="text-slate-600">60km</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="font-label-caps text-[8px] text-tertiary uppercase mb-2 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-tertiary inline-block"></span> Passive Sensors
+          </div>
+          <div class="flex flex-col gap-1">
+            <div class="border border-slate-800 p-2 flex items-center justify-between font-data-mono text-[10px]">
+              <span>ESM / SIGINT — ERIEYE EMS</span>
+              <div class="flex items-center gap-2"><span class="text-tertiary">COLLECTING</span><span class="text-slate-600">wideband</span></div>
+            </div>
+            <div class="border border-slate-800 p-2 flex items-center justify-between font-data-mono text-[10px]">
+              <span>EO/IR — FLIR Pod (Gripen)</span>
+              <div class="flex items-center gap-2"><span class="text-tertiary">STREAMING</span><span class="text-slate-600">thermal</span></div>
+            </div>
+            <div class="border border-slate-800 p-2 flex items-center justify-between font-data-mono text-[10px]">
+              <span>Acoustic Sensors — Baltic Array</span>
+              <div class="flex items-center gap-2"><span class="text-slate-500">STANDBY</span><span class="text-slate-600">subsurface</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="font-label-caps text-[8px] text-sky-300 uppercase mb-2 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-300 inline-block"></span> External / Space
+          </div>
+          <div class="flex flex-col gap-1">
+            <div class="border border-slate-800 p-2 flex items-center justify-between font-data-mono text-[10px]">
+              <span>ICEYE SAR — Constellation Pass</span>
+              <div class="flex items-center gap-2"><span class="text-sky-300">TASKED</span><span class="text-slate-600">next: 47min</span></div>
+            </div>
+            <div class="border border-slate-800 p-2 flex items-center justify-between font-data-mono text-[10px]">
+              <span>SSC Ground Station — Kiruna</span>
+              <div class="flex items-center gap-2"><span class="text-primary">ONLINE</span><span class="text-slate-600">uplink</span></div>
+            </div>
+            <div class="border border-slate-800 p-2 flex items-center justify-between font-data-mono text-[10px]">
+              <span>Meteorological — SMHI Baltic</span>
+              <div class="flex items-center gap-2"><span class="text-sky-300">LIVE</span><span class="text-slate-600">15min cycle</span></div>
+            </div>
+            <div class="border border-slate-800 p-2 flex items-center justify-between font-data-mono text-[10px]">
+              <span>Topographic — NGA DEM</span>
+              <div class="flex items-center gap-2"><span class="text-slate-500">LOADED</span><span class="text-slate-600">static</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Live Data Feed -->
+    <div class="border border-outline-variant bg-surface-container-low flex flex-col">
+      <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+        <h2 class="font-headline-md text-headline-md uppercase">Live Track Feed</h2>
+        <span class="font-data-mono text-[10px] text-slate-500">STRIL DATA NETWORK // ENCRYPTED</span>
+      </div>
+      <div class="flex-1 overflow-y-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="sticky top-0 bg-surface-container-high border-b border-slate-800 text-slate-500 font-label-caps text-label-caps uppercase z-10">
+            <tr>
+              <th class="py-2 px-3 font-normal">Time Z</th>
+              <th class="py-2 px-3 font-normal">Track</th>
+              <th class="py-2 px-3 font-normal">Type</th>
+              <th class="py-2 px-3 font-normal">Alt</th>
+              <th class="py-2 px-3 font-normal">Speed</th>
+              <th class="py-2 px-3 font-normal">Source</th>
+              <th class="py-2 px-3 font-normal text-right">Class</th>
+            </tr>
+          </thead>
+          <tbody class="font-data-mono text-[10px] text-on-surface-variant divide-y divide-slate-800" id="telemetry-table">
+            <tr class="hover:bg-slate-800/30 border-l-2 border-error">
+              <td class="py-2 px-3 text-error" id="t1-time">09:14:22</td>
+              <td class="py-2 px-3 text-error">BOGEY-A01</td>
+              <td class="py-2 px-3">Tu-22M3</td>
+              <td class="py-2 px-3">FL340</td>
+              <td class="py-2 px-3">980 km/h</td>
+              <td class="py-2 px-3 text-primary">EWR</td>
+              <td class="py-2 px-3 text-right text-error">HOSTILE</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 border-l-2 border-error">
+              <td class="py-2 px-3 text-error">09:14:18</td>
+              <td class="py-2 px-3 text-error">BOGEY-A02</td>
+              <td class="py-2 px-3">Su-27</td>
+              <td class="py-2 px-3">FL360</td>
+              <td class="py-2 px-3">1040 km/h</td>
+              <td class="py-2 px-3 text-primary">EWR</td>
+              <td class="py-2 px-3 text-right text-error">HOSTILE</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 border-l-2 border-primary">
+              <td class="py-2 px-3 text-primary">09:14:05</td>
+              <td class="py-2 px-3 text-primary">SABER-01</td>
+              <td class="py-2 px-3">JAS 39C</td>
+              <td class="py-2 px-3">FL350</td>
+              <td class="py-2 px-3">920 km/h</td>
+              <td class="py-2 px-3 text-primary">DATA LINK</td>
+              <td class="py-2 px-3 text-right text-primary">FRIENDLY</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 border-l-2 border-primary">
+              <td class="py-2 px-3 text-primary">09:14:05</td>
+              <td class="py-2 px-3 text-primary">SABER-02</td>
+              <td class="py-2 px-3">JAS 39C</td>
+              <td class="py-2 px-3">FL340</td>
+              <td class="py-2 px-3">915 km/h</td>
+              <td class="py-2 px-3 text-primary">DATA LINK</td>
+              <td class="py-2 px-3 text-right text-primary">FRIENDLY</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 border-l-2 border-tertiary">
+              <td class="py-2 px-3 text-tertiary">09:13:44</td>
+              <td class="py-2 px-3 text-tertiary">BOGEY-B01</td>
+              <td class="py-2 px-3">IL-20</td>
+              <td class="py-2 px-3">FL230</td>
+              <td class="py-2 px-3">640 km/h</td>
+              <td class="py-2 px-3 text-tertiary">ESM</td>
+              <td class="py-2 px-3 text-right text-tertiary">SUSPECT</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 border-l-2 border-slate-600">
+              <td class="py-2 px-3">09:12:30</td>
+              <td class="py-2 px-3">CIVIL-447</td>
+              <td class="py-2 px-3">B737-800</td>
+              <td class="py-2 px-3">FL380</td>
+              <td class="py-2 px-3">820 km/h</td>
+              <td class="py-2 px-3 text-sky-300">ADS-B</td>
+              <td class="py-2 px-3 text-right text-slate-400">CIVIL</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 border-l-2 border-slate-600">
+              <td class="py-2 px-3">09:11:50</td>
+              <td class="py-2 px-3">CIVIL-089</td>
+              <td class="py-2 px-3">A320</td>
+              <td class="py-2 px-3">FL310</td>
+              <td class="py-2 px-3">780 km/h</td>
+              <td class="py-2 px-3 text-sky-300">ADS-B</td>
+              <td class="py-2 px-3 text-right text-slate-400">CIVIL</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 border-l-2 border-slate-600">
+              <td class="py-2 px-3">09:10:18</td>
+              <td class="py-2 px-3">NATO-F35</td>
+              <td class="py-2 px-3">F-35A</td>
+              <td class="py-2 px-3">FL390</td>
+              <td class="py-2 px-3">Mach 0.9</td>
+              <td class="py-2 px-3 text-primary">LINK 16</td>
+              <td class="py-2 px-3 text-right text-sky-300">NATO</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Telemetry Stats Footer -->
+      <div class="p-3 border-t border-slate-800 grid grid-cols-4 gap-3">
+        <div class="text-center">
+          <div class="font-label-caps text-[8px] text-slate-500 uppercase">Hostile</div>
+          <div class="font-data-mono text-[14px] text-error">3</div>
+        </div>
+        <div class="text-center">
+          <div class="font-label-caps text-[8px] text-slate-500 uppercase">Friendly</div>
+          <div class="font-data-mono text-[14px] text-primary">2</div>
+        </div>
+        <div class="text-center">
+          <div class="font-label-caps text-[8px] text-slate-500 uppercase">Civil</div>
+          <div class="font-data-mono text-[14px] text-slate-400">238</div>
+        </div>
+        <div class="text-center">
+          <div class="font-label-caps text-[8px] text-slate-500 uppercase">Unknown</div>
+          <div class="font-data-mono text-[14px] text-tertiary">4</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Link Quality & Data Health -->
+  <section class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+    <div class="border border-outline-variant bg-surface-container-low p-3">
+      <div class="font-label-caps text-[8px] text-slate-500 uppercase mb-2">Stril C2 Link</div>
+      <div class="font-data-mono text-[16px] text-primary">NOMINAL</div>
+      <div class="h-1 bg-slate-900 mt-2"><div class="h-1 bg-primary w-[98%]"></div></div>
+      <div class="font-data-mono text-[9px] text-slate-600 mt-1">Latency: 12ms</div>
+    </div>
+    <div class="border border-outline-variant bg-surface-container-low p-3">
+      <div class="font-label-caps text-[8px] text-slate-500 uppercase mb-2">NATO Link 16</div>
+      <div class="font-data-mono text-[16px] text-primary">ACTIVE</div>
+      <div class="h-1 bg-slate-900 mt-2"><div class="h-1 bg-primary w-[100%]"></div></div>
+      <div class="font-data-mono text-[9px] text-slate-600 mt-1">Latency: 8ms</div>
+    </div>
+    <div class="border border-outline-variant bg-surface-container-low p-3">
+      <div class="font-label-caps text-[8px] text-slate-500 uppercase mb-2">ICEYE SAR Uplink</div>
+      <div class="font-data-mono text-[16px] text-tertiary">SCHEDULED</div>
+      <div class="h-1 bg-slate-900 mt-2"><div class="h-1 bg-tertiary w-[40%]"></div></div>
+      <div class="font-data-mono text-[9px] text-slate-600 mt-1">Next pass: 47 min</div>
+    </div>
+    <div class="border border-outline-variant bg-surface-container-low p-3">
+      <div class="font-label-caps text-[8px] text-slate-500 uppercase mb-2">ESM Data Quality</div>
+      <div class="font-data-mono text-[16px] text-primary">GOOD</div>
+      <div class="h-1 bg-slate-900 mt-2"><div class="h-1 bg-primary w-[91%]"></div></div>
+      <div class="font-data-mono text-[9px] text-slate-600 mt-1">SNR: 24dB avg</div>
+    </div>
+  </section>
+
+</main>
+</div>
+<script src="./ai-system.js"></script>
+<script src="./shared-components.js"></script>
+<script>
+  function updateTelemetryClock() {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const t = `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
+    const el = document.getElementById('t1-time');
+    if (el) el.textContent = t;
+    const tracks = document.getElementById('active-tracks');
+    if (tracks) tracks.textContent = String(Math.floor(240 + Math.random() * 15));
+    const rate = document.getElementById('data-rate');
+    if (rate) rate.textContent = (1200 + Math.floor(Math.random() * 100)).toLocaleString() + ' msg/s';
+  }
+  setInterval(updateTelemetryClock, 2000);
+</script>
+</body></html>
