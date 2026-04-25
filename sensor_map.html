@@ -1,58 +1,45 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="en">
-
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Multi-Domain Sensor Map</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <style>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Multi-Domain Sensor Map</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
         .bg-hex-grid {
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='103.923' viewBox='0 0 60 103.923' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 17.32v34.64L30 69.28 0 51.96V17.32zM30 103.923L0 86.603V51.96l30 17.32 30-17.32v34.643z' fill='none' stroke='rgba(135, 146, 155, 0.05)' stroke-width='1'/%3E%3C/svg%3E");
             background-size: 60px 103.923px;
         }
     </style>
-    <script src="tailwind.config.js"></script>
+<script src="tailwind.config.js"></script>
 </head>
-
-<body
-    class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
-    <!-- TopNavBar -->
-    <div id="header-placeholder"></div>
-    <div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
-        <!-- SideNavBar -->
-        <div id="sidebar-placeholder"></div>
-        <!-- Main Content Canvas -->
-        <main class="flex h-full relative bg-surface-lowest">
-            <!-- Tactical Map Area (Fluid) -->
-            <div class="flex-1 relative overflow-hidden bg-surface-dim border-r border-outline-variant/30">
-                <!-- Base Map Image -->
-                <div class="absolute inset-0 z-0 opacity-40 mix-blend-screen"
-                    data-alt="Satellite imagery view of dark ocean waters with landmass edges representing the Baltic Sea region in a high contrast tactical style"
-                    data-location="Baltic Sea"
-                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAtY3EOyN-2ZK7CYOBzTJ4xQKYV__5E2ehu_hy5ahEUFszNcvNl0Pz1-Pqgg6xQyaT3V6-7WZO0vgJq9STQaf3JmCMa3QeI7FRabXDjj1ZIeDrQEuhmykTElB2sw3ho-V44ZY7z7ct83x81851Lg7xb-mY2KVVUowRV81tdWOa4FRQxrX6Gx70CI1klfD507P4BgmyJynQxq7ijdhfcfY7UiwPferM4-j2gl6gv13D2S0CXSOeXhXCu78A9-fRwymLXFl1uK5yzbj7i'); background-size: cover; background-position: center;">
-                </div>
-                <!-- Hex Grid -->
-                <div class="absolute inset-0 z-10 bg-hex-grid pointer-events-none"></div>
-                <!-- Overlays Layer -->
-                <div class="absolute inset-0 z-20 pointer-events-none">
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<div id="header-placeholder"></div>
+<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+<!-- SideNavBar -->
+<div id="sidebar-placeholder"></div>
+<!-- Main Content Canvas -->
+<main class="flex h-full relative bg-surface-lowest">
+<!-- Tactical Map Area (Fluid) -->
+<div class="flex-1 relative overflow-hidden bg-surface-dim border-r border-outline-variant/30">
+<!-- Base Map Image -->
+<div class="absolute inset-0 z-0 opacity-40 mix-blend-screen" data-alt="Satellite imagery view of dark ocean waters with landmass edges representing the Baltic Sea region in a high contrast tactical style" data-location="Baltic Sea" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAtY3EOyN-2ZK7CYOBzTJ4xQKYV__5E2ehu_hy5ahEUFszNcvNl0Pz1-Pqgg6xQyaT3V6-7WZO0vgJq9STQaf3JmCMa3QeI7FRabXDjj1ZIeDrQEuhmykTElB2sw3ho-V44ZY7z7ct83x81851Lg7xb-mY2KVVUowRV81tdWOa4FRQxrX6Gx70CI1klfD507P4BgmyJynQxq7ijdhfcfY7UiwPferM4-j2gl6gv13D2S0CXSOeXhXCu78A9-fRwymLXFl1uK5yzbj7i'); background-size: cover; background-position: center;">
+</div>
+<!-- Hex Grid -->
+<div class="absolute inset-0 z-10 bg-hex-grid pointer-events-none"></div>
+<!-- Overlays Layer -->
+<div class="absolute inset-0 z-20 pointer-events-none">
                     <!-- Sovereign Airspace (Gotland area roughly) -->
                     <div
-                        class="absolute top-1/4 left-1/3 w-64 h-64 border border-primary/40 rounded-full bg-primary/5 flex items-center justify-center">
-                        <span class="font-data-mono text-data-mono text-primary/60 absolute top-4 uppercase">Gotland
-                            12nm</span>
+                        class="absolute top-1/4 left-1/3 w-64 h-64 border-2 border-primary/40 rounded-full bg-primary/5 flex items-center justify-center animate-[pulse_4s_infinite]">
+                        <span class="font-data-mono text-data-mono text-primary/60 absolute top-4 uppercase tracking-tighter text-[10px]">Sovereign Airspace (12nm)</span>
                     </div>
-                    <!-- Radar Fan (Amber) -->
-                    <div id="layer-radar" class="transition-opacity duration-500">
-                        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 radar-sweep flex items-center justify-center"
-                            style="clip-path: polygon(50% 50%, 100% 0, 100% 100%); transform: rotate(-45deg);">
-                            <div class="absolute inset-0 border border-tertiary/30 rounded-full"></div>
-                        </div>
-                        <span
-                            class="absolute bottom-1/4 right-1/4 font-data-mono text-data-mono text-tertiary/80 ml-48 mb-12">KALININGRAD
-                            RADAR</span>
-                    </div>
+<!-- Radar Fan (Amber) -->
+<div class="absolute bottom-1/4 right-1/4 w-96 h-96 radar-sweep flex items-center justify-center" style="clip-path: polygon(50% 50%, 100% 0, 100% 100%); transform: rotate(-45deg);">
+<div class="absolute inset-0 border border-tertiary/30 rounded-full"></div>
+</div>
+<span class="absolute bottom-1/4 right-1/4 font-data-mono text-data-mono text-tertiary/80 ml-48 mb-12">KALININGRAD RADAR</span>
                     <!-- Satellite Pass (ICEYE) -->
                     <div id="layer-satellite" class="absolute inset-0 overflow-hidden transition-opacity duration-500">
                         <svg class="opacity-50" height="100%" width="100%">
@@ -88,205 +75,181 @@
                             <span class="font-data-mono text-data-mono text-sky-400">OVERCAST 8/8 FL180</span>
                         </div>
                     </div>
-                    <!-- Trail dots container -->
+                    <!-- Trail dots containers -->
                     <div id="bogey-trail" class="absolute inset-0"></div>
+                    <div id="gripen-trail" class="absolute inset-0"></div>
                     <!-- Active Track (Bogey) -->
                     <div id="bogey-marker" class="absolute flex flex-col items-center"
-                        style="top: 50%; right: 30%; transition: top 1.5s ease-in-out, left 1.5s ease-in-out;">
+                        style="top: 50%; right: 30%; transition: top 1.5s linear, left 1.5s linear;">
                         <div class="relative w-4 h-4">
                             <div class="absolute inset-0 bg-error rounded-full opacity-75 animate-ping"></div>
                             <div class="absolute inset-1 bg-error rounded-full"></div>
                         </div>
                         <div
-                            class="mt-2 bg-surface-container-highest border border-error/50 px-2 py-1 backdrop-blur-sm relative">
+                            class="mt-2 bg-surface-container-highest/80 border border-error/50 px-2 py-0.5 backdrop-blur-sm relative">
                             <!-- Track line indicating direction -->
                             <div id="bogey-heading-line"
-                                class="absolute w-24 h-px bg-error/50 right-full top-1/2 -mt-px mr-2"
+                                class="absolute w-16 h-px bg-error/50 right-full top-1/2 -mt-px mr-2"
                                 style="transform-origin: right center; transform: rotate(15deg);"></div>
                             <span
-                                class="font-data-mono text-data-mono text-error uppercase font-bold tracking-wider">BOGEY_GOLF_42</span>
+                                class="font-data-mono text-[10px] text-error uppercase font-bold tracking-widest">BOGEY_G42</span>
                         </div>
                     </div>
-                </div>
-                <!-- Map Controls (Bottom Left) -->
+
+                    <!-- Interceptor (Gripen-1) -->
+                    <div id="gripen-marker" class="absolute flex flex-col items-center"
+                        style="top: 60%; right: 40%; transition: top 1.5s linear, left 1.5s linear;">
+                        <div class="relative w-4 h-4">
+                            <div class="absolute inset-0 bg-primary rounded-full opacity-40"></div>
+                            <div class="absolute inset-1 bg-primary rounded-none rotate-45"></div>
+                        </div>
+                        <div
+                            class="mt-2 bg-surface-container-highest/80 border border-primary/50 px-2 py-0.5 backdrop-blur-sm relative">
+                            <div id="gripen-heading-line"
+                                class="absolute w-12 h-px bg-primary/50 right-full top-1/2 -mt-px mr-2"
+                                style="transform-origin: right center; transform: rotate(45deg);"></div>
+                            <span
+                                class="font-data-mono text-[10px] text-primary uppercase font-bold tracking-widest">GRIPEN-1</span>
+                        </div>
+                    </div>
+</div>
                 <div class="absolute bottom-4 left-4 z-30 flex gap-2">
                     <div
                         class="bg-surface-container border border-outline-variant p-panel-padding flex gap-4 backdrop-blur-sm">
                         <div class="flex flex-col">
                             <span class="font-label-caps text-label-caps text-on-surface-variant mb-1">LAT / LON</span>
-                            <span class="font-data-mono text-data-mono text-on-surface">57°18'N 19°05'E</span>
+                            <span id="sm-latlon" class="font-data-mono text-data-mono text-on-surface">57°18'N 19°05'E</span>
                         </div>
                         <div class="w-px bg-outline-variant"></div>
                         <div class="flex flex-col">
-                            <span class="font-label-caps text-label-caps text-on-surface-variant mb-1">ELEVATION</span>
-                            <span class="font-data-mono text-data-mono text-on-surface">SEA LEVEL</span>
+                            <span class="font-label-caps text-label-caps text-on-surface-variant mb-1">TIME (Z)</span>
+                            <span id="sm-zulu" class="font-data-mono text-data-mono text-on-surface">00:00:00Z</span>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- Sidebar Detail (Fixed Right) -->
-            <aside class="w-[320px] bg-surface border-l border-outline-variant flex flex-col z-30">
-                <!-- Target Header -->
-                <div class="p-gutter border-b border-outline-variant bg-surface-container-low">
-                    <div class="flex justify-between items-start mb-2">
-                        <h2 class="font-headline-md text-headline-md text-error flex items-center gap-2">
-                            <span class="material-symbols-outlined"
-                                style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<!-- Sidebar Detail (Fixed Right) -->
+<aside class="w-[320px] bg-surface border-l border-outline-variant flex flex-col z-30">
+<!-- Target Header -->
+<div class="p-gutter border-b border-outline-variant bg-surface-container-low">
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-headline-md text-headline-md text-error flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
                             ACTIVE TRACK
                         </h2>
-                        <span
-                            class="px-1.5 py-0.5 bg-error-container text-on-error-container font-label-caps text-label-caps border border-error/30">HOSTILE</span>
-                    </div>
-                    <div class="font-data-mono text-[16px] text-on-surface font-bold tracking-wider uppercase mb-1">
+<span class="px-1.5 py-0.5 bg-error-container text-on-error-container font-label-caps text-label-caps border border-error/30">HOSTILE</span>
+</div>
+<div class="font-data-mono text-[16px] text-on-surface font-bold tracking-wider uppercase mb-1">
                         BOGEY_GOLF_42
                     </div>
-                    <div class="flex items-center gap-2 text-on-surface-variant">
-                        <div class="w-1.5 h-1.5 bg-error rounded-full"></div>
-                        <span class="font-data-mono text-data-mono">TRACKING IN PROGRESS</span>
-                    </div>
-                </div>
-                <!-- Telemetry Bento Grid -->
-                <div class="p-gutter flex flex-col gap-unit overflow-y-auto flex-1">
-                    <!-- Row 1: Kinematics -->
-                    <div class="grid grid-cols-2 gap-unit">
-                        <div
-                            class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden">
-                            <div
-                                class="absolute top-0 right-0 w-8 h-8 bg-surface-container-highest flex items-center justify-center border-l border-b border-outline-variant/50">
-                                <span class="material-symbols-outlined text-[14px] text-outline">speed</span>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<div class="w-1.5 h-1.5 bg-error rounded-full"></div>
+<span class="font-data-mono text-data-mono">TRACKING IN PROGRESS</span>
+</div>
+</div>
+<!-- Telemetry Bento Grid -->
+<div class="p-gutter flex flex-col gap-unit overflow-y-auto flex-1">
+<!-- Row 1: Kinematics -->
+<div class="grid grid-cols-2 gap-unit">
+<div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-8 h-8 bg-surface-container-highest flex items-center justify-center border-l border-b border-outline-variant/50">
+<span class="material-symbols-outlined text-[14px] text-outline">speed</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-2">TARGET SPEED</span>
+<div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
+                                0.85 <span class="font-data-mono text-data-mono text-primary/70">MACH</span>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-8 h-8 bg-surface-container-highest flex items-center justify-center border-l border-b border-outline-variant/50">
+<span class="material-symbols-outlined text-[14px] text-outline">flight</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-2">ALTITUDE</span>
+<div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
+                                32K <span class="font-data-mono text-data-mono text-primary/70">FT</span>
+</div>
+<div class="mt-1 font-data-mono text-label-caps text-error flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]">arrow_downward</span> DESCENDING
                             </div>
-                            <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">TARGET
-                                SPEED</span>
-                            <div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
-                                <span id="sm-speed">0.85</span> <span
-                                    class="font-data-mono text-data-mono text-primary/70">MACH</span>
-                            </div>
-                        </div>
-                        <div
-                            class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden">
-                            <div
-                                class="absolute top-0 right-0 w-8 h-8 bg-surface-container-highest flex items-center justify-center border-l border-b border-outline-variant/50">
-                                <span class="material-symbols-outlined text-[14px] text-outline">flight</span>
-                            </div>
-                            <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">ALTITUDE</span>
-                            <div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
-                                <span id="sm-altitude">32K</span> <span
-                                    class="font-data-mono text-data-mono text-primary/70">FT</span>
-                            </div>
-                            <div id="sm-alt-trend"
-                                class="mt-1 font-data-mono text-label-caps text-error flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[10px]">arrow_downward</span> <span
-                                    id="sm-alt-trend-text">DESCENDING</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Row 2: Signatures -->
-                    <div class="bg-surface-container border border-outline-variant p-panel-padding mt-2 flex flex-col">
-                        <div class="flex justify-between items-center mb-4 border-b border-outline-variant/50 pb-2">
-                            <span class="font-label-caps text-label-caps text-on-surface-variant">SENSOR FUSION
-                                DATA</span>
-                            <span class="material-symbols-outlined text-[16px] text-tertiary">memory</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-x-4 gap-y-3">
-                            <div class="flex flex-col">
-                                <span class="font-label-caps text-[8px] text-outline mb-1">ESM SIGNATURE</span>
-                                <span id="sm-esm"
-                                    class="font-data-mono text-data-mono text-on-surface uppercase bg-surface-container-highest px-1 border border-outline-variant/30 inline-block w-max">FLANKER-H</span>
-                            </div>
-                            <div class="flex flex-col">
-                                <span class="font-label-caps text-[8px] text-outline mb-1">TRANSPONDER</span>
-                                <span
-                                    class="font-data-mono text-data-mono text-error uppercase flex items-center gap-1">
-                                    <div class="w-1 h-1 bg-error"></div> OFF
+</div>
+</div>
+<!-- Row 2: Signatures -->
+<div class="bg-surface-container border border-outline-variant p-panel-padding mt-2 flex flex-col">
+<div class="flex justify-between items-center mb-4 border-b border-outline-variant/50 pb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant">SENSOR FUSION DATA</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary">memory</span>
+</div>
+<div class="grid grid-cols-2 gap-x-4 gap-y-3">
+<div class="flex flex-col">
+<span class="font-label-caps text-[8px] text-outline mb-1">ESM SIGNATURE</span>
+<span class="font-data-mono text-data-mono text-on-surface uppercase bg-surface-container-highest px-1 border border-outline-variant/30 inline-block w-max">FLANKER-H</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-[8px] text-outline mb-1">TRANSPONDER</span>
+<span class="font-data-mono text-data-mono text-error uppercase flex items-center gap-1">
+<div class="w-1 h-1 bg-error"></div> OFF
                                 </span>
+</div>
+<div class="flex flex-col col-span-2">
+<span class="font-label-caps text-[8px] text-outline mb-1">HEADING</span>
+<div class="flex items-center gap-2">
+<span class="font-data-mono text-data-mono text-on-surface">285° (WNW) TO GOTLAND</span>
+</div>
+</div>
+</div>
+</div>
+                    <!-- Row 3: Intel Summary -->
+                    <div class="bg-surface-container-highest border border-error-container p-panel-padding mt-2 shadow-[0_0_10px_rgba(255,82,82,0.1)]">
+                        <span class="font-label-caps text-label-caps text-error mb-2 block tracking-widest">INTEL SUMMARY</span>
+                        <p id="sm-intel" class="font-data-mono text-[10px] leading-relaxed text-on-surface-variant italic">
+                            Acquiring multi-domain sensor lock...
+                        </p>
+                    </div>
+</div>
+                <div class="p-gutter border-t border-outline-variant bg-surface-container-low">
+                    <span class="font-label-caps text-label-caps text-on-surface-variant mb-3 block">OVERLAY CONTROLS</span>
+                    <div class="flex flex-col gap-2">
+                        <label data-toggle="radar"
+                            class="flex items-center justify-between p-2 border border-outline-variant bg-surface cursor-pointer hover:bg-surface-container transition-colors">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px] text-tertiary">radar</span>
+                                <span class="font-data-mono text-data-mono text-on-surface">RADAR FANS</span>
                             </div>
-                            <div class="flex flex-col col-span-2">
-                                <span class="font-label-caps text-[8px] text-outline mb-1">HEADING</span>
-                                <div class="flex items-center gap-2">
-                                    <span id="sm-heading" class="font-data-mono text-data-mono text-on-surface">285°
-                                        (WNW) TO GOTLAND</span>
-                                </div>
+                            <div class="w-8 h-4 border border-tertiary flex items-center bg-tertiary/20 px-0.5">
+                                <div class="toggle-knob w-3 h-3 bg-tertiary translate-x-3.5 transition-transform"></div>
                             </div>
-                        </div>
-                        <!-- Fusion Confidence Bar -->
-                        <div class="mt-4 pt-3 border-t border-outline-variant/50">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-label-caps text-[8px] text-outline">FUSED CONFIDENCE</span>
-                                <span id="sm-fused-pct" class="font-data-mono text-data-mono text-primary">94.2%</span>
+                        </label>
+                        <label data-toggle="satellite"
+                            class="flex items-center justify-between p-2 border border-outline-variant bg-surface cursor-pointer hover:bg-surface-container transition-colors">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px] text-primary">satellite_alt</span>
+                                <span class="font-data-mono text-data-mono text-on-surface">SAT PASSES</span>
                             </div>
-                            <div
-                                class="flex h-2 w-full bg-surface-container-highest border border-outline-variant/30 overflow-hidden">
-                                <div id="bar-radar" class="h-full bg-primary transition-all duration-700"
-                                    style="width: 48%" title="Radar"></div>
-                                <div id="bar-esm" class="h-full bg-tertiary transition-all duration-700"
-                                    style="width: 26%" title="ESM"></div>
-                                <div id="bar-sat" class="h-full bg-sky-400 transition-all duration-700"
-                                    style="width: 14%" title="Satellite"></div>
+                            <div class="w-8 h-4 border border-primary flex items-center bg-primary/20 px-0.5">
+                                <div class="toggle-knob w-3 h-3 bg-primary translate-x-3.5 transition-transform"></div>
                             </div>
-                            <div class="flex justify-between mt-1">
-                                <span class="font-data-mono text-[8px] text-primary">RADAR</span>
-                                <span class="font-data-mono text-[8px] text-tertiary">ESM</span>
-                                <span class="font-data-mono text-[8px] text-sky-400">SAT</span>
+                        </label>
+                        <label data-toggle="weather"
+                            class="flex items-center justify-between p-2 border border-outline-variant/50 bg-surface/50 cursor-pointer hover:bg-surface-container transition-colors">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px] text-outline">cloud</span>
+                                <span class="font-data-mono text-data-mono text-on-surface">WEATHER</span>
                             </div>
-                        </div>
+                            <div class="w-8 h-4 border border-outline-variant flex items-center px-0.5">
+                                <div class="toggle-knob w-3 h-3 bg-outline-variant transition-transform"></div>
+                            </div>
+                        </label>
                     </div>
                 </div>
-                <!-- Row 3: Action Context -->
-                <div class="bg-surface-container-highest border border-error-container p-panel-padding mt-2">
-                    <span class="font-label-caps text-label-caps text-error mb-2 block">INTEL SUMMARY</span>
-                    <p class="font-data-mono text-[10px] leading-relaxed text-on-surface-variant">
-                        Target acquired departing Kaliningrad airspace. High speed, descending profile consistent with
-                        tactical maneuvers. Lack of transponder signal mandates Alpha threat categorization until visual
-                        ID.
-                    </p>
-                </div>
-    </div>
-    <!-- Layer Toggles -->
-    <div class="p-gutter border-t border-outline-variant bg-surface-container-low">
-        <span class="font-label-caps text-label-caps text-on-surface-variant mb-3 block">OVERLAY CONTROLS</span>
-        <div class="flex flex-col gap-2">
-            <label data-toggle="radar"
-                class="flex items-center justify-between p-2 border border-outline-variant bg-surface cursor-pointer hover:bg-surface-container transition-colors">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-tertiary">radar</span>
-                    <span class="font-data-mono text-data-mono text-on-surface">RADAR FANS</span>
-                </div>
-                <div class="w-8 h-4 border border-tertiary flex items-center bg-tertiary/20 px-0.5">
-                    <div class="toggle-knob w-3 h-3 bg-tertiary translate-x-3.5 transition-transform"></div>
-                </div>
-            </label>
-            <label data-toggle="satellite"
-                class="flex items-center justify-between p-2 border border-outline-variant bg-surface cursor-pointer hover:bg-surface-container transition-colors">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-primary">satellite_alt</span>
-                    <span class="font-data-mono text-data-mono text-on-surface">SAT PASSES</span>
-                </div>
-                <div class="w-8 h-4 border border-primary flex items-center bg-primary/20 px-0.5">
-                    <div class="toggle-knob w-3 h-3 bg-primary translate-x-3.5 transition-transform"></div>
-                </div>
-            </label>
-            <label data-toggle="weather"
-                class="flex items-center justify-between p-2 border border-outline-variant/50 bg-surface/50 cursor-pointer hover:bg-surface-container transition-colors">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-outline">cloud</span>
-                    <span class="font-data-mono text-data-mono text-on-surface">WEATHER</span>
-                </div>
-                <div class="w-8 h-4 border border-outline-variant flex items-center px-0.5">
-                    <div class="toggle-knob w-3 h-3 bg-outline-variant transition-transform"></div>
-                </div>
-            </label>
-        </div>
-    </div>
-    </aside>
-    </main>
-    </div>
+</aside>
+</main>
+</div>
     <script src="./sensor-data.js"></script>
     <script src="./shared-components.js"></script>
     <script>
         // --- Layer Toggles ---
         const layerState = { radar: true, satellite: true, weather: false };
 
-        // Restore from sessionStorage
         try {
             const saved = sessionStorage.getItem('layerToggles');
             if (saved) Object.assign(layerState, JSON.parse(saved));
@@ -322,68 +285,79 @@
 
         applyLayerState();
 
-        // --- Bogey Track Movement ---
-        const trailDots = [];
-        const MAX_TRAIL = 6;
-        // Map lat/lon ranges to percentage positions on the map
-        // Lat: 56.5–58.5 maps to 90%–10% top, Lon: 17.5–21.0 maps to 5%–95% left
+        // --- Track Movement Logic ---
+        const bogeyTrail = [];
+        const gripenTrail = [];
+        const MAX_TRAIL = 8;
+
         function geoToPos(lat, lon) {
-            const top = 90 - ((lat - 56.5) / 2.0) * 80;  // rough mapping
+            // Rough mapping for Baltic Sea region (Gotland center)
+            const top = 90 - ((lat - 56.5) / 2.0) * 80;
             const left = ((lon - 17.5) / 3.5) * 90 + 5;
             return {
-                top: Math.max(5, Math.min(90, top)) + '%',
-                left: Math.max(5, Math.min(90, left)) + '%'
+                top: Math.max(5, Math.min(95, top)) + '%',
+                left: Math.max(5, Math.min(95, left)) + '%'
             };
+        }
+
+        function updateMarker(id, trailArray, trailContainerId, lat, lon, heading) {
+            const marker = document.getElementById(id + '-marker');
+            const pos = geoToPos(lat, lon);
+            const container = document.getElementById(trailContainerId);
+
+            if (marker && marker.style.top) {
+                // Create trail dot
+                const dot = document.createElement('div');
+                const colorClass = id === 'bogey' ? 'bg-error/40' : 'bg-primary/30';
+                dot.className = `absolute w-1.5 h-1.5 ${colorClass} rounded-full transition-opacity duration-[4000ms]`;
+                dot.style.top = marker.style.top;
+                dot.style.left = marker.style.left;
+                dot.style.transform = 'translate(-50%, -50%)';
+                if (container) container.appendChild(dot);
+                trailArray.push(dot);
+
+                requestAnimationFrame(() => dot.style.opacity = '0');
+                while (trailArray.length > MAX_TRAIL) {
+                    const old = trailArray.shift();
+                    old.remove();
+                }
+            }
+
+            if (marker) {
+                marker.style.top = pos.top;
+                marker.style.left = pos.left;
+                marker.style.transform = 'translate(-50%, -50%)';
+            }
+
+            const headingLine = document.getElementById(id + '-heading-line');
+            if (headingLine) {
+                headingLine.style.transform = `rotate(${(heading - 270) % 360}deg)`;
+            }
         }
 
         // --- Live Telemetry Listener ---
         window.addEventListener('sensor-update', (e) => {
             const d = e.detail;
             const t = d.target;
+            const i = d.interceptor;
             const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-            // --- Bogey position ---
-            const pos = geoToPos(t.lat, t.lon);
-            const marker = document.getElementById('bogey-marker');
-            if (marker) {
-                // Add trail dot at current position before moving
-                const trailContainer = document.getElementById('bogey-trail');
-                if (trailContainer && marker.style.top && marker.style.left) {
-                    const dot = document.createElement('div');
-                    dot.className = 'absolute w-2 h-2 bg-error/60 rounded-full transition-opacity duration-[3000ms]';
-                    dot.style.top = marker.style.top;
-                    dot.style.left = marker.style.left;
-                    dot.style.transform = 'translate(-50%, -50%)';
-                    trailContainer.appendChild(dot);
-                    trailDots.push(dot);
-                    // Fade out
-                    requestAnimationFrame(() => {
-                        dot.style.opacity = '0.15';
-                    });
-                    // Remove old dots
-                    while (trailDots.length > MAX_TRAIL) {
-                        const old = trailDots.shift();
-                        old.remove();
-                    }
-                }
-                marker.style.top = pos.top;
-                marker.style.left = pos.left;
-                marker.style.right = 'auto';
-                marker.style.transform = 'translate(-50%, -50%)';
-            }
+            // Update markers
+            updateMarker('bogey', bogeyTrail, 'bogey-trail', t.lat, t.lon, t.heading);
+            updateMarker('gripen', gripenTrail, 'gripen-trail', i.lat, i.lon, i.heading);
 
-            // Heading line rotation
-            const headingLine = document.getElementById('bogey-heading-line');
-            if (headingLine) {
-                headingLine.style.transform = `rotate(${(t.heading - 270) % 360}deg)`;
-            }
+            // Coordinates
+            const latD = Math.floor(t.lat);
+            const latM = Math.round((t.lat - latD) * 60);
+            const lonD = Math.floor(t.lon);
+            const lonM = Math.round((t.lon - lonD) * 60);
+            set('sm-latlon', `${latD}°${latM}'N ${lonD}°${lonM}'E`);
+            set('sm-zulu', d.zuluTime);
 
-            // --- Sidebar telemetry ---
+            // Telemetry
             set('sm-speed', t.speed.toFixed(2));
-            const altK = Math.round(t.altitude / 1000);
-            set('sm-altitude', altK + 'K');
-
-            // Altitude trend
+            set('sm-altitude', Math.round(t.altitude / 1000) + 'K');
+            
             const trendEl = document.getElementById('sm-alt-trend');
             const trendText = document.getElementById('sm-alt-trend-text');
             if (trendEl && trendText) {
@@ -406,21 +380,36 @@
             const dirIdx = Math.round(t.heading / 22.5) % 16;
             set('sm-heading', `${Math.round(t.heading)}° (${dirs[dirIdx]}) TO GOTLAND`);
 
-            // --- Fusion confidence bar ---
+            // Fusion Confidence
+            set('sm-fused-pct', d.fusedConfidence.toFixed(1) + '%');
             const s = d.sensors;
             const total = s.radar.confidence + s.esm.confidence + s.satellite.confidence;
-            const rPct = (s.radar.confidence / total * 100).toFixed(0);
-            const ePct = (s.esm.confidence / total * 100).toFixed(0);
-            const sPct = (s.satellite.confidence / total * 100).toFixed(0);
-            const barR = document.getElementById('bar-radar');
-            const barE = document.getElementById('bar-esm');
-            const barS = document.getElementById('bar-sat');
-            if (barR) barR.style.width = rPct + '%';
-            if (barE) barE.style.width = ePct + '%';
-            if (barS) barS.style.width = sPct + '%';
-            set('sm-fused-pct', d.fusedConfidence.toFixed(1) + '%');
+            if (total > 0) {
+                const barR = document.getElementById('bar-radar');
+                const barE = document.getElementById('bar-esm');
+                const barS = document.getElementById('bar-sat');
+                if (barR) barR.style.width = (s.radar.confidence / total * 100) + '%';
+                if (barE) barE.style.width = (s.esm.confidence / total * 100) + '%';
+                if (barS) barS.style.width = (s.satellite.confidence / total * 100) + '%';
+            }
+
+            // Intel Summary Logic
+            const intelEl = document.getElementById('sm-intel');
+            if (intelEl) {
+                let summary = "";
+                if (d.threatScore > 80) summary = "CRITICAL THREAT. High-speed closure on Sovereign airspace. ROE authorized for Phase 4 engagement.";
+                else if (d.threatScore > 50) summary = "Target maintaining tactical profile. Gripen-1 shadowing at close range. ESM indicates active radar search.";
+                else summary = "Target in stable cruise. Multi-domain tracking active. No aggressive maneuvers detected.";
+                intelEl.textContent = summary;
+            }
+
+            // Status Badge
+            const badge = document.getElementById('track-status-badge');
+            if (badge) {
+                if (d.threatScore > 80) { badge.textContent = 'HOSTILE'; badge.className = 'px-1.5 py-0.5 bg-error text-white font-label-caps text-label-caps border border-error animate-pulse'; }
+                else if (d.threatScore > 50) { badge.textContent = 'SUSPECT'; badge.className = 'px-1.5 py-0.5 bg-amber-500 text-black font-label-caps text-label-caps border border-amber-600'; }
+                else { badge.textContent = 'NEUTRAL'; badge.className = 'px-1.5 py-0.5 bg-sky-500 text-white font-label-caps text-label-caps border border-sky-600'; }
+            }
         });
     </script>
-</body>
-
-</html>
+</body></html>
