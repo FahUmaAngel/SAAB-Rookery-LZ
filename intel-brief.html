@@ -37,19 +37,19 @@
   .ops-console .scanline-overlay::after { display:block; animation-duration:4.8s; }
   .ops-console [data-ops-panel],
   .ops-console article,
-  .ops-console aside { position:relative; overflow:hidden; animation:opsBorderPulse 7s ease-in-out infinite; }
+  .ops-console aside { position:relative; overflow:hidden; }
   .ops-console [data-ops-panel]::before,
   .ops-console article::before,
   .ops-console aside::before {
     content:""; position:absolute; inset:0 auto 0 -40%; width:38%; pointer-events:none;
-    background:linear-gradient(90deg,transparent,rgba(130,207,255,.08),transparent);
-    animation:opsPanelSweep 6.5s linear infinite;
+    background:linear-gradient(90deg,transparent,rgba(130,207,255,.03),transparent);
+    animation:opsPanelSweep 12s linear infinite;
   }
   .ops-console [data-ops-hot] { animation:opsAmberPulse 2.4s ease-in-out infinite; }
-  .ops-console .ops-value,
-  .ops-console .ops-status-pill,
-  .ops-console .font-data-mono { animation:opsDataFlicker 5.5s steps(1,end) infinite; }
-  .ops-console .bar-animate { animation:barLoad .9s ease-out both, opsDataFlicker 4s steps(1,end) infinite; }
+  /* Only flicker specific live-update elements, not all mono text */
+  #live-speed, #live-dist, #live-dist-mini, #live-dist-summary, #live-alt,
+  #live-cpa, #live-closure, #live-elapsed, #live-action-state { animation:opsDataFlicker 5.5s steps(1,end) infinite; }
+  .ops-console .bar-animate { animation:barLoad .9s ease-out both; }
   .ops-console .feed-priority { animation:softPulse 1.8s ease-in-out infinite; }
   .ops-console .action-glow { animation:actionGlow 1.4s ease-in-out infinite; }
   .ops-console .impact-pulse { animation:impactPulse 1.2s ease-in-out infinite; }
@@ -80,9 +80,9 @@
   .ops-control-btn { border:1px solid rgba(51,65,85,.9); background:rgba(15,23,42,.58); padding:.45rem .6rem; font-family:monospace; font-size:10px; text-transform:uppercase; color:#cbd5e1; transition:all .18s ease; }
   .ops-control-btn:hover,.ops-control-btn.active { border-color:rgba(130,207,255,.75); color:#82cfff; background:rgba(14,116,144,.14); }
   .ops-hidden-layer { display:none !important; }
-  .operator-controls { min-height:132px; border-color:rgba(130,207,255,.55) !important; background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(2,6,23,.82)); }
+  .operator-controls { min-height:auto; border-color:rgba(130,207,255,.30) !important; background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(2,6,23,.82)); }
   .operator-controls > * { position:relative; z-index:1; }
-  .operator-controls .ops-control-btn { position:relative; z-index:3; pointer-events:auto; min-height:38px; padding:.6rem .8rem; }
+  .operator-controls .ops-control-btn { position:relative; z-index:3; pointer-events:auto; min-height:26px; padding:.25rem .55rem; font-size:9px; }
 </style>
 </head>
 <body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
@@ -91,6 +91,11 @@
 <div id="sidebar-placeholder"></div>
 
 <main class="ops-console h-full overflow-y-auto p-gutter flex flex-col gap-gutter">
+  <!-- Classification Strip -->
+  <div class="border border-slate-800/60 bg-slate-950 flex items-center justify-between px-4 py-1.5 shrink-0">
+    <span class="font-data-mono text-[9px] text-slate-600 uppercase tracking-[0.10em]">NATO UNCLASSIFIED // TRAINING SIMULATION ONLY</span>
+    <span class="font-data-mono text-[9px] text-slate-700 uppercase tracking-[0.10em]">INC-2024-BALTIC-042 // NOT FOR OPERATIONAL USE</span>
+  </div>
 
   <!-- Page Header -->
   <header class="border border-outline-variant bg-surface-container p-panel-padding flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -126,33 +131,35 @@
     </div>
   </header>
 
-  <!-- Interactive Controls -->
-  <section data-ops-panel class="operator-controls border border-primary/50 bg-surface-container-high p-4 flex flex-col gap-4 shadow-[0_0_28px_rgba(130,207,255,0.10)]">
-    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
-      <div class="flex flex-col gap-1">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-[18px] text-primary">tune</span>
-          <span class="font-label-caps text-label-caps uppercase text-primary">Operator Controls</span>
-        </div>
-        <div class="font-data-mono text-[10px] text-slate-500 uppercase">Track selection, map layers, and local operator logging</div>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        <button type="button" class="ops-control-btn active" data-track-button="BOGEY-731" data-operator-action="select-track" data-track-id="BOGEY-731" onclick="selectTrack('BOGEY-731')">BOGEY-731</button>
-        <button type="button" class="ops-control-btn" data-track-button="QRA-01" data-operator-action="select-track" data-track-id="QRA-01" onclick="selectTrack('QRA-01')">QRA-01</button>
-        <button type="button" class="ops-control-btn" data-track-button="QRA-02" data-operator-action="select-track" data-track-id="QRA-02" onclick="selectTrack('QRA-02')">QRA-02</button>
-        <button type="button" class="ops-control-btn active" id="vectors-toggle" data-operator-action="toggle-layer" data-layer="vectors" onclick="toggleMapLayer('vectors')">Vectors</button>
-        <button type="button" class="ops-control-btn active" id="trails-toggle" data-operator-action="toggle-layer" data-layer="trails" onclick="toggleMapLayer('trails')">Trails</button>
-        <button type="button" class="ops-control-btn" data-operator-action="log-note" onclick="injectOperatorEvent()">Log Note</button>
-        <button type="button" class="ops-control-btn" data-operator-action="clear-audit" onclick="clearAuditLog()">Clear Audit</button>
-      </div>
-    </div>
-    <div id="selected-track-readout" class="font-data-mono text-[11px] text-on-surface-variant border border-primary/25 bg-black/35 p-3">
-      SELECTED BOGEY-731 | UNKNOWN/MIL ASSESSED | XPDR NEG | NO FPL MATCH | ACTION: MAINTAIN VID STANDOFF
+  <!-- Operator Control Strip -->
+  <section data-ops-panel class="operator-controls border border-primary/30 bg-surface-container-high">
+    <div class="flex items-center gap-2 px-3 py-2 flex-wrap">
+      <span class="font-label-caps text-[8px] text-primary uppercase tracking-widest shrink-0 flex items-center gap-1">
+        <span class="material-symbols-outlined text-[14px]">tune</span>OPS
+      </span>
+      <span class="text-slate-700 shrink-0 font-mono">│</span>
+      <button type="button" class="ops-control-btn active" data-track-button="BOGEY-731" data-operator-action="select-track" data-track-id="BOGEY-731" onclick="selectTrack('BOGEY-731')">BOGEY-731</button>
+      <button type="button" class="ops-control-btn" data-track-button="QRA-01" data-operator-action="select-track" data-track-id="QRA-01" onclick="selectTrack('QRA-01')">QRA-01</button>
+      <button type="button" class="ops-control-btn" data-track-button="QRA-02" data-operator-action="select-track" data-track-id="QRA-02" onclick="selectTrack('QRA-02')">QRA-02</button>
+      <span class="text-slate-700 shrink-0 font-mono">│</span>
+      <button type="button" class="ops-control-btn active" id="vectors-toggle" data-operator-action="toggle-layer" data-layer="vectors" onclick="toggleMapLayer('vectors')">Vectors</button>
+      <button type="button" class="ops-control-btn active" id="trails-toggle" data-operator-action="toggle-layer" data-layer="trails" onclick="toggleMapLayer('trails')">Trails</button>
+      <button type="button" class="ops-control-btn" data-operator-action="log-note" onclick="injectOperatorEvent()">Log Note</button>
+      <button type="button" class="ops-control-btn" data-operator-action="clear-audit" onclick="clearAuditLog()">Clear Audit</button>
+      <span class="text-slate-700 shrink-0 font-mono hidden xl:block">│</span>
+      <div id="selected-track-readout" class="font-data-mono text-[9px] text-slate-400 flex-1 min-w-0 truncate hidden xl:block">BOGEY-731 | XPDR NEG | NO FPL MATCH | MAINTAIN VID STANDOFF</div>
     </div>
   </section>
 
   <!-- Watch Floor Status -->
   <section data-ops-panel class="border border-outline-variant bg-surface-container-low">
+    <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+      <h3 class="font-label-caps text-label-caps uppercase text-slate-400 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px] text-primary">assignment</span>
+        Watch Floor Status
+      </h3>
+      <span class="font-data-mono text-[9px] text-slate-500 uppercase">STRIL C2 WATCH // ROE LADDER ACTIVE</span>
+    </div>
     <div class="grid grid-cols-1 lg:grid-cols-[180px_minmax(0,1fr)_220px]">
       <div data-ops-hot class="border-b lg:border-b-0 lg:border-r border-outline-variant p-3 bg-surface-container-high">
         <div class="font-label-caps text-[8px] text-slate-500 uppercase">Current Work Item</div>
@@ -174,7 +181,7 @@
   <!-- Operational Summary -->
   <section class="grid grid-cols-1 xl:grid-cols-[1.2fr_1fr_0.9fr] gap-gutter">
     <article data-ops-panel class="border border-outline-variant bg-surface-container-low flex flex-col">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+      <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
         <h2 class="font-label-caps text-label-caps uppercase text-slate-400 flex items-center gap-2">
           <span class="material-symbols-outlined text-[16px] text-primary">table_chart</span>
           Track Summary
@@ -192,7 +199,7 @@
     </article>
 
     <article data-ops-panel class="border border-outline-variant bg-surface-container-low flex flex-col">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+      <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
         <h2 class="font-label-caps text-label-caps uppercase text-slate-400 flex items-center gap-2">
           <span class="material-symbols-outlined text-[16px] text-tertiary">verified_user</span>
           Evidence Custody
@@ -210,7 +217,7 @@
     </article>
 
     <article data-ops-panel data-ops-hot class="border border-outline-variant bg-surface-container-low flex flex-col">
-      <div class="flex items-center justify-between border-b border-error/20 pb-2">
+      <div class="p-panel-padding border-b border-error/25 bg-surface-container-high flex items-center justify-between">
         <h2 class="font-label-caps text-label-caps uppercase text-slate-400 flex items-center gap-2">
           <span class="material-symbols-outlined text-[16px] text-tertiary">rule</span>
           Supervisor Decisions
@@ -722,7 +729,7 @@
   </section>
 
   <!-- Source Links -->
-  <section class="border border-outline-variant bg-surface-container-low">
+  <section data-ops-panel class="border border-outline-variant bg-surface-container-low">
     <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
       <h3 class="font-label-caps text-label-caps uppercase text-slate-400">Source Links</h3>
       <span class="font-data-mono text-[10px] text-slate-500">OPEN SOURCE / TRAINING BRIEF</span>
