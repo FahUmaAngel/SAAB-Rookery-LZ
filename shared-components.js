@@ -303,9 +303,11 @@ const SharedComponents = {
     },
 
     handleNav: (event, url) => {
-        event.preventDefault();
-        window.history.pushState({}, '', url);
-        SharedComponents.loadContent(url);
+        // Use standard full-page navigation instead of SPA content swapping.
+        // Each page is a complete standalone HTML file with its own scripts.
+        // SPA swapping breaks because CSP blocks dynamically injected inline scripts,
+        // and DOMContentLoaded doesn't fire again for page-init logic.
+        window.location.href = url;
     },
 
     loadContent: async (url) => {
@@ -507,16 +509,8 @@ const SharedComponents = {
             });
         }
 
-        // SPA link delegation — intercept any internal <a href> click that hasn't
-        // already been handled by an inline onclick (those call preventDefault first).
-        document.addEventListener('click', (e) => {
-            if (e.defaultPrevented) return;
-            const link = e.target.closest('a[href]');
-            if (!link) return;
-            const href = link.getAttribute('href');
-            if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto') || href.startsWith('//')) return;
-            SharedComponents.handleNav(e, href);
-        });
+        // Navigation uses standard full-page loads (no SPA interception needed).
+        // Each page is a complete HTML document with its own scripts and init logic.
 
         // Save state on sidebar toggle
         const observer = new MutationObserver(() => {
