@@ -96,104 +96,42 @@
             <div class="bg-surface-container border border-outline-variant rounded-DEFAULT overflow-hidden self-start">
                 <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
                     <div>
-                        <h2 class="font-headline-md text-headline-md uppercase tracking-[0.12em]">Theater Position Plot</h2>
-                        <p class="font-data-mono text-[10px] text-on-surface-variant mt-1">Airborne assets are projected over the Baltic operational area. Grounded platforms remain anchored to their home base.</p>
+                        <h2 class="font-headline-md text-headline-md uppercase tracking-[0.12em]">Asset Position Map</h2>
+                        <p class="font-data-mono text-[10px] text-on-surface-variant mt-1">Blue diamond = airborne. Yellow circle = ready on ground. Gray = hangar. Red = repair.</p>
                     </div>
                     <span class="font-data-mono text-[10px] text-primary border border-primary/30 px-2 py-1">SYNCED TO C2 PLOT</span>
                 </div>
                 <div class="p-panel-padding">
-                    <div class="relative h-[420px] border border-outline-variant overflow-hidden bg-[linear-gradient(180deg,#10202c_0%,#0b151c_100%)]">
-                        <svg aria-hidden="true" class="absolute inset-0 h-full w-full" viewBox="0 0 1000 620">
-                            <defs>
-                                <linearGradient id="assetSeaGradient" x1="0" x2="0" y1="0" y2="1">
-                                    <stop offset="0%" stop-color="#183142"/>
-                                    <stop offset="52%" stop-color="#102532"/>
-                                    <stop offset="100%" stop-color="#0a141b"/>
-                                </linearGradient>
-                                <radialGradient id="assetSeaGlow" cx="52%" cy="38%" r="55%">
-                                    <stop offset="0%" stop-color="#4f8cb3" stop-opacity="0.28"/>
-                                    <stop offset="100%" stop-color="#4f8cb3" stop-opacity="0"/>
-                                </radialGradient>
-                                <filter id="assetCoastGlow" x="-20%" y="-20%" width="140%" height="140%">
-                                    <feGaussianBlur stdDeviation="4" result="blur"/>
-                                    <feMerge>
-                                        <feMergeNode in="blur"/>
-                                        <feMergeNode in="SourceGraphic"/>
-                                    </feMerge>
-                                </filter>
-                            </defs>
-
-                            <rect width="1000" height="620" fill="url(#assetSeaGradient)"/>
-                            <rect width="1000" height="620" fill="url(#assetSeaGlow)"/>
-
-                            <g opacity="0.3" stroke="#335164" stroke-width="1">
-                                <line x1="120" y1="0" x2="120" y2="620"/>
-                                <line x1="250" y1="0" x2="250" y2="620"/>
-                                <line x1="380" y1="0" x2="380" y2="620"/>
-                                <line x1="510" y1="0" x2="510" y2="620"/>
-                                <line x1="640" y1="0" x2="640" y2="620"/>
-                                <line x1="770" y1="0" x2="770" y2="620"/>
-                                <line x1="0" y1="110" x2="1000" y2="110"/>
-                                <line x1="0" y1="220" x2="1000" y2="220"/>
-                                <line x1="0" y1="330" x2="1000" y2="330"/>
-                                <line x1="0" y1="440" x2="1000" y2="440"/>
-                                <line x1="0" y1="550" x2="1000" y2="550"/>
-                            </g>
-
-                            <g fill="#253238" stroke="#91afbf" stroke-opacity="0.6" stroke-width="2" filter="url(#assetCoastGlow)">
-                                <path d="M0 0 H262 L288 38 L302 84 L294 126 L270 162 L280 210 L258 254 L274 308 L254 354 L264 420 L238 484 L248 548 L230 620 H0 Z"/>
-                                <path d="M640 0 H1000 V190 L962 182 L926 160 L898 130 L872 118 L842 134 L818 164 L792 196 L758 194 L724 154 L700 108 L684 62 Z"/>
-                                <path d="M836 214 L892 220 L944 244 L1000 286 V620 H742 L724 568 L740 522 L718 470 L732 420 L766 362 L792 310 Z"/>
-                                <path d="M570 620 H1000 V522 L956 510 L916 488 L868 478 L818 486 L770 510 L718 532 L662 556 L618 586 Z"/>
-                                <path d="M681 178 L706 192 L714 228 L700 260 L674 266 L660 242 L662 206 Z"/>
-                                <path d="M654 304 L667 324 L662 374 L650 428 L636 424 L636 364 L642 320 Z"/>
-                                <path d="M598 492 L615 500 L620 520 L606 532 L590 526 L586 506 Z"/>
-                            </g>
-
-                            <g fill="none" stroke="#82cfff" stroke-opacity="0.28" stroke-width="2" stroke-dasharray="8 8">
-                                <path d="M312 338 C410 292 520 274 638 286"/>
-                                <path d="M286 402 C390 370 522 360 668 382"/>
-                                <path d="M302 234 C410 216 540 214 698 228"/>
-                            </g>
-
-                            <g font-family="Inter, sans-serif" font-size="13" font-weight="700" letter-spacing="3">
-                                <text x="146" y="88" fill="#8ca2af">SWEDEN</text>
-                                <text x="720" y="82" fill="#8ca2af">FINLAND</text>
-                                <text x="868" y="262" fill="#8ca2af">LATVIA</text>
-                                <text x="864" y="332" fill="#8ca2af">LITHUANIA</text>
-                                <text x="810" y="520" fill="#8ca2af">POLAND</text>
-                                <text x="736" y="470" fill="#ffb4ab">KALININGRAD</text>
-                                <text x="458" y="338" fill="#82cfff" opacity="0.72">BALTIC SEA</text>
-                                <text x="680" y="170" fill="#d4dde3" font-size="11" letter-spacing="2">GOTLAND</text>
-                                <text x="640" y="298" fill="#d4dde3" font-size="10" letter-spacing="2">OLAND</text>
-                            </g>
-                        </svg>
-
-                        <div class="absolute top-[27%] left-[33%] z-10 -translate-x-1/2 -translate-y-1/2">
-                            <div class="w-2.5 h-2.5 rounded-full bg-primary border border-sky-100 shadow-[0_0_12px_rgba(130,207,255,0.85)]"></div>
-                            <div class="absolute left-4 -top-1 px-2 py-1 rounded-sm bg-slate-950/60 backdrop-blur-sm border border-primary/20 shadow-[0_4px_14px_rgba(0,0,0,0.24)] text-[9px] font-data-mono text-primary whitespace-nowrap">F7 SATENAS</div>
+                    <div class="relative h-[460px] border border-outline-variant overflow-hidden bg-[#0f1b24]">
+                        <div id="asset-map-canvas" class="h-full w-full"></div>
+                        <div class="pointer-events-none absolute left-3 top-3 z-[500] rounded-sm border border-outline-variant/70 bg-slate-950/70 px-3 py-2 text-[9px] font-data-mono text-on-surface shadow-[0_6px_18px_rgba(0,0,0,0.28)] backdrop-blur-sm">
+                            <div class="text-primary uppercase tracking-[0.18em]">Asset Position Map</div>
+                            <div id="asset-map-selection" class="mt-1 text-on-surface-variant">Select an asset to inspect exact coordinates.</div>
                         </div>
-                        <div class="absolute top-[52%] left-[28%] z-10 -translate-x-1/2 -translate-y-1/2">
-                            <div class="w-2.5 h-2.5 rounded-full bg-primary border border-sky-100 shadow-[0_0_12px_rgba(130,207,255,0.85)]"></div>
-                            <div class="absolute left-4 -top-1 px-2 py-1 rounded-sm bg-slate-950/60 backdrop-blur-sm border border-primary/20 shadow-[0_4px_14px_rgba(0,0,0,0.24)] text-[9px] font-data-mono text-primary whitespace-nowrap">F17 KALLINGE</div>
-                        </div>
-                        <div class="absolute top-[16%] left-[24%] z-10 -translate-x-1/2 -translate-y-1/2">
-                            <div class="w-2.5 h-2.5 rounded-full bg-primary border border-sky-100 shadow-[0_0_12px_rgba(130,207,255,0.85)]"></div>
-                            <div class="absolute left-4 -top-1 px-2 py-1 rounded-sm bg-slate-950/60 backdrop-blur-sm border border-primary/20 shadow-[0_4px_14px_rgba(0,0,0,0.24)] text-[9px] font-data-mono text-primary whitespace-nowrap">F21 LULEA</div>
-                        </div>
-
-                        <div class="absolute bottom-4 left-4 z-10 flex max-w-[calc(100%-2rem)] flex-wrap items-center gap-x-3 gap-y-2 rounded-sm bg-slate-950/60 backdrop-blur-sm border border-outline-variant/60 px-3 py-2 text-[9px] font-data-mono text-on-surface shadow-[0_6px_18px_rgba(0,0,0,0.28)]">
+                        <div class="pointer-events-none absolute bottom-4 left-4 z-[500] flex max-w-[calc(100%-2rem)] flex-wrap items-center gap-x-4 gap-y-2 rounded-sm border border-outline-variant/70 bg-slate-950/70 px-3 py-2 text-[9px] font-data-mono text-on-surface shadow-[0_6px_18px_rgba(0,0,0,0.28)] backdrop-blur-sm">
                             <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-primary border border-sky-100"></span>
+                                <span class="relative h-3.5 w-3.5 rounded-full border border-sky-100 bg-transparent">
+                                    <span class="absolute inset-1 rounded-full bg-primary"></span>
+                                </span>
                                 <span>Air Base</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rotate-45 bg-primary border border-sky-100"></span>
-                                <span>Airborne Asset</span>
+                                <span class="h-2.5 w-2.5 rotate-45 border border-sky-100 bg-primary"></span>
+                                <span>Airborne</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="h-2.5 w-2.5 rounded-full border border-[#ffe08b] bg-tertiary"></span>
+                                <span>On Ground</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="h-2.5 w-2.5 rounded-full border border-white/70 bg-slate-300"></span>
+                                <span>Hangar</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="h-2.5 w-2.5 rounded-full border border-[#ffd2cd] bg-error"></span>
+                                <span>Repair</span>
                             </div>
                         </div>
-
-                        <div id="asset-map-layer" class="absolute inset-0 z-20"></div>
                     </div>
                 </div>
             </div>
@@ -221,7 +159,7 @@
                             </div>
                             <div class="border border-outline-variant bg-surface-container-low p-3">
                                 <div class="text-[9px] font-label-caps text-outline uppercase">Data Link</div>
-                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-primary">Linked</div>
+                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-primary">Connected</div>
                             </div>
                             <div class="border border-outline-variant bg-surface-container-low p-3">
                                 <div class="text-[9px] font-label-caps text-outline uppercase">ROE State</div>
@@ -245,7 +183,7 @@
                     <div class="p-panel-padding space-y-3 text-[12px] text-on-surface-variant">
                         <div class="border border-outline-variant bg-surface-container-low p-3">
                             <div class="text-[10px] font-label-caps text-primary uppercase tracking-[0.18em]">Airborne</div>
-                            <p class="mt-2">The asset is currently active and plotted on the theater map.</p>
+                            <p class="mt-2">The asset is currently active and plotted on the asset position map.</p>
                         </div>
                         <div class="border border-outline-variant bg-surface-container-low p-3">
                             <div class="text-[10px] font-label-caps text-tertiary uppercase tracking-[0.18em]">On Field / Ready</div>
@@ -275,13 +213,13 @@
                         fuel: 64,
                         mission: "VID on bogey",
                         readiness: "Ready in 00:00",
-                        latlon: "56.82N / 18.61E",
+                        latlon: "56.824N / 18.606E",
                         mapTop: 58,
                         mapLeft: 67,
                         color: "primary",
                         note: "Lead interceptor tracking unknown air contact in parallel shadow.",
                         missionClock: "28 min",
-                        datalink: "Linked",
+                        datalink: "Connected",
                         roe: "VID",
                         maintenance: "None"
                     },
@@ -297,13 +235,13 @@
                         fuel: 61,
                         mission: "Escort support",
                         readiness: "Ready in 00:00",
-                        latlon: "56.57N / 18.94E",
+                        latlon: "56.571N / 18.942E",
                         mapTop: 62,
                         mapLeft: 72,
                         color: "tertiary",
                         note: "Wingman positioned offset to maintain visual warning options.",
                         missionClock: "28 min",
-                        datalink: "Linked",
+                        datalink: "Connected",
                         roe: "Warning ladder",
                         maintenance: "None"
                     },
@@ -312,20 +250,20 @@
                         name: "Gripen 312",
                         type: "JAS 39E Gripen",
                         role: "Hot Spare Pair",
-                        base: "F7 Satenas",
+                        base: "F7 Såtenäs",
                         sector: "Hangar 2",
                         state: "Hangar",
                         disposition: "hangar",
                         fuel: 96,
                         mission: "15 min standby",
                         readiness: "Ready in 08:00",
-                        latlon: "58.43N / 12.71E",
-                        mapTop: 27,
-                        mapLeft: 33,
+                        latlon: "58.430N / 12.710E",
+                        mapTop: 29,
+                        mapLeft: 25,
                         color: "primary",
                         note: "Armed, fueled and crewed for relief launch if escort extends.",
                         missionClock: "Standby",
-                        datalink: "Warm",
+                        datalink: "Standby",
                         roe: "Scramble",
                         maintenance: "None"
                     },
@@ -341,13 +279,13 @@
                         fuel: 72,
                         mission: "Coastal ISR relay",
                         readiness: "Ready in 06:00",
-                        latlon: "55.95N / 15.61E",
+                        latlon: "55.954N / 15.611E",
                         mapTop: 68,
                         mapLeft: 51,
                         color: "primary",
                         note: "Feeding broad-area maritime picture and route verification.",
                         missionClock: "42 min",
-                        datalink: "Streaming",
+                        datalink: "Connected",
                         roe: "Observe",
                         maintenance: "Sensor cleaning due +6h"
                     },
@@ -363,13 +301,13 @@
                         fuel: 78,
                         mission: "Air picture control",
                         readiness: "On station",
-                        latlon: "58.94N / 20.42E",
+                        latlon: "58.938N / 20.416E",
                         mapTop: 35,
                         mapLeft: 77,
                         color: "primary",
                         note: "Providing radar custody and secure tasking to fighters.",
                         missionClock: "1h 14m",
-                        datalink: "Network host",
+                        datalink: "Command Node",
                         roe: "Control",
                         maintenance: "None"
                     },
@@ -378,14 +316,14 @@
                         name: "Gripen 118",
                         type: "JAS 39C Gripen",
                         role: "Reserve Interceptor",
-                        base: "F21 Lulea",
+                        base: "F21 Luleå",
                         sector: "Bay 4",
                         state: "Repair",
                         disposition: "repair",
                         fuel: 18,
                         mission: "Radar calibration hold",
                         readiness: "Down for 12h",
-                        latlon: "65.54N / 22.12E",
+                        latlon: "65.543N / 22.122E",
                         mapTop: 16,
                         mapLeft: 24,
                         color: "error",
@@ -400,20 +338,20 @@
                         name: "Gripen 407",
                         type: "JAS 39E Gripen",
                         role: "Turnaround Pair",
-                        base: "F7 Satenas",
+                        base: "F7 Såtenäs",
                         sector: "Apron West",
                         state: "On Field",
                         disposition: "field",
                         fuel: 48,
                         mission: "Rearm and refuel",
                         readiness: "Ready in 21:00",
-                        latlon: "58.41N / 12.69E",
-                        mapTop: 31,
-                        mapLeft: 35,
+                        latlon: "58.409N / 12.688E",
+                        mapTop: 33,
+                        mapLeft: 26,
                         color: "tertiary",
                         note: "Returned from training sortie and can be regenerated for QRA if needed.",
                         missionClock: "Turnaround",
-                        datalink: "Available",
+                        datalink: "Standby",
                         roe: "Scramble",
                         maintenance: "Refuel plus missile upload"
                     }
@@ -428,10 +366,399 @@
 
                 const filterButtons = document.querySelectorAll(".asset-filter");
                 const tableBody = document.getElementById("asset-table-body");
-                const mapLayer = document.getElementById("asset-map-layer");
+                const mapCanvas = document.getElementById("asset-map-canvas");
+                const mapSelection = document.getElementById("asset-map-selection");
                 const detail = document.getElementById("asset-detail");
+                const baseLocations = {
+                    "F7 Såtenäs": { lat: 58.43, lon: 12.71 },
+                    "F17 Kallinge": { lat: 56.27, lon: 15.27 },
+                    "F21 Luleå": { lat: 65.54, lon: 22.12 }
+                };
                 let activeFilter = "all";
                 let selectedAssetId = "GRP-201";
+                let assetMap;
+                let mapReadyPromise;
+                let assetMarkerLayer;
+                let baseMarkerLayer;
+                let liveTick = 0;
+                let liveTelemetryTimer;
+
+                function ensureAssetMapStyles() {
+                    if (document.getElementById("asset-tracking-map-styles")) return;
+                    const style = document.createElement("style");
+                    style.id = "asset-tracking-map-styles";
+                    style.textContent = `
+                        .asset-leaflet-map {
+                            font-family: Inter, sans-serif;
+                            background: linear-gradient(180deg, #0f1b24 0%, #081117 100%);
+                        }
+                        .asset-leaflet-map .leaflet-control-zoom a {
+                            background: rgba(2, 6, 23, 0.82);
+                            color: #dbe8ff;
+                            border-color: rgba(135, 146, 155, 0.45);
+                        }
+                        .asset-leaflet-map .leaflet-control-attribution {
+                            background: rgba(2, 6, 23, 0.7);
+                            color: #94a3b8;
+                            border-top-left-radius: 4px;
+                        }
+                        .asset-leaflet-map .leaflet-control-attribution a {
+                            color: #82cfff;
+                        }
+                        .asset-map-marker {
+                            width: 14px;
+                            height: 14px;
+                            border: 1px solid rgba(255, 255, 255, 0.8);
+                            box-shadow: 0 0 14px rgba(130, 207, 255, 0.3);
+                            transform-origin: center;
+                        }
+                        .asset-map-marker--airborne {
+                            transform: rotate(45deg);
+                            background: #82cfff;
+                            border-color: rgba(255, 255, 255, 0.8);
+                            box-shadow: 0 0 14px rgba(130, 207, 255, 0.3);
+                        }
+                        .asset-map-marker--field {
+                            border-radius: 9999px;
+                            background: #f1c100;
+                            border-color: #ffe08b;
+                            box-shadow: 0 0 14px rgba(241, 193, 0, 0.35);
+                        }
+                        .asset-map-marker--hangar {
+                            border-radius: 9999px;
+                            background: #cbd5e1;
+                            border-color: rgba(255, 255, 255, 0.75);
+                            box-shadow: 0 0 12px rgba(226, 232, 240, 0.2);
+                        }
+                        .asset-map-marker--repair {
+                            border-radius: 9999px;
+                            background: #ffb4ab;
+                            border-color: #ffd2cd;
+                            box-shadow: 0 0 14px rgba(255, 180, 171, 0.35);
+                        }
+                        .asset-map-marker.is-selected {
+                            box-shadow: 0 0 18px rgba(130, 207, 255, 0.85);
+                            transform: scale(1.2);
+                        }
+                        .asset-map-marker--airborne.is-selected {
+                            transform: rotate(45deg) scale(1.2);
+                        }
+                        .asset-map-base {
+                            width: 18px;
+                            height: 18px;
+                            border-radius: 9999px;
+                            border: 1px solid rgba(198, 231, 255, 0.9);
+                            background: rgba(0, 0, 0, 0.16);
+                            box-shadow: 0 0 18px rgba(130, 207, 255, 0.35);
+                            position: relative;
+                        }
+                        .asset-map-base::after {
+                            content: "";
+                            position: absolute;
+                            inset: 4px;
+                            border-radius: 9999px;
+                            background: #82cfff;
+                        }
+                        .leaflet-tooltip.asset-map-tooltip {
+                            background: rgba(2, 6, 23, 0.78);
+                            border: 1px solid rgba(130, 207, 255, 0.28);
+                            color: #e5e7eb;
+                            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+                            border-radius: 6px;
+                            padding: 6px 10px;
+                            font-family: Inter, sans-serif;
+                        }
+                        .leaflet-tooltip.asset-map-tooltip::before {
+                            display: none;
+                        }
+                        .leaflet-tooltip.asset-map-tooltip--base {
+                            color: #82cfff;
+                            margin-left: 10px;
+                            letter-spacing: 0.04em;
+                        }
+                        .leaflet-tooltip.asset-map-tooltip--asset {
+                            min-width: 120px;
+                        }
+                        .leaflet-tooltip.asset-map-tooltip--asset .asset-map-tooltip__meta {
+                            margin-top: 2px;
+                            color: #94a3b8;
+                            font-size: 10px;
+                        }
+                        .asset-map-fallback {
+                            display: grid;
+                            place-items: center;
+                            width: 100%;
+                            height: 100%;
+                            color: #cbd5e1;
+                            font: 500 12px/1.4 Inter, sans-serif;
+                            letter-spacing: 0.04em;
+                            text-transform: uppercase;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+
+                function ensureLeafletAssets() {
+                    if (window.L) return Promise.resolve();
+                    if (window.__assetTrackingLeafletPromise) return window.__assetTrackingLeafletPromise;
+
+                    window.__assetTrackingLeafletPromise = new Promise((resolve, reject) => {
+                        if (!document.getElementById("asset-tracking-leaflet-css")) {
+                            const css = document.createElement("link");
+                            css.id = "asset-tracking-leaflet-css";
+                            css.rel = "stylesheet";
+                            css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+                            document.head.appendChild(css);
+                        }
+
+                        const existingScript = document.getElementById("asset-tracking-leaflet-js");
+                        if (existingScript) {
+                            existingScript.addEventListener("load", () => resolve(), { once: true });
+                            existingScript.addEventListener("error", () => reject(new Error("Leaflet failed to load.")), { once: true });
+                            return;
+                        }
+
+                        const script = document.createElement("script");
+                        script.id = "asset-tracking-leaflet-js";
+                        script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+                        script.onload = () => resolve();
+                        script.onerror = () => reject(new Error("Leaflet failed to load."));
+                        document.head.appendChild(script);
+                    });
+
+                    return window.__assetTrackingLeafletPromise;
+                }
+
+                function parseLatLon(value) {
+                    const match = /([0-9.]+)N\s*\/\s*([0-9.]+)E/.exec(value || "");
+                    if (!match) return null;
+                    return {
+                        lat: Number(match[1]),
+                        lon: Number(match[2])
+                    };
+                }
+
+                function getAssetCoordinates(asset) {
+                    return parseLatLon(asset.latlon) || baseLocations[asset.base] || null;
+                }
+
+                function formatLatLon(asset) {
+                    const coords = getAssetCoordinates(asset);
+                    if (!coords) return asset.latlon || "Position unavailable";
+                    return `${coords.lat.toFixed(3)}N / ${coords.lon.toFixed(3)}E`;
+                }
+
+                function markerClass(asset) {
+                    if (asset.state === "Repair") return "asset-map-marker--repair";
+                    if (asset.state === "Hangar") return "asset-map-marker--hangar";
+                    if (asset.state === "On Field") return "asset-map-marker--field";
+                    return "asset-map-marker--airborne";
+                }
+
+                function dataLinkTone(value) {
+                    if (value === "Offline") return "text-outline";
+                    if (value === "Standby") return "text-tertiary";
+                    if (value === "Command Node") return "text-primary";
+                    return "text-primary";
+                }
+
+                function parseMissionMinutes(value) {
+                    let match = /^(\d+)\s*min$/i.exec(value || "");
+                    if (match) return Number(match[1]);
+                    match = /^(\d+)h\s+(\d+)m$/i.exec(value || "");
+                    if (match) return Number(match[1]) * 60 + Number(match[2]);
+                    return null;
+                }
+
+                function formatMissionMinutes(totalMinutes) {
+                    if (totalMinutes >= 60) {
+                        const hours = Math.floor(totalMinutes / 60);
+                        const minutes = totalMinutes % 60;
+                        return `${hours}h ${minutes}m`;
+                    }
+                    return `${totalMinutes} min`;
+                }
+
+                function parseReadySeconds(value) {
+                    const match = /^Ready in\s+(\d{2}):(\d{2})$/i.exec(value || "");
+                    if (!match) return null;
+                    return Number(match[1]) * 60 + Number(match[2]);
+                }
+
+                function formatReadySeconds(totalSeconds) {
+                    const minutes = Math.floor(totalSeconds / 60);
+                    const seconds = totalSeconds % 60;
+                    return `Ready in ${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+                }
+
+                function initializeLiveTelemetry() {
+                    assets.forEach((asset, index) => {
+                        asset._baseCoords = parseLatLon(asset.latlon) || baseLocations[asset.base] || null;
+                        asset._missionMinutes = parseMissionMinutes(asset.missionClock);
+                        asset._readySeconds = parseReadySeconds(asset.readiness);
+                        asset._tickOffset = index * 0.9;
+                    });
+                }
+
+                function tickAirborneAsset(asset) {
+                    if (asset._missionMinutes !== null) {
+                        asset._missionMinutes += 1;
+                        asset.missionClock = formatMissionMinutes(asset._missionMinutes);
+                    }
+
+                    if (liveTick % 2 === 0) {
+                        asset.fuel = Math.max(18, asset.fuel - 1);
+                    }
+
+                    if (!asset._baseCoords) return;
+
+                    const latAmplitude = asset.id === "GLF-551" ? 0.055 : 0.022;
+                    const lonAmplitude = asset.id === "GLF-551" ? 0.085 : 0.038;
+                    const phase = liveTick * 0.34 + asset._tickOffset;
+                    const lat = asset._baseCoords.lat + Math.sin(phase) * latAmplitude;
+                    const lon = asset._baseCoords.lon + Math.cos(phase) * lonAmplitude;
+                    asset.latlon = `${lat.toFixed(3)}N / ${lon.toFixed(3)}E`;
+                }
+
+                function tickGroundAsset(asset) {
+                    if (asset._readySeconds !== null && asset._readySeconds > 0) {
+                        asset._readySeconds = Math.max(0, asset._readySeconds - 30);
+                        asset.readiness = formatReadySeconds(asset._readySeconds);
+                    }
+
+                    if ((asset.state === "On Field" || asset.state === "Hangar") && asset.fuel < 99 && liveTick % 2 === 1) {
+                        asset.fuel += 1;
+                    }
+                }
+
+                function runLiveTelemetryTick() {
+                    liveTick += 1;
+
+                    assets.forEach(asset => {
+                        if (asset.state === "Airborne") {
+                            tickAirborneAsset(asset);
+                            return;
+                        }
+
+                        if (asset.state === "On Field" || asset.state === "Hangar") {
+                            tickGroundAsset(asset);
+                        }
+                    });
+
+                    renderKPIs();
+                    renderTable();
+                    renderMap();
+                    renderDetail();
+                }
+
+                function startLiveTelemetry() {
+                    initializeLiveTelemetry();
+                    if (liveTelemetryTimer) clearInterval(liveTelemetryTimer);
+                    liveTelemetryTimer = setInterval(runLiveTelemetryTick, 4000);
+                }
+
+                function buildAssetMarker(asset, isSelected) {
+                    const classes = [
+                        "asset-map-marker",
+                        markerClass(asset),
+                        isSelected ? "is-selected" : ""
+                    ].filter(Boolean).join(" ");
+
+                    return L.divIcon({
+                        className: "",
+                        iconSize: [18, 18],
+                        iconAnchor: [9, 9],
+                        html: `<div class="${classes}"></div>`
+                    });
+                }
+
+                function updateMapSelectionSummary() {
+                    if (!selectedAssetId) {
+                        mapSelection.textContent = "Select an asset to inspect exact coordinates. Live telemetry remains active.";
+                        return;
+                    }
+
+                    const asset = assets.find(item => item.id === selectedAssetId);
+                    const coords = asset ? getAssetCoordinates(asset) : null;
+                    if (!asset || !coords) {
+                        mapSelection.textContent = "Select an asset to inspect exact coordinates. Live telemetry remains active.";
+                        return;
+                    }
+
+                    mapSelection.textContent = `${asset.name} | ${formatLatLon(asset)} | ${asset.state}`;
+                }
+
+                async function focusSelectedAsset() {
+                    if (!selectedAssetId) return;
+                    try {
+                        await ensureMapReady();
+                    } catch {
+                        return;
+                    }
+
+                    if (!assetMap) return;
+                    const asset = assets.find(item => item.id === selectedAssetId);
+                    const coords = asset ? getAssetCoordinates(asset) : null;
+                    if (!asset || !coords) return;
+
+                    const nextZoom = Math.max(assetMap.getZoom(), asset.state === "Airborne" ? 7 : 8);
+                    assetMap.flyTo([coords.lat, coords.lon], nextZoom, {
+                        animate: true,
+                        duration: 0.45
+                    });
+                }
+
+                function ensureMapReady() {
+                    if (mapReadyPromise) return mapReadyPromise;
+
+                    mapReadyPromise = (async () => {
+                        ensureAssetMapStyles();
+                        await ensureLeafletAssets();
+
+                        if (!mapCanvas) return;
+
+                        assetMap = L.map(mapCanvas, {
+                            zoomControl: true,
+                            attributionControl: true,
+                            preferCanvas: true
+                        });
+
+                        mapCanvas.classList.add("asset-leaflet-map");
+
+                        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+                            subdomains: "abcd",
+                            maxZoom: 18,
+                            attribution: "&copy; OpenStreetMap &copy; CARTO"
+                        }).addTo(assetMap);
+
+                        assetMap.fitBounds([
+                            [54.0, 10.5],
+                            [66.9, 24.8]
+                        ], {
+                            padding: [18, 18]
+                        });
+
+                        assetMap.on("click", () => {
+                            if (!selectedAssetId) return;
+                            selectedAssetId = null;
+                            renderTable();
+                            renderMap();
+                            renderDetail();
+                        });
+
+                        baseMarkerLayer = L.layerGroup().addTo(assetMap);
+                        assetMarkerLayer = L.layerGroup().addTo(assetMap);
+                        requestAnimationFrame(() => assetMap.invalidateSize());
+                    })().catch((error) => {
+                        mapCanvas.innerHTML = `<div class="asset-map-fallback">Map layer unavailable</div>`;
+                        if (mapSelection) {
+                            mapSelection.textContent = "Map service unavailable. Asset data remains available in the table.";
+                        }
+                        throw error;
+                    });
+
+                    return mapReadyPromise;
+                }
 
                 function filteredAssets() {
                     if (activeFilter === "all") return assets;
@@ -459,8 +786,8 @@
 
                 function renderTable() {
                     const visibleAssets = filteredAssets();
-                    if (!visibleAssets.some(asset => asset.id === selectedAssetId)) {
-                        selectedAssetId = visibleAssets[0]?.id || assets[0].id;
+                    if (selectedAssetId && !visibleAssets.some(asset => asset.id === selectedAssetId)) {
+                        selectedAssetId = null;
                     }
 
                     tableBody.innerHTML = visibleAssets.map(asset => `
@@ -486,41 +813,128 @@
                             </td>
                             <td class="py-3 px-4">
                                 <div>${asset.sector}</div>
-                                <div class="text-[10px] text-outline">${asset.latlon}</div>
+                                <div class="text-[10px] text-outline">${formatLatLon(asset)}</div>
                             </td>
                         </tr>
                     `).join("");
                 }
 
-                function renderMap() {
-                    mapLayer.innerHTML = assets.map(asset => {
+                async function renderMap() {
+                    try {
+                        await ensureMapReady();
+                    } catch {
+                        return;
+                    }
+
+                    if (!assetMap || !assetMarkerLayer || !baseMarkerLayer) return;
+
+                    assetMarkerLayer.clearLayers();
+                    baseMarkerLayer.clearLayers();
+
+                    Object.entries(baseLocations).forEach(([name, coords]) => {
+                        const baseMarker = L.marker([coords.lat, coords.lon], {
+                            interactive: false,
+                            icon: L.divIcon({
+                                className: "",
+                                iconSize: [18, 18],
+                                iconAnchor: [9, 9],
+                                html: `<div class="asset-map-base"></div>`
+                            })
+                        });
+
+                        baseMarker.bindTooltip(name, {
+                            permanent: true,
+                            direction: "right",
+                            offset: [12, 0],
+                            className: "asset-map-tooltip asset-map-tooltip--base"
+                        });
+
+                        baseMarker.addTo(baseMarkerLayer);
+                    });
+
+                    assets.forEach((asset) => {
+                        const coords = getAssetCoordinates(asset);
+                        if (!coords) return;
+
                         const isSelected = asset.id === selectedAssetId;
-                        const isAirborne = asset.state === "Airborne";
-                        return `
-                            <button type="button" data-map-asset-id="${asset.id}" class="absolute pointer-events-auto" style="top:${asset.mapTop}%; left:${asset.mapLeft}%;">
-                                <div class="relative -translate-x-1/2 -translate-y-1/2">
-                                    <div class="${isAirborne ? "rotate-45" : "rounded-full"} ${asset.state === "Repair" ? "bg-error border-error" : asset.color === "tertiary" ? "bg-tertiary border-tertiary" : "bg-primary border-primary"} w-3 h-3 border ${isSelected ? "shadow-[0_0_16px_rgba(130,207,255,0.9)] scale-125" : "shadow-[0_0_10px_rgba(130,207,255,0.45)]"}"></div>
-                                    ${isSelected ? `<div class="absolute inset-[-10px] rounded-full border border-primary/40 animate-ping"></div>` : ""}
-                                    ${isSelected ? `
-                                        <div class="absolute top-full left-1/2 mt-2 -translate-x-1/2 px-2 py-1 rounded-sm bg-slate-950/60 backdrop-blur-sm shadow-[0_4px_14px_rgba(0,0,0,0.24)] border ${asset.state === "Repair" ? "border-error/30 text-error" : "border-outline-variant/70 text-on-surface"} text-[9px] font-data-mono whitespace-nowrap">
-                                            ${asset.name}
-                                        </div>
-                                    ` : ""}
-                                </div>
-                            </button>
-                        `;
-                    }).join("");
+                        const marker = L.marker([coords.lat, coords.lon], {
+                            icon: buildAssetMarker(asset, isSelected)
+                        });
+
+                        marker.on("click", (event) => {
+                            if (event.originalEvent) {
+                                L.DomEvent.stop(event.originalEvent);
+                            }
+                            selectedAssetId = asset.id;
+                            renderTable();
+                            renderMap();
+                            renderDetail();
+                            focusSelectedAsset();
+                        });
+
+                        if (isSelected) {
+                            marker.bindTooltip(
+                                `<div>${asset.name}</div><div class="asset-map-tooltip__meta">${formatLatLon(asset)}</div>`,
+                                {
+                                    permanent: true,
+                                    direction: "top",
+                                    offset: [0, -10],
+                                    className: "asset-map-tooltip asset-map-tooltip--asset"
+                                }
+                            );
+                        }
+
+                        marker.addTo(assetMarkerLayer);
+                    });
+
+                    updateMapSelectionSummary();
                 }
 
                 function renderDetail() {
-                    const asset = assets.find(item => item.id === selectedAssetId) || assets[0];
+                    const asset = selectedAssetId ? assets.find(item => item.id === selectedAssetId) : null;
+                    if (!asset) {
+                        detail.innerHTML = `
+                            <div class="border border-outline-variant bg-surface-container-low p-4">
+                                <div class="text-[10px] font-label-caps text-outline uppercase tracking-[0.18em]">No Asset Selected</div>
+                                <div class="mt-2 text-[24px] font-['Space_Grotesk'] font-bold text-on-surface">Map view cleared</div>
+                                <div class="mt-1 text-[12px] font-data-mono text-on-surface-variant">Click a row or map marker to inspect live telemetry.</div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="border border-outline-variant bg-surface-container-low p-3">
+                                    <div class="text-[9px] font-label-caps text-outline uppercase">Fuel</div>
+                                    <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-outline">--</div>
+                                </div>
+                                <div class="border border-outline-variant bg-surface-container-low p-3">
+                                    <div class="text-[9px] font-label-caps text-outline uppercase">Mission Clock</div>
+                                    <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-outline">--</div>
+                                </div>
+                                <div class="border border-outline-variant bg-surface-container-low p-3">
+                                    <div class="text-[9px] font-label-caps text-outline uppercase">Data Link</div>
+                                    <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-outline">--</div>
+                                </div>
+                                <div class="border border-outline-variant bg-surface-container-low p-3">
+                                    <div class="text-[9px] font-label-caps text-outline uppercase">ROE State</div>
+                                    <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-outline">--</div>
+                                </div>
+                            </div>
+                            <div class="border border-outline-variant bg-surface-container-low p-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-[9px] font-label-caps text-outline uppercase">Commander Notes</div>
+                                    <span class="text-[10px] font-data-mono text-outline">LIVE</span>
+                                </div>
+                                <p class="mt-2 text-[12px] leading-relaxed text-on-surface-variant">The dashboard keeps updating fuel, readiness, and airborne positions even when no asset is selected.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
                     const tone = asset.state === "Repair" ? "border-error/30 bg-error/10 text-error" : asset.state === "Airborne" ? "border-primary/30 bg-primary/10 text-primary" : "border-tertiary/30 bg-tertiary/10 text-tertiary";
 
                     detail.innerHTML = `
                         <div class="border ${tone} p-4">
                             <div class="text-[10px] font-label-caps uppercase tracking-[0.18em]">${asset.type}</div>
                             <div class="mt-2 text-[26px] font-['Space_Grotesk'] font-bold ${asset.state === "Repair" ? "text-on-error-container" : "text-on-surface"}">${asset.name}</div>
-                            <div class="mt-1 text-[12px] font-data-mono ${asset.state === "Repair" ? "text-on-error-container/80" : "text-on-surface-variant"}">${asset.base} | ${asset.state} | ${asset.latlon}</div>
+                            <div class="mt-1 text-[12px] font-data-mono ${asset.state === "Repair" ? "text-on-error-container/80" : "text-on-surface-variant"}">${asset.base} | ${asset.state} | ${formatLatLon(asset)}</div>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div class="border border-outline-variant bg-surface-container-low p-3">
@@ -533,7 +947,7 @@
                             </div>
                             <div class="border border-outline-variant bg-surface-container-low p-3">
                                 <div class="text-[9px] font-label-caps text-outline uppercase">Data Link</div>
-                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-primary">${asset.datalink}</div>
+                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold ${dataLinkTone(asset.datalink)}">${asset.datalink}</div>
                             </div>
                             <div class="border border-outline-variant bg-surface-container-low p-3">
                                 <div class="text-[9px] font-label-caps text-outline uppercase">ROE State</div>
@@ -570,6 +984,7 @@
                     renderTable();
                     renderMap();
                     renderDetail();
+                    focusSelectedAsset();
                 });
 
                 tableBody.addEventListener("keydown", (event) => {
@@ -581,17 +996,10 @@
                     renderTable();
                     renderMap();
                     renderDetail();
+                    focusSelectedAsset();
                 });
 
-                mapLayer.addEventListener("click", (event) => {
-                    const marker = event.target.closest("[data-map-asset-id]");
-                    if (!marker) return;
-                    selectedAssetId = marker.dataset.mapAssetId;
-                    renderTable();
-                    renderMap();
-                    renderDetail();
-                });
-
+                startLiveTelemetry();
                 renderKPIs();
                 renderTable();
                 renderMap();
