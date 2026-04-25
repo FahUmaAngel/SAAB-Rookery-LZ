@@ -7,6 +7,7 @@
     <title>C2 // TACTICAL MAP</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="tailwind.config.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
 </head>
 
 <body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
@@ -178,6 +179,13 @@
                                 <span class="font-data-mono text-[10px] text-on-surface-variant">UAV / DRÖNARE</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Threat Event Toast Overlay -->
+                <div id="threat-event-toast" class="absolute top-[15%] left-[50%] hidden pointer-events-none -translate-x-1/2 z-[550] flex flex-col items-center gap-2">
+                    <div id="threat-toast-content" class="bg-surface/90 border border-outline px-4 py-2 text-center backdrop-blur shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                        <!-- Message goes here -->
                     </div>
                 </div>
 
@@ -678,37 +686,126 @@
                     });
                     L.marker(trajectoryEnd, { icon: arrowIcon, interactive: false }).addTo(tracksGroup);
 
-                    const swedenBoundary = [
-                        [69.06, 20.55], [68.35, 18.12], [66.39, 15.41], [65.61, 14.47],
-                        [64.15, 13.97], [63.07, 14.75], [62.09, 14.78], [61.06, 14.19],
-                        [59.77, 12.44], [59.07, 11.21], [58.17, 11.12], [56.91, 12.49],
-                        [55.34, 12.87], [55.38, 14.19], [56.13, 15.98], [56.51, 16.43],
-                        [57.68, 16.63], [58.76, 16.83], [59.38, 17.01], [60.13, 17.64],
-                        [60.31, 18.35], [60.63, 17.41], [61.87, 17.22], [63.30, 18.62],
-                        [63.70, 20.23], [65.25, 21.56], [65.87, 24.16], [66.39, 23.64],
-                        [67.36, 23.78], [68.06, 20.68], [69.06, 20.55]
-                    ];
+                    // Threat Tracking Logic & Animation
+                    let trackProgress = 0;
+                    let crossedFir = false;
+                    let crossedSov = false;
+                    
+                    function updateThreatState(msg, type) {
+                        const toast = document.getElementById('threat-event-toast');
+                        const content = document.getElementById('threat-toast-content');
+                        toast.classList.remove('hidden');
+                        
+                        if (type === 'CRITICAL') {
+                            content.className = "bg-error/20 border-2 border-error px-6 py-3 text-center backdrop-blur shadow-[0_0_20px_rgba(255,85,85,0.6)]";
+                            content.innerHTML = `<span class="material-symbols-outlined text-error text-[24px] align-middle mr-2">warning</span><span class="text-[12px] font-data-mono text-error font-bold uppercase tracking-widest align-middle">${msg}</span>`;
+                            const mainSection = document.querySelector('section.flex-grow');
+                            mainSection.classList.add('border-error');
+                            mainSection.style.boxShadow = 'inset 0 0 60px rgba(255,85,85,0.6)';
+                            document.querySelector('.hostile-diamond').style.animationDuration = '0.5s'; // faster pulse
+                        } else {
+                            content.className = "bg-surface/90 border border-[#82cfff] px-4 py-2 text-center backdrop-blur shadow-[0_0_15px_rgba(130,207,255,0.3)]";
+                            content.innerHTML = `<span class="text-[10px] font-data-mono text-[#82cfff] uppercase tracking-widest block">${msg}</span>`;
+                            setTimeout(() => { toast.classList.add('hidden'); }, 6000);
+                        }
+                    }
 
-                    const boundaryPoly = L.polygon(swedenBoundary, {
-                        color: '#00AEEF',
-                        weight: 2,
-                        fillColor: 'rgba(0, 174, 239, 0.03)',
-                        fillOpacity: 1,
-                        dashArray: '8 4',
+                    // Threat check logic (variables already declared above)
+                    
+                    window.updateHostilePosition = function(lat, lng) {
+                        if (hostileMarker) hostileMarker.setLatLng([lat, lng]);
+                        
+                        if (window.turf && window.esaaFirGeoJson && !crossedFir) {
+                            if (turf.booleanPointInPolygon([lng, lat], window.esaaFirGeoJson)) {
+                                crossedFir = true;
+                                updateThreatState("INFO: TRACK ENTERED ESAA FIR", "INFO");
+                            }
+                        }
+                        
+                        if (window.turf && window.sovereignBufferPolygon && !crossedSov) {
+                            if (turf.booleanPointInPolygon([lng, lat], window.sovereignBufferPolygon)) {
+                                crossedSov = true;
+                                updateThreatState("CRITICAL: SOVEREIGN AIRSPACE VIOLATION", "CRITICAL");
+                            }
+                        }
+                    };
+
+                    // Sweden Land Border (GeoJSON)
+                    const sweGeoJSON = {"type": "FeatureCollection","features": [{"type": "Feature","id": "SWE","properties": {"name": "Sweden"},"geometry": {"type": "MultiPolygon","coordinates": [[[[22.183173, 65.723741],[21.213517, 65.026005],[21.369631, 64.413588],[19.778876, 63.609554],[17.847779, 62.7494],[17.119555, 61.341166],[17.831346, 60.636583],[18.787722, 60.081914],[17.869225, 58.953766],[16.829185, 58.719827],[16.44771, 57.041118],[15.879786, 56.104302],[14.666681, 56.200885],[14.100721, 55.407781],[12.942911, 55.361737],[12.625101, 56.30708],[11.787942, 57.441817],[11.027369, 58.856149],[11.468272, 59.432393],[12.300366, 60.117933],[12.631147, 61.293572],[11.992064, 61.800362],[11.930569, 63.128318],[12.579935, 64.066219],[13.571916, 64.049114],[13.919905, 64.445421],[13.55569, 64.787028],[15.108411, 66.193867],[16.108712, 67.302456],[16.768879, 68.013937],[17.729182, 68.010552],[17.993868, 68.567391],[19.87856, 68.407194],[20.025269, 69.065139],[20.645593, 69.106247],[21.978535, 68.616846],[23.539473, 67.936009],[23.56588, 66.396051],[23.903379, 66.006927],[22.183173, 65.723741]]],[[[17.061767, 57.385783],[17.210083, 57.326521],[16.430053, 56.179196],[16.364135, 56.556455],[17.061767, 57.385783]]],[[[19.357910, 57.958588],[18.803100, 57.651279],[18.825073, 57.444949],[18.995361, 57.441993],[18.951416, 57.370976],[18.693237, 57.305756],[18.709716, 57.204734],[18.462524, 57.127295],[18.319702, 56.926992],[18.105468, 56.891003],[18.187866, 57.109402],[18.072509, 57.267163],[18.154907, 57.394664],[18.094482, 57.545312],[18.660278, 57.929434],[19.039306, 57.941098],[19.105224, 57.993543],[19.374389, 57.996454],[19.357910, 57.958588]]],[[[20.846557, 63.823710],[21.066284, 63.829768],[20.972900, 63.715670],[20.824584, 63.579121],[20.695495, 63.591340],[20.819091, 63.714454],[20.799865, 63.780059],[20.846557, 63.823710]]]]}}]};
+
+                    L.geoJSON(sweGeoJSON, {
+                        style: {
+                            color: '#00AEEF',
+                            weight: 2,
+                            fillColor: 'rgba(0, 174, 239, 0.03)',
+                            fillOpacity: 1,
+                            dashArray: '8 4'
+                        },
                         interactive: false
                     }).addTo(boundaryGroup);
 
-                    const waterBoundary = L.polygon(swedenBoundary.map(([lat, lng]) => {
-                        const cx = 62.0, cy = 17.5;
-                        const scale = 1.08;
-                        return [cx + (lat - cx) * scale, cy + (lng - cy) * scale];
-                    }), {
-                        color: 'rgba(0, 174, 239, 0.15)',
-                        weight: 1,
-                        fill: false,
-                        dashArray: '3 8',
-                        interactive: false
-                    }).addTo(boundaryGroup);
+                    if (window.turf) {
+                        try {
+                            const bufferedSovereign = turf.buffer(sweGeoJSON, 22.2, { units: 'kilometers' });
+                            L.geoJSON(bufferedSovereign, {
+                                style: {
+                                    color: '#ff4444',
+                                    weight: 2,
+                                    fill: false
+                                },
+                                interactive: false
+                            }).addTo(boundaryGroup);
+                            window.sovereignBufferPolygon = bufferedSovereign;
+                            
+                            // 12 NM Label inside the buffer curve
+                            const sovLabel = L.divIcon({
+                                className: '',
+                                html: `<div style="
+                                    font-family:'Inter',monospace; font-size:7px; font-weight:600;
+                                    letter-spacing:0.12em; color:rgba(255,68,68,0.8);
+                                    white-space:nowrap; pointer-events:none;
+                                    transform: rotate(-20deg) translateY(-8px); transform-origin: left center;
+                                ">SOV AIRSPACE // 12NM LIMIT</div>`,
+                                iconSize: [120, 12],
+                                iconAnchor: [0, 6]
+                            });
+                            // roughly eastern boundary near Stockhokm archipelago
+                            L.marker([59.5, 19.3], { icon: sovLabel, interactive: false }).addTo(boundaryGroup);
+                            
+                        } catch (e) { console.warn("Turf bug:", e); window.sovereignBufferPolygon = null; }
+                    }
+
+                    // ESAA FIR Polygon (Sweden Flight Information Region)
+                    if (window.turf) {
+                        const esaaPolyCoords = [
+                            // [lng, lat]
+                            [12.8, 55.3], [19.0, 55.3], [20.5, 59.0], [24.1, 65.8],
+                            [20.5, 69.0], [15.0, 69.0], [10.5, 58.9], [12.8, 55.3]
+                        ];
+                        const esaaFirGeoJson = turf.polygon([esaaPolyCoords]);
+                        L.geoJSON(esaaFirGeoJson, {
+                            style: {
+                                color: '#00AEEF',
+                                weight: 2,
+                                dashArray: '4 6',
+                                fill: false
+                            },
+                            interactive: false
+                        }).addTo(boundaryGroup);
+                        window.esaaFirGeoJson = esaaFirGeoJson;
+                        
+                        const firLabel = L.divIcon({
+                            className: '',
+                            html: `<div style="
+                                font-family:'Inter',monospace; font-size:8px; font-weight:600;
+                                letter-spacing:0.1em; color:rgba(0,174,239,0.5);
+                                white-space:nowrap; pointer-events:none;
+                            ">ESAA FIR LIMIT</div>`,
+                            iconSize: [80, 12],
+                            iconAnchor: [40, 6]
+                        });
+                        L.marker([58.0, 20.2], { icon: firLabel, interactive: false }).addTo(boundaryGroup);
+                    }
 
                     window.toggleLayer = function(layerName) {
                         layerState[layerName] = !layerState[layerName];
@@ -1016,6 +1113,12 @@
                         L.marker([alert.depletedLat, alert.depletedLng], { icon: warningIcon, interactive: false, zIndexOffset: 1100 }).addTo(predictiveGroup);
                     };
                     window.addEventListener('ai-predictive-alert', window._tacticalPredictiveListener);
+                    
+                    setTimeout(() => {
+                        if (window.tacticalMapInstance) {
+                            window.tacticalMapInstance.invalidateSize();
+                        }
+                    }, 250);
                 });
             })();
             </script>
