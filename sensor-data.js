@@ -41,6 +41,8 @@ const SensorDataEngine = {
         // Interceptor (Gripen-1)
         interceptor: {
             callsign: 'GRIPEN-1',
+            lat: 57.15,              // Starting lat (south of bogey)
+            lon: 18.90,              // Starting lon (west of bogey)
             heading: 45,
             speed: 1.25,             // Mach
             altitude: 28500,
@@ -205,6 +207,11 @@ const SensorDataEngine = {
         i.speed = this._clamp(+(i.speed + this._jitter(0, 0.005)).toFixed(2), 0.90, 1.60);
         i.altitude = this._clamp(Math.round(i.altitude + this._jitter(-30, 30)), 20000, 35000);
 
+        // Move interceptor position based on heading
+        const iRad = (i.heading * Math.PI) / 180;
+        i.lat += Math.cos(iRad) * 0.001 + this._jitter(0, 0.0001);
+        i.lon += Math.sin(iRad) * 0.0018 + this._jitter(0, 0.0002);
+
         // --- Sensor confidence jitter ---
         s.radar.confidence = this._clamp(Math.round(s.radar.confidence + this._jitter(0, 2)), 75, 99);
         s.esm.confidence = this._clamp(Math.round(s.esm.confidence + this._jitter(0, 3)), 60, 95);
@@ -213,6 +220,12 @@ const SensorDataEngine = {
             +((s.radar.confidence * 0.5 + s.esm.confidence * 0.3 + s.satellite.confidence * 0.2) / 1).toFixed(1),
             70, 99
         );
+
+        // --- Threat Score (dynamic) ---
+        const rangeScore = this._clamp(100 - (t.range * 2), 0, 100);
+        const closureScore = this._clamp(Math.abs(t.closureRate) / 7, 0, 100);
+        const speedScore = this._clamp((t.speed - 0.5) * 100, 0, 100);
+        this.state.threatScore = Math.round(rangeScore * 0.5 + closureScore * 0.3 + speedScore * 0.2);
 
         // --- Timestamp ---
         const now = new Date();
