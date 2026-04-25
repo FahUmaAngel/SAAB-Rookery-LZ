@@ -400,7 +400,7 @@
                 <div style="font-family:'Inter',monospace;">
                     <div style="color:#ffb4ab; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">TRK-842 — HOSTILE</div>
                     <div style="color:#87929b; font-size:9px;">ID: SU-27 FLANKER</div>
-                    <div style="color:#87929b; font-size:9px;">SPEED: MACH 1.2</div>
+                    <div style="color:#87929b; font-size:9px;">SPEED: MACH 0.85</div>
                     <div style="color:#87929b; font-size:9px;">ALT: 32,000 FT</div>
                     <div style="color:#87929b; font-size:9px;">BRG: 274° TRUE</div>
                     <div style="color:#ffb4ab; font-size:9px; margin-top:4px; font-weight:600;">⚠ TRANSPONDER: OFF</div>
@@ -411,12 +411,12 @@
         // ── AI Probability Cone ──
         // Widening polygon in front of TRK-842 showing 10-min prediction
         const coneTip = hostilePos;
-        const coneNarrow1 = [58.60, 20.5];
-        const coneNarrow2 = [58.40, 20.5];
-        const coneMid1    = [58.80, 19.0];
-        const coneMid2    = [58.20, 19.0];
-        const coneWide1   = [59.10, 17.2];
-        const coneWide2   = [57.90, 17.2];
+        const coneNarrow1 = [58.75, 20.5];
+        const coneNarrow2 = [58.55, 20.5];
+        const coneMid1    = [58.83, 19.0];
+        const coneMid2    = [58.23, 19.0];
+        const coneWide1   = [59.00, 17.2];
+        const coneWide2   = [57.80, 17.2];
 
         L.polygon([coneTip, coneNarrow1, coneMid1, coneWide1, coneWide2, coneMid2, coneNarrow2], {
             color: 'rgba(255,180,171,0.25)',
