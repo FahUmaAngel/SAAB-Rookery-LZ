@@ -178,6 +178,16 @@
                 </div>
                 <!-- Telemetry & Action Sidebar -->
                 <div class="flex flex-col gap-gutter">
+                    <!-- Predictive Logistics Alert Container -->
+                    <div id="predictive-alert-container" class="hidden bg-error-container/20 border-2 border-error/50 p-panel-padding flex-col gap-2 rounded-none relative animate-pulse">
+                        <div class="flex justify-between items-center">
+                            <span class="font-label-caps text-label-caps text-error tracking-widest font-black">STRATEGIC RELOCATION ALERT</span>
+                            <span class="material-symbols-outlined text-error text-[18px]">warning</span>
+                        </div>
+                        <span id="predictive-alert-msg" class="font-data-mono text-[10px] text-error/90 leading-tight"></span>
+                        <button onclick="approveRelocation()" class="mt-2 w-full py-1.5 bg-error/20 hover:bg-error/40 border border-error text-error font-label-caps text-[10px] transition-colors">AUTHORIZE RELOCATION</button>
+                    </div>
+                    
                     <!-- Target Telemetry Bento -->
                     <div
                         class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col gap-3 rounded-none relative">
@@ -407,6 +417,34 @@
                 // Phase UI sync
                 updatePhaseUI(d.phase);
             });
+
+            // --- Predictive Logistics Listener ---
+            window.addEventListener('ai-predictive-alert', (e) => {
+                const alertContainer = document.getElementById('predictive-alert-container');
+                const alertMsg = document.getElementById('predictive-alert-msg');
+                if (alertContainer && alertMsg) {
+                    alertContainer.classList.remove('hidden');
+                    alertContainer.classList.add('flex');
+                    alertMsg.innerHTML = `${e.detail.reason}<br><br><b>SUGGESTED ACTION:</b> Relocate ${e.detail.asset} from ${e.detail.source} to ${e.detail.destination}.`;
+                }
+            });
+
+            function approveRelocation() {
+                const alertContainer = document.getElementById('predictive-alert-container');
+                if (alertContainer) {
+                    alertContainer.classList.remove('flex', 'animate-pulse');
+                    alertContainer.classList.add('hidden');
+                    // Add to log
+                    const logContainer = document.getElementById('comms-log');
+                    if (logContainer) {
+                        const entry = document.createElement('div');
+                        entry.className = "flex gap-2 text-error border-l-2 border-error pl-2 bg-error/5 py-1";
+                        entry.innerHTML = `<span class="text-error w-16 shrink-0 font-bold">[C2:CMD]</span><span class="flex-1">STRATEGIC RELOCATION AUTHORIZED. ASSETS MOVING.</span>`;
+                        logContainer.appendChild(entry);
+                        logContainer.scrollTop = logContainer.scrollHeight;
+                    }
+                }
+            }
         </script>
 </body>
 

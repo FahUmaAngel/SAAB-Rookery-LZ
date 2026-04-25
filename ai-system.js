@@ -79,27 +79,42 @@ const AISystem = {
      */
     suggest: async (data) => {
         AISystem.state.currentPhase = 'SUGGEST';
-        AISystem.log('SUGGEST', "AI Generating tactical suggestions...");
+        AISystem.log('SUGGEST', "AI Evaluating optimal effector (Drönare, Luftvärn, Gripen)...");
         
+        // Basic heuristic for effector selection
+        let suggestedEffector = 'Gripen Interceptor';
+        let actionStr = 'Scramble Gripen 01';
+        if (data.speed < 400 && data.distance < 80) {
+            suggestedEffector = 'Drönare (Recon Drone)';
+            actionStr = 'Deploy Recon Drone for visual ID';
+        } else if (data.speed > 1000 && data.distance < 40) {
+            suggestedEffector = 'Luftvärn (GBAD)';
+            actionStr = 'Activate Patriot/BAMSE Air Defense';
+        }
+
         if (AISystem.state.apiKey) {
-            const aiResponse = await AISystem.callOpenRouter(`Analyze this threat: Speed ${data.speed}kts, Distance ${data.distance}km, IFF ${data.iff ? 'Friendly' : 'Unknown'}. Provide a 1-sentence tactical recommendation for the C2 Commander. Be professional and decisive.`);
+            const prompt = `Analyze this threat: Speed ${data.speed}kts, Distance ${data.distance}km, IFF ${data.iff ? 'Friendly' : 'Unknown'}. 
+            CRITICAL: You MUST choose exactly ONE optimal effector from this list: 1) 'Luftvärn' (Ground-based Air Defense) for close/fast threats, 2) 'Drönare' (Drone) for slow/recon threats, or 3) 'Gripen' (Fighter) for distant/unknown interception. 
+            Provide a 1-sentence tactical recommendation starting with the chosen effector.`;
+            
+            const aiResponse = await AISystem.callOpenRouter(prompt);
             if (aiResponse) {
                 const recommendations = [
-                    { id: 'ai-scramble', action: aiResponse, priority: 'CRITICAL' },
-                    { id: 'warn', action: 'Issue Radio Warning (Standard)', priority: 'MEDIUM' }
+                    { id: 'ai-effector', action: aiResponse, priority: 'CRITICAL' },
+                    { id: 'warn', action: 'Issue Radio/Flare Warning', priority: 'MEDIUM' }
                 ];
                 AISystem.state.suggestions = recommendations;
-                AISystem.log('SUGGEST', `AI Real Response: ${aiResponse}`);
+                AISystem.log('SUGGEST', `AI Effector Selection: ${aiResponse}`);
                 return recommendations;
             }
         }
 
         const recommendations = [
-            { id: 'scramble', action: 'Scramble Gripen 01', priority: 'HIGH' },
+            { id: 'effector', action: actionStr, priority: 'HIGH' },
             { id: 'warn', action: 'Issue Radio Warning', priority: 'MEDIUM' }
         ];
         AISystem.state.suggestions = recommendations;
-        AISystem.log('SUGGEST', `AI suggested: ${recommendations[0].action}`);
+        AISystem.log('SUGGEST', `AI suggested fallback effector: ${suggestedEffector}`);
         return recommendations;
     },
 
@@ -152,6 +167,47 @@ const AISystem = {
         }));
 
         return best;
+    },
+
+    /**
+     * Predictive Logistics & Resource Relocation
+     * Anticipates future shortfalls based on current consumption and recommends strategic asset transfers.
+     */
+    predictiveLogistics: (deployedFromBase) => {
+        AISystem.log('PROTECT', `Analyzing strategic resource impact of deploying from ${deployedFromBase}...`);
+        
+        // Simulated readiness levels
+        const bases = {
+            'F7 Såtenäs': { ready: 8, reserve: 4 },
+            'F17 Kallinge': { ready: 2, reserve: 0 }, // Low readiness
+            'F21 Luleå': { ready: 10, reserve: 6 }    // High readiness
+        };
+
+        // Simulate deployment impact
+        if (bases[deployedFromBase]) {
+            bases[deployedFromBase].ready -= 2;
+        }
+
+        let alertTriggered = false;
+        let suggestion = null;
+
+        // Check for vulnerabilities (e.g., F17 is highly vulnerable if readiness drops)
+        if (bases['F17 Kallinge'].ready <= 2) {
+            alertTriggered = true;
+            suggestion = {
+                type: 'STRATEGIC_RELOCATION',
+                source: 'F21 Luleå',
+                destination: 'F17 Kallinge',
+                asset: '4x JAS 39 Gripen',
+                reason: 'F17 operational readiness below critical threshold. Anticipated escalation in Baltic sector requires preemptive reinforcement.'
+            };
+            AISystem.log('REPORT', `PREDICTIVE ALERT: Suggesting relocation of ${suggestion.asset} from ${suggestion.source} to ${suggestion.destination}.`);
+            
+            // Dispatch event to UI
+            dispatchEvent(new CustomEvent('ai-predictive-alert', { detail: suggestion }));
+        }
+
+        return suggestion;
     },
 
     /**
