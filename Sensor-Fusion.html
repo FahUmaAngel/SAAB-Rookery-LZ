@@ -437,7 +437,6 @@
         <script src="./sensor-data.js"></script>
         <script src="./shared-components.js"></script>
         <script>
-        <script>
             // ═══════════════════════════════════════════════════
             // UTILITY
             // ═══════════════════════════════════════════════════
@@ -645,12 +644,12 @@
                 if (alertContainer && alertMsg) {
                     alertContainer.classList.remove('hidden');
                     alertContainer.classList.add('flex');
-                    alertMsg.innerHTML = `${e.detail.reason}<br><br><b>SUGGESTED ACTION:</b> Relocate ${e.detail.asset} from ${e.detail.source} to ${e.detail.destination}.`;
+                    alertMsg.innerHTML = `${e.detail.message}<br><br><b>SUGGESTED ACTION:</b> Relocate ${e.detail.suggestedTransfer}× JAS 39 from ${e.detail.donorBase} to ${e.detail.depletedBase}.`;
                 }
             });
 
             window.addEventListener('sensor-update', (e) => {
-                const d = e.detail, t = d.target, i = d.interceptor;
+                const d = e.detail, t = d.activeTarget, i = d.interceptor;
                 set('hud-hdg', String(Math.round(i.heading)).padStart(3, '0'));
                 set('hud-mach', i.speed.toFixed(2));
                 set('hud-alt', i.altitude.toLocaleString());
