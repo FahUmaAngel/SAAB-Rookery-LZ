@@ -309,56 +309,6 @@
         }).addTo(map);
 
 
-        // ══════════════════════════════════════════
-        //  SOVEREIGN AIRSPACE BOUNDARY (12nm)
-        // ══════════════════════════════════════════
-
-        // Simplified Swedish coastal 12nm line (offset seaward)
-        const sovereignBoundary = [
-            [55.40, 12.95], [55.45, 14.30], [56.15, 16.10], [56.55, 16.55],
-            [57.30, 16.80], [57.75, 16.75], [58.40, 16.95], [58.80, 17.10],
-            [59.10, 17.30], [59.45, 17.50], [59.80, 17.90], [60.15, 18.10],
-            [60.35, 18.70], [60.50, 19.20], [60.40, 19.80],
-            // Gotland eastern coast
-            [57.95, 19.50], [57.50, 18.80], [57.10, 18.55],
-        ];
-
-        L.polyline(sovereignBoundary, {
-            color: '#ff6b6b',
-            weight: 1.5,
-            dashArray: '8 6',
-            opacity: 0.45,
-            interactive: false
-        }).addTo(map);
-
-        // Gotland sovereign ring
-        const gotlandSovereign = [
-            [57.95, 19.50], [58.00, 19.00], [57.90, 18.50],
-            [57.50, 18.10], [57.10, 18.20], [56.90, 18.60],
-            [57.00, 19.10], [57.30, 19.40], [57.70, 19.60], [57.95, 19.50]
-        ];
-
-        L.polyline(gotlandSovereign, {
-            color: '#ff6b6b',
-            weight: 1,
-            dashArray: '6 8',
-            opacity: 0.3,
-            interactive: false
-        }).addTo(map);
-
-        // Label for sovereign line
-        const sovLabel = L.divIcon({
-            className: '',
-            html: `<div style="
-                font-family:'Inter',monospace; font-size:7px; font-weight:600;
-                letter-spacing:0.12em; color:rgba(255,107,107,0.5);
-                white-space:nowrap; pointer-events:none;
-                transform: rotate(-20deg); transform-origin: left center;
-            ">12 NM SOVEREIGN LIMIT</div>`,
-            iconSize: [120, 12],
-            iconAnchor: [0, 6]
-        });
-        L.marker([58.0, 17.4], { icon: sovLabel, interactive: false }).addTo(map);
 
 
         // ══════════════════════════════════════════
@@ -658,6 +608,32 @@
                 interactive: false
             }).addTo(map);
         });
+
+        // ESAA FIR Polygon (Sweden Flight Information Region)
+        const esaaFirCoords = [
+            // [lat, lng]
+            [55.3, 12.8], [55.3, 19.0], [59.0, 20.5], [65.8, 24.1],
+            [69.0, 20.5], [69.0, 15.0], [58.9, 10.5]
+        ];
+        L.polygon(esaaFirCoords, {
+            color: '#00AEEF',
+            weight: 2,
+            dashArray: '4 6',
+            fill: false,
+            interactive: false
+        }).addTo(map);
+
+        const firLabel = L.divIcon({
+            className: '',
+            html: `<div style="
+                font-family:'Inter',monospace; font-size:8px; font-weight:600;
+                letter-spacing:0.1em; color:rgba(0,174,239,0.5);
+                white-space:nowrap; pointer-events:none;
+            ">ESAA FIR LIMIT</div>`,
+            iconSize: [80, 12],
+            iconAnchor: [40, 6]
+        });
+        L.marker([58.0, 20.2], { icon: firLabel, interactive: false }).addTo(map);
 
         // Central radar sweep decoration
         const sweepIcon = L.divIcon({
