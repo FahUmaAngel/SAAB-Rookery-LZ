@@ -464,7 +464,7 @@
             // --- Live telemetry listener ---
             window.addEventListener('sensor-update', (e) => {
                 const d = e.detail;
-                const t = d.target;
+                const t = d.activeTarget;
                 const i = d.interceptor;
 
                 // HUD updates

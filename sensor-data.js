@@ -12,29 +12,70 @@ const SensorDataEngine = {
         intervalId: null,
         tickCount: 0,
 
-        // Target kinematics
-        target: {
-            callsign: 'BOGEY_GOLF_42',
-            classId: 'SU-27 FLANKER',
-            lat: 57.30,               // Starting lat (near Gotland)
-            lon: 19.05,               // Starting lon
-            heading: 285,             // Degrees, WNW toward Gotland
-            speed: 0.85,              // Mach
-            speedKts: 520,            // Knots ground speed
-            altitude: 32000,          // Feet
-            altitudeTrend: 'DESCENDING',
-            closureRate: -450,        // KTS (negative = closing)
-            range: 12.4,              // NM from interceptor
-            squawk: 'NONE',
-            transponder: false,
-        },
+        // Multiple targets support
+        targets: [
+            {
+                id: 'BOGEY_GOLF_42',
+                callsign: 'BOGEY_GOLF_42',
+                classId: 'SU-27 FLANKER',
+                status: 'HOSTILE',
+                lat: 57.30,
+                lon: 19.05,
+                heading: 285,
+                speed: 0.85,
+                speedKts: 520,
+                altitude: 32000,
+                altitudeTrend: 'DESCENDING',
+                closureRate: -450,
+                range: 12.4,
+                squawk: 'NONE',
+                transponder: false,
+            },
+            {
+                id: 'TANGO_ALPHA_7',
+                callsign: 'TANGO_ALPHA_7',
+                classId: 'TU-95 BEAR',
+                status: 'UNKNOWN',
+                lat: 56.85,
+                lon: 20.15,
+                heading: 220,
+                speed: 0.65,
+                speedKts: 400,
+                altitude: 28000,
+                altitudeTrend: 'LEVEL',
+                closureRate: -200,
+                range: 45.0,
+                squawk: 'NONE',
+                transponder: false,
+            },
+            {
+                id: 'NATO_1',
+                callsign: 'NATO_1',
+                classId: 'F-16C FALCON',
+                status: 'FRIENDLY',
+                lat: 58.10,
+                lon: 17.80,
+                heading: 90,
+                speed: 0.95,
+                speedKts: 580,
+                altitude: 30000,
+                altitudeTrend: 'LEVEL',
+                closureRate: 0,
+                range: 18.0,
+                squawk: '4271',
+                transponder: true,
+            }
+        ],
 
-        // Sensor confidence
+        // Active target index for sidebar detail
+        activeTargetIndex: 0,
+
+        // Sensor confidence (aggregated across all targets)
         sensors: {
             radar: { active: true, confidence: 96 },
             esm: { active: true, confidence: 88, signature: 'FLANKER-H' },
             satellite: { active: true, confidence: 72, source: 'ICEYE-X1' },
-            iff: { active: true, confidence: 0 },   // No IFF response
+            iff: { active: true, confidence: 0 },
         },
         fusedConfidence: 94.2,
 
@@ -42,15 +83,21 @@ const SensorDataEngine = {
         interceptor: {
             callsign: 'GRIPEN-1',
             heading: 45,
-            speed: 1.25,             // Mach
+            speed: 1.25,
             altitude: 28500,
             weaponStatus: 'ARM',
             weaponQty: 4,
         },
 
         // Phase management
-        phase: 3,                    // 1-5 (Detection, Scramble, Visual ID, Warning, Escort)
+        phase: 3,
         threatScore: 85,
+
+        // Historical data for charts (last 60 ticks)
+        history: [],
+
+        // Audio alert settings
+        audioEnabled: false,
     },
 
     /** Comms log messages to cycle through */
@@ -136,12 +183,13 @@ const SensorDataEngine = {
         }
     },
 
-    /** Handle messages from other tabs */
+/** Handle messages from other tabs */
     _onChannelMessage(data) {
         if (data.type === 'tick' && !this._isLeader) {
             // Follower: apply the leader's state snapshot
             const p = data.payload;
-            Object.assign(this.state.target, p.target);
+            this.state.targets = p.targets;
+            this.state.activeTargetIndex = p.activeTargetIndex;
             Object.assign(this.state.interceptor, p.interceptor);
             this.state.sensors.radar = { ...p.sensors.radar };
             this.state.sensors.esm = { ...p.sensors.esm };
@@ -150,11 +198,15 @@ const SensorDataEngine = {
             this.state.phase = p.phase;
             this.state.tickCount = p.tick;
             this.state.threatScore = p.threatScore;
+            this.state.history = p.history || [];
             // Dispatch local event so UI listeners update
             window.dispatchEvent(new CustomEvent('sensor-update', { detail: p }));
         } else if (data.type === 'phase') {
-            // Phase changed on another tab
             this.state.phase = this._clamp(data.phase, 1, 5);
+        } else if (data.type === 'activeTarget') {
+            this.state.activeTargetIndex = data.index;
+        } else if (data.type === 'audioToggle') {
+            this.state.audioEnabled = data.enabled;
         }
     },
 
@@ -175,30 +227,35 @@ const SensorDataEngine = {
     /** Single simulation tick (only executed by leader) */
     _tick() {
         this.state.tickCount++;
-        const t = this.state.target;
+        const targets = this.state.targets;
         const i = this.state.interceptor;
         const s = this.state.sensors;
 
-        // --- Target kinematics ---
-        // Drift heading slightly (±2°)
-        t.heading = this._clampDeg(t.heading + this._jitter(0, 1.5));
-        // Move position based on heading (simplified: ~0.001° per tick at ~520kts)
-        const rad = (t.heading * Math.PI) / 180;
-        t.lat += Math.cos(rad) * 0.0008 + this._jitter(0, 0.0001);
-        t.lon += Math.sin(rad) * 0.0015 + this._jitter(0, 0.0002);
+        // --- Update each target ---
+        targets.forEach((t, idx) => {
+            // Drift heading slightly
+            t.heading = this._clampDeg(t.heading + this._jitter(0, 1.5));
+            // Move position based on heading
+            const rad = (t.heading * Math.PI) / 180;
+            const speedFactor = t.id === 'NATO_1' ? 0.0006 : 0.0008;
+            t.lat += Math.cos(rad) * speedFactor + this._jitter(0, 0.0001);
+            t.lon += Math.sin(rad) * speedFactor * 1.5 + this._jitter(0, 0.0002);
 
-        // Speed fluctuation
-        t.speed = this._clamp(t.speed + this._jitter(0, 0.01), 0.70, 1.10);
-        t.speedKts = Math.round(t.speed * 611);
+            // Speed fluctuation
+            t.speed = this._clamp(t.speed + this._jitter(0, 0.01), 0.60, 1.10);
+            t.speedKts = Math.round(t.speed * 611);
 
-        // Altitude drift (descending bias)
-        const altDelta = this._jitter(-80, 50);
-        t.altitude = this._clamp(Math.round(t.altitude + altDelta), 15000, 38000);
-        t.altitudeTrend = altDelta < -20 ? 'DESCENDING' : altDelta > 20 ? 'CLIMBING' : 'LEVEL';
+            // Altitude drift
+            const altBias = t.status === 'HOSTILE' ? -80 : 0;
+            const altDelta = this._jitter(altBias, 50);
+            t.altitude = this._clamp(Math.round(t.altitude + altDelta), 15000, 40000);
+            t.altitudeTrend = altDelta < -20 ? 'DESCENDING' : altDelta > 20 ? 'CLIMBING' : 'LEVEL';
 
-        // Closure rate
-        t.closureRate = this._clamp(Math.round(t.closureRate + this._jitter(0, 15)), -700, -100);
-        t.range = this._clamp(+(t.range + t.closureRate / 3600 * 1.5).toFixed(1), 1.0, 50.0);
+// Closure rate
+            t.closureRate = this._clamp(Math.round(t.closureRate + this._jitter(0, 15)), -700, 100);
+            t.range = this._clamp(+(t.range + t.closureRate / 3600 * 1.5).toFixed(1), 1.0, 80.0);
+        });
+        const activeTarget = targets[this.state.activeTargetIndex];
 
         // --- Interceptor ---
         i.heading = this._clampDeg(i.heading + this._jitter(0, 1));
@@ -231,17 +288,44 @@ const SensorDataEngine = {
             this._commsIndex++;
         }
 
+        // --- Build history record ---
+        const historyRecord = {
+            tick: this.state.tickCount,
+            zuluTime,
+            targets: JSON.parse(JSON.stringify(targets)),
+            activeTarget: targets[this.state.activeTargetIndex],
+            interceptor: { ...i },
+            sensors: JSON.parse(JSON.stringify(s)),
+            fusedConfidence: this.state.fusedConfidence,
+            phase: this.state.phase,
+            threatScore: this.state.threatScore,
+        };
+
+        // Add to history (keep last 60 ticks)
+        this.state.history.push(historyRecord);
+        if (this.state.history.length > 60) {
+            this.state.history.shift();
+        }
+
+        // --- Audio alert for hostile approach ---
+        if (this.state.audioEnabled && activeTarget && activeTarget.status === 'HOSTILE' && activeTarget.range < 8) {
+            this._playAlertSound();
+        }
+
         // --- Dispatch event ---
         const payload = {
             tick: this.state.tickCount,
             zuluTime,
-            target: { ...t },
+            targets: JSON.parse(JSON.stringify(targets)),
+            activeTarget: activeTarget,
+            activeTargetIndex: this.state.activeTargetIndex,
             interceptor: { ...i },
             sensors: JSON.parse(JSON.stringify(s)),
             fusedConfidence: this.state.fusedConfidence,
             threatScore: this.state.threatScore,
             phase: this.state.phase,
             newComm,
+            history: JSON.parse(JSON.stringify(this.state.history)),
         };
 
         window.dispatchEvent(new CustomEvent('sensor-update', { detail: payload }));
@@ -259,10 +343,89 @@ const SensorDataEngine = {
     setPhase(phaseNumber) {
         this.state.phase = this._clamp(phaseNumber, 1, 5);
         this._saveState();
-        // Broadcast phase change to other tabs
         if (this._channel) {
             try { this._channel.postMessage({ type: 'phase', phase: this.state.phase }); } catch (e) { }
         }
+    },
+
+    /** Set active target index */
+    setActiveTarget(index) {
+        if (index >= 0 && index < this.state.targets.length) {
+            this.state.activeTargetIndex = index;
+            this._saveState();
+            if (this._channel) {
+                try { this._channel.postMessage({ type: 'activeTarget', index }); } catch (e) { }
+            }
+        }
+    },
+
+    /** Enable/disable audio alerts */
+    setAudio(enabled) {
+        this.state.audioEnabled = enabled;
+        if (this._channel) {
+            try { this._channel.postMessage({ type: 'audioToggle', enabled }); } catch (e) { }
+        }
+    },
+
+    /** Play alert sound */
+    _playAlertSound() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        } catch (e) { }
+    },
+
+    /** Export data to JSON */
+    exportData() {
+        const data = {
+            exportTime: new Date().toISOString(),
+            tick: this.state.tickCount,
+            phase: this.state.phase,
+            threatScore: this.state.threatScore,
+            targets: this.state.targets,
+            interceptor: this.state.interceptor,
+            sensors: this.state.sensors,
+            fusedConfidence: this.state.fusedConfidence,
+            history: this.state.history,
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sensor_data_${this.state.tickCount}_${new Date().toISOString().slice(0,19)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+
+    /** Export data to CSV */
+    exportCSV() {
+        const rows = [['tick', 'zuluTime', 'callsign', 'status', 'lat', 'lon', 'heading', 'speed', 'altitude', 'altitudeTrend', 'range']];
+        this.state.history.forEach(h => {
+            h.targets.forEach(t => {
+                rows.push([
+                    h.tick, h.zuluTime, t.callsign, t.status,
+                    t.lat.toFixed(4), t.lon.toFixed(4), Math.round(t.heading),
+                    t.speed.toFixed(2), t.altitude, t.altitudeTrend, t.range.toFixed(1)
+                ]);
+            });
+        });
+        const csv = rows.map(r => r.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sensor_data_${this.state.tickCount}_${new Date().toISOString().slice(0,19)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
     },
 
     // --- Utilities ---
@@ -278,25 +441,35 @@ const SensorDataEngine = {
 
     _saveState() {
         try {
-            const s = { ...this.state, running: false, intervalId: null };
+            const s = {
+                ...this.state,
+                running: false,
+                intervalId: null,
+                targets: this.state.targets,
+                activeTargetIndex: this.state.activeTargetIndex,
+                history: this.state.history,
+                audioEnabled: this.state.audioEnabled,
+            };
             sessionStorage.setItem('sensorDataState', JSON.stringify(s));
-        } catch (e) { /* quota or private mode */ }
+        } catch (e) { }
     },
     _restoreState() {
         try {
             const raw = sessionStorage.getItem('sensorDataState');
             if (!raw) return;
             const saved = JSON.parse(raw);
-            // Merge saved state, preserving methods-only fields
-            Object.assign(this.state.target, saved.target || {});
+            this.state.targets = saved.targets || this.state.targets;
+            this.state.activeTargetIndex = saved.activeTargetIndex ?? 0;
             Object.assign(this.state.interceptor, saved.interceptor || {});
             Object.assign(this.state.sensors, saved.sensors || {});
             this.state.fusedConfidence = saved.fusedConfidence ?? this.state.fusedConfidence;
             this.state.phase = saved.phase ?? this.state.phase;
             this.state.tickCount = saved.tickCount ?? 0;
+            this.state.history = saved.history || [];
+            this.state.audioEnabled = saved.audioEnabled ?? false;
             this._commsIndex = saved._commsIndex ?? 0;
             console.log('[SensorDataEngine] Restored state from session');
-        } catch (e) { /* corrupted data, start fresh */ }
+        } catch (e) { }
     },
 };
 
