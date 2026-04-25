@@ -470,7 +470,8 @@
                 set('sys-status', 'AI ACTIVE'); set('hud-sys', 'AI SCAN');
                 document.getElementById('sys-status')?.classList.replace('text-secondary', 'text-sky-400');
 
-                const range = SensorDataEngine.state.target.range;
+                const activeTarget = SensorDataEngine.state.targets[SensorDataEngine.state.activeTargetIndex];
+                const range = activeTarget ? activeTarget.range : 12;
                 addCommEntry('AI', '▶ PHASE 1/5: SCANNING — Ingesting multi-domain sensor data...');
                 
                 AISystem.scan({ speed: 1200, distance: range, iff: false });

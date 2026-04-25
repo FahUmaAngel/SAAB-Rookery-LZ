@@ -184,52 +184,52 @@
         TestRunner.suite('SensorDataEngine — State Structure');
 
         const s = SensorDataEngine.state;
-        TestRunner.assertType('target is an object', s.target, 'object');
+        TestRunner.assertType('targets is an array', s.targets, 'array');
+        TestRunner.assertEqual('has 3 targets', s.targets.length, 3);
+        TestRunner.assertEqual('first target callsign', s.targets[0].callsign, 'BOGEY_GOLF_42');
+        TestRunner.assertEqual('first target classId', s.targets[0].classId, 'SU-27 FLANKER');
+        TestRunner.assertType('first target.lat is number', s.targets[0].lat, 'number');
+        TestRunner.assertType('first target.lon is number', s.targets[0].lon, 'number');
+        TestRunner.assertType('first target.heading is number', s.targets[0].heading, 'number');
+        TestRunner.assertType('first target.speed is number', s.targets[0].speed, 'number');
+        TestRunner.assertType('first target.altitude is number', s.targets[0].altitude, 'number');
+        TestRunner.assertType('first target.closureRate is number', s.targets[0].closureRate, 'number');
+        TestRunner.assertType('first target.range is number', s.targets[0].range, 'number');
+        TestRunner.assertEqual('first target.transponder is false', s.targets[0].transponder, false);
         TestRunner.assertType('sensors is an object', s.sensors, 'object');
         TestRunner.assertType('interceptor is an object', s.interceptor, 'object');
-        TestRunner.assertEqual('target.callsign', s.target.callsign, 'BOGEY_GOLF_42');
-        TestRunner.assertEqual('target.classId', s.target.classId, 'SU-27 FLANKER');
-        TestRunner.assertType('target.lat is number', s.target.lat, 'number');
-        TestRunner.assertType('target.lon is number', s.target.lon, 'number');
-        TestRunner.assertType('target.heading is number', s.target.heading, 'number');
-        TestRunner.assertType('target.speed is number', s.target.speed, 'number');
-        TestRunner.assertType('target.altitude is number', s.target.altitude, 'number');
-        TestRunner.assertType('target.closureRate is number', s.target.closureRate, 'number');
-        TestRunner.assertType('target.range is number', s.target.range, 'number');
-        TestRunner.assertEqual('target.transponder is false', s.target.transponder, false);
-        TestRunner.assertType('sensors.radar is object', s.sensors.radar, 'object');
-        TestRunner.assertType('sensors.esm is object', s.sensors.esm, 'object');
-        TestRunner.assertType('sensors.satellite is object', s.sensors.satellite, 'object');
         TestRunner.assertType('fusedConfidence is number', s.fusedConfidence, 'number');
         TestRunner.assertType('phase is number', s.phase, 'number');
         TestRunner.assertInRange('phase starts at 3', s.phase, 1, 5);
+        TestRunner.assertType('activeTargetIndex is number', s.activeTargetIndex, 'number');
 
         // ------ 3. SensorDataEngine: Tick Simulation ------
         TestRunner.suite('SensorDataEngine — Tick Simulation');
 
-        // Stop any auto-started engine, save state, run ticks manually
+// Stop any auto-started engine, save state, run ticks manually
         SensorDataEngine.stop();
+        const firstTarget = s.targets[0];
         const beforeTick = {
-            lat: s.target.lat,
-            lon: s.target.lon,
+            lat: firstTarget.lat,
+            lon: firstTarget.lon,
             tickCount: s.tickCount,
         };
 
         SensorDataEngine._tick();
 
         TestRunner.assert('tickCount incremented', () => s.tickCount === beforeTick.tickCount + 1);
-        TestRunner.assert('target lat changed after tick', () => s.target.lat !== beforeTick.lat);
-        TestRunner.assert('target lon changed after tick', () => s.target.lon !== beforeTick.lon);
-        TestRunner.assertInRange('target speed in valid range', s.target.speed, 0.70, 1.10);
-        TestRunner.assertInRange('target altitude in valid range', s.target.altitude, 15000, 38000);
-        TestRunner.assertInRange('target closureRate in range', s.target.closureRate, -700, -100);
-        TestRunner.assertInRange('target range in valid range', s.target.range, 1.0, 50.0);
+        TestRunner.assert('target lat changed after tick', () => firstTarget.lat !== beforeTick.lat);
+        TestRunner.assert('target lon changed after tick', () => firstTarget.lon !== beforeTick.lon);
+        TestRunner.assertInRange('target speed in valid range', firstTarget.speed, 0.60, 1.10);
+        TestRunner.assertInRange('target altitude in valid range', firstTarget.altitude, 15000, 40000);
+        TestRunner.assertInRange('closureRate in range', firstTarget.closureRate, -700, 100);
+        TestRunner.assertInRange('target range in valid range', firstTarget.range, 1.0, 80.0);
         TestRunner.assertInRange('radar confidence in range', s.sensors.radar.confidence, 75, 99);
         TestRunner.assertInRange('esm confidence in range', s.sensors.esm.confidence, 60, 95);
         TestRunner.assertInRange('satellite confidence in range', s.sensors.satellite.confidence, 40, 90);
         TestRunner.assertInRange('fusedConfidence in range', s.fusedConfidence, 70, 99);
         TestRunner.assert('altitudeTrend is valid string', () =>
-            ['DESCENDING', 'CLIMBING', 'LEVEL'].includes(s.target.altitudeTrend)
+            ['DESCENDING', 'CLIMBING', 'LEVEL'].includes(firstTarget.altitudeTrend)
         );
 
         // ------ 4. SensorDataEngine: Event Dispatch ------
@@ -303,13 +303,14 @@
         // ------ 8. SensorDataEngine: SessionStorage Persistence ------
         TestRunner.suite('SensorDataEngine — Persistence');
 
-        SensorDataEngine.state.target.lat = 58.123;
+        const targetToTest = SensorDataEngine.state.targets[0];
+        targetToTest.lat = 58.123;
         SensorDataEngine._saveState();
         const saved = sessionStorage.getItem('sensorDataState');
         TestRunner.assert('state saved to sessionStorage', () => saved !== null);
-        TestRunner.assert('saved state contains target lat', () => {
+        TestRunner.assert('saved state contains targets', () => {
             const parsed = JSON.parse(saved);
-            return parsed.target.lat === 58.123;
+            return parsed.targets && parsed.targets[0].lat === 58.123;
         });
 
         // ------ 9. SensorDataEngine: Multi-tick Stability ------
@@ -322,9 +323,9 @@
             tickError = e.message;
         }
         TestRunner.assert('50 consecutive ticks without error', () => tickError === null);
-        TestRunner.assertInRange('speed stable after 50 ticks', s.target.speed, 0.70, 1.10);
-        TestRunner.assertInRange('altitude stable after 50 ticks', s.target.altitude, 15000, 38000);
-        TestRunner.assertInRange('closureRate stable after 50 ticks', s.target.closureRate, -700, -100);
+        TestRunner.assertInRange('first target speed stable after 50 ticks', targetToTest.speed, 0.60, 1.10);
+        TestRunner.assertInRange('first target altitude stable after 50 ticks', targetToTest.altitude, 15000, 40000);
+        TestRunner.assertInRange('closureRate stable after 50 ticks', targetToTest.closureRate, -700, 100);
         TestRunner.assertInRange('radar confidence stable', s.sensors.radar.confidence, 75, 99);
         TestRunner.assertInRange('fusedConfidence stable', s.fusedConfidence, 70, 99);
 

@@ -8,40 +8,33 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="tailwind.config.js"></script>
     <style>
-        /* Leaflet overrides for tactical dark theme */
+        /* Leaflet overrides */
         .leaflet-container { background: #0a0e14 !important; font-family: 'Inter', sans-serif; }
         .leaflet-control-zoom a { background: #1a1f2e !important; color: #82cfff !important; border: 1px solid #3e4850 !important; }
         .leaflet-control-zoom a:hover { background: #252b3b !important; }
         .leaflet-control-attribution { display: none !important; }
-        .leaflet-popup-content-wrapper { background: rgba(10,14,20,0.95) !important; border: 1px solid #3e4850 !important; border-radius: 4px !important; color: #e5e2e1 !important; font-family: 'Inter', sans-serif !important; box-shadow: 0 0 20px rgba(0,0,0,0.5) !important; }
+        .leaflet-popup-content-wrapper { background: rgba(10,14,20,0.95) !important; border: 1px solid #3e4850 !important; border-radius: 4px !important; color: #e5e2e1 !important; font-family: 'Inter', sans-serif !important; }
         .leaflet-popup-tip { background: rgba(10,14,20,0.95) !important; border: 1px solid #3e4850 !important; }
-        .leaflet-popup-content { margin: 8px 12px !important; font-size: 11px !important; line-height: 1.6 !important; }
+        .leaflet-popup-content { margin: 8px 12px !important; font-size: 11px !important; }
 
-        /* Hostile pulse */
+        /* Animations */
         @keyframes hostilePulse {
-            0%, 100% { box-shadow: 0 0 6px rgba(255,85,85,0.8); transform: rotate(45deg) scale(1); }
-            50%      { box-shadow: 0 0 14px rgba(255,85,85,1); transform: rotate(45deg) scale(1.15); }
+            0%, 100% { box-shadow: 0 0 6px rgba(255,85,85,0.8); }
+            50% { box-shadow: 0 0 14px rgba(255,85,85,1); }
         }
-        .hostile-diamond { animation: hostilePulse 1.5s ease-in-out infinite; }
+        .hostile-marker { animation: hostilePulse 1.5s ease-in-out infinite; }
 
-        /* Friendly pulse */
         @keyframes friendlyPulse {
             0%, 100% { box-shadow: 0 0 4px rgba(130,207,255,0.8); }
-            50%      { box-shadow: 0 0 12px rgba(130,207,255,1); }
+            50% { box-shadow: 0 0 12px rgba(130,207,255,1); }
         }
-        .friendly-dot { animation: friendlyPulse 2s ease-in-out infinite; }
+        .friendly-marker { animation: friendlyPulse 2s ease-in-out infinite; }
 
-        /* Unknown pulse */
         @keyframes unknownPulse {
             0%, 100% { box-shadow: 0 0 4px rgba(245,158,11,0.8); }
-            50%      { box-shadow: 0 0 10px rgba(245,158,11,1); }
+            50% { box-shadow: 0 0 10px rgba(245,158,11,1); }
         }
-        .unknown-dot { animation: unknownPulse 2s ease-in-out infinite; }
-
-        /* Chart container */
-        .chart-container { height: 120px; position: relative; }
-        .chart-line { stroke-width: 2; fill: none; }
-        .chart-grid { stroke: rgba(255,255,255,0.05); }
+        .unknown-marker { animation: unknownPulse 2s ease-in-out infinite; }
 
         .bg-hex-grid {
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='103.923' viewBox='0 0 60 103.923' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 17.32v34.64L30 69.28 0 51.96V17.32zM30 103.923L0 86.603V51.96l30 17.32 30-17.32v34.643z' fill='none' stroke='rgba(56, 189, 248, 0.1)' stroke-width='1'/%3E%3C/svg%3E");
@@ -56,17 +49,16 @@
     <div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)] flex">
         <!-- SideNavBar -->
         <div id="sidebar-placeholder"></div>
-        <!-- Main Content Canvas -->
+        
+        <!-- Main Content -->
         <main class="flex-1 flex h-full relative">
-            <!-- Tactical Map Area (Fluid) -->
+            <!-- Tactical Map Area -->
             <div class="flex-1 relative overflow-hidden bg-surface-dim border-r border-outline-variant/30">
-                <!-- Hex Grid -->
                 <div class="absolute inset-0 z-10 bg-hex-grid pointer-events-none opacity-20"></div>
-                <!-- Leaflet Map Container -->
                 <div id="map-container" class="absolute inset-0 z-0"></div>
             </div>
 
-            <!-- Sidebar Detail (Fixed Right) -->
+            <!-- Sidebar Detail -->
             <aside class="w-[380px] bg-surface border-l border-outline-variant flex flex-col z-30 overflow-y-auto">
                 <!-- Target Selector -->
                 <div class="p-gutter border-b border-outline-variant bg-surface-container-low">
@@ -77,9 +69,7 @@
                             <span class="font-data-mono text-[10px]">AUDIO</span>
                         </button>
                     </div>
-                    <div id="target-list" class="flex flex-col gap-1 max-h-[100px] overflow-y-auto">
-                        <!-- Target items injected by JS -->
-                    </div>
+                    <div id="target-list" class="flex flex-col gap-1 max-h-[100px] overflow-y-auto"></div>
                 </div>
 
                 <!-- Active Target Header -->
@@ -93,27 +83,34 @@
                     </div>
                     <div id="target-callsign" class="font-data-mono text-[18px] text-on-surface font-bold tracking-wider uppercase mb-1">BOGEY_GOLF_42</div>
                     <div id="target-class" class="font-data-mono text-[12px] text-on-surface-variant mb-2">SU-27 FLANKER</div>
+                    <div class="flex items-center gap-2">
+                        <div id="status-dot" class="w-1.5 h-1.5 bg-error rounded-full"></div>
+                        <span id="status-text" class="font-data-mono text-data-mono text-on-surface-variant">TRACKING IN PROGRESS</span>
+                    </div>
                 </div>
 
-                <!-- Telemetry Bento Grid -->
+                <!-- Telemetry -->
                 <div class="p-gutter flex flex-col gap-unit overflow-y-auto flex-1">
-                    <!-- Row 1: Kinematics -->
                     <div class="grid grid-cols-2 gap-unit">
-                        <div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden">
+                        <div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col">
                             <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">TARGET SPEED</span>
                             <div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
                                 <span id="sm-speed">0.85</span> <span class="font-data-mono text-data-mono text-primary/70">MACH</span>
                             </div>
                         </div>
-                        <div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden">
+                        <div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col">
                             <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">ALTITUDE</span>
                             <div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
                                 <span id="sm-altitude">32K</span> <span class="font-data-mono text-data-mono text-primary/70">FT</span>
                             </div>
+                            <div id="sm-alt-trend" class="mt-1 font-data-mono text-label-caps text-error flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[10px]">arrow_downward</span>
+                                <span id="sm-alt-trend-text">DESCENDING</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Row 2: Position -->
+                    <!-- Position -->
                     <div class="bg-surface-container border border-outline-variant p-panel-padding mt-2 flex flex-col">
                         <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">POSITION</span>
                         <div class="grid grid-cols-2 gap-2">
@@ -128,7 +125,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 3: Sensor Fusion -->
+                    <!-- Sensor Fusion -->
                     <div class="bg-surface-container border border-outline-variant p-panel-padding mt-2 flex flex-col">
                         <div class="flex justify-between items-center mb-3 border-b border-outline-variant/50 pb-2">
                             <span class="font-label-caps text-label-caps text-on-surface-variant">SENSOR FUSION</span>
@@ -140,9 +137,15 @@
                             <div id="bar-sat" class="h-full bg-sky-400 transition-all duration-700" style="width: 14%"></div>
                         </div>
                     </div>
+
+                    <!-- Export Buttons -->
+                    <div class="mt-2 flex gap-2">
+                        <button id="btn-export-json" class="px-3 py-2 bg-surface-container border border-outline-variant hover:bg-surface-container-high text-on-surface text-sm">EXPORT JSON</button>
+                        <button id="btn-export-csv" class="px-3 py-2 bg-surface-container border border-outline-variant hover:bg-surface-container-high text-on-surface text-sm">EXPORT CSV</button>
+                    </div>
                 </div>
 
-                <!-- Row 5: Sensor Filters -->
+                <!-- Sensor Filters -->
                 <div class="p-gutter border-t border-outline-variant bg-surface-container-low">
                     <span class="font-label-caps text-label-caps text-on-surface-variant mb-3 block">SENSOR FILTERS</span>
                     <div class="flex flex-col gap-2">
@@ -176,138 +179,278 @@
     <script src="./sensor-data.js"></script>
     <script src="./shared-components.js"></script>
     <script>
-        // --- Leaflet Map Setup ---
+        // === Global State ===
+        let mapInitialized = false;
+        let audioEnabled = false;
+        const trackMarkers = {};
+        const trackLabels = {};
+        let map = null;
+        let markersLayer = null;
+        let labelsLayer = null;
+
+        // === Leaflet Map ===
         function initMap() {
-            // Cleanup previous
-            if (window.sensorMapInstance) {
-                window.sensorMapInstance.remove();
-                window.sensorMapInstance = null;
-            }
-
-            // Load Leaflet
-            if (!document.getElementById('leaflet-css')) {
-                const link = document.createElement('link');
-                link.id = 'leaflet-css';
-                link.rel = 'stylesheet';
-                link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-                document.head.appendChild(link);
-            }
-
-            function loadLeafletJS(callback) {
-                if (typeof L !== 'undefined') { callback(); return; }
-                if (document.getElementById('leaflet-js')) {
-                    const checkL = setInterval(() => {
-                        if (typeof L !== 'undefined') { clearInterval(checkL); callback(); }
-                    }, 50);
-                    return;
+            if (document.getElementById('map-container') && !mapInitialized) {
+                // Load Leaflet CSS
+                if (!document.getElementById('leaflet-css')) {
+                    const link = document.createElement('link');
+                    link.id = 'leaflet-css';
+                    link.rel = 'stylesheet';
+                    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                    document.head.appendChild(link);
                 }
-                const script = document.createElement('script');
-                script.id = 'leaflet-js';
-                script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-                script.onload = callback;
-                document.head.appendChild(script);
+
+                // Load Leaflet JS
+                if (typeof L === 'undefined') {
+                    const script = document.createElement('script');
+                    script.id = 'leaflet-js';
+                    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                    script.onload = createMap;
+                    document.head.appendChild(script);
+                } else {
+                    createMap();
+                }
             }
-
-            loadLeafletJS(() => {
-                const map = L.map('map-container', {
-                    center: [57.5, 18.5],
-                    zoom: 6,
-                    zoomControl: false,
-                    attributionControl: false,
-                    minZoom: 4,
-                    maxZoom: 10
-                });
-
-                window.sensorMapInstance = map;
-                L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-                // Dark tiles
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
-                    subdomains: 'abcd',
-                    maxZoom: 19
-                }).addTo(map);
-
-                // Layer groups
-                window.trackMarkers = L.layerGroup().addTo(map);
-                window.trackLabels = L.layerGroup().addTo(map);
-
-                // Store references
-                window._targetMarkers = {};
-                window._targetLabels = {};
-
-                // Initial render
-                updateAllTargets();
-            });
         }
 
-        // --- Target Markers ---
-        function createTargetIcon(status) {
-            let colorClass = status === 'HOSTILE' ? 'hostile-diamond' : status === 'FRIENDLY' ? 'friendly-dot' : 'unknown-dot';
-            let color = status === 'HOSTILE' ? '#ff5555' : status === 'FRIENDLY' ? '#82cfff' : '#f59e0b';
+        function createMap() {
+            map = L.map('map-container', {
+                center: [57.5, 18.5],
+                zoom: 6,
+                zoomControl: false,
+                attributionControl: false,
+                minZoom: 4,
+                maxZoom: 10
+            });
 
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            markersLayer = L.layerGroup().addTo(map);
+            labelsLayer = L.layerGroup().addTo(map);
+
+            mapInitialized = true;
+            updateTargets();
+        }
+
+        // === Icons ===
+        function createIcon(status) {
+            const color = status === 'HOSTILE' ? '#ff5555' : status === 'FRIENDLY' ? '#82cfff' : '#f59e0b';
+            const animClass = status === 'HOSTILE' ? 'hostile-marker' : status === 'FRIENDLY' ? 'friendly-marker' : 'unknown-marker';
+            
             return L.divIcon({
                 className: '',
-                html: `
-                    <div style="position:relative; width:16px; height:16px;">
-                        <div class="${colorClass}" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(45deg); width:12px; height:12px; background:${color}; border:2px solid ${color};"></div>
-                    </div>
-                `,
-                iconSize: [16, 16],
-                iconAnchor: [8, 8]
+                html: `<div class="${animClass}" style="width:12px;height:12px;background:${color};border:2px solid ${color};border-radius:50%;"></div>`,
+                iconSize: [12, 12],
+                iconAnchor: [6, 6]
             });
         }
 
-        function updateAllTargets() {
-            if (typeof SensorDataEngine === 'undefined' || !window.trackMarkers) return;
-            const data = SensorDataEngine.state;
-            const map = window.sensorMapInstance;
-            if (!map) return;
+        // === Update Targets ===
+        function updateTargets() {
+            if (!mapInitialized || typeof SensorDataEngine === 'undefined') return;
 
-            // Simple demo: show the main target and a few dummy ones
-            const targets = [
-                { id: 'bogey', callsign: 'BOGEY_G42', pos: data.target.pos, status: 'HOSTILE', class: 'SU-27' },
-                { id: 'gripen', callsign: 'GRIPEN-1', pos: data.interceptor.pos, status: 'FRIENDLY', class: 'JAS-39' }
-            ];
+            const state = SensorDataEngine.state;
+            if (!state || !state.targets) return;
 
-            targets.forEach(t => {
-                if (!window._targetMarkers[t.id]) {
-                    window._targetMarkers[t.id] = L.marker(t.pos, { icon: createTargetIcon(t.status) }).addTo(window.trackMarkers);
+            const targets = state.targets;
+            const activeIdx = state.activeTargetIndex || 0;
+            const activeTarget = targets[activeIdx];
+
+            // Update markers
+            targets.forEach((t, idx) => {
+                if (trackMarkers[t.id]) {
+                    trackMarkers[t.id].setLatLng([t.lat, t.lon]);
                 } else {
-                    window._targetMarkers[t.id].setLatLng(t.pos);
+                    const marker = L.marker([t.lat, t.lon], { icon: createIcon(t.status) });
+                    marker.bindPopup(`<b>${t.callsign}</b><br>${t.classId}<br>HDG: ${Math.round(t.heading)}° | ALT: ${t.altitude}ft`);
+                    marker.addTo(markersLayer);
+                    trackMarkers[t.id] = marker;
+                }
+
+                // Label
+                if (trackLabels[t.id]) {
+                    trackLabels[t.id].setLatLng([t.lat, t.lon]);
+                } else {
+                    const label = L.divIcon({
+                        className: '',
+                        html: `<span style="font-family:'Inter',monospace;font-size:9px;font-weight:700;color:${t.status === 'HOSTILE' ? '#ff5555' : t.status === 'FRIENDLY' ? '#82cfff' : '#f59e0b'};text-shadow:0 0 4px #000;">${t.callsign}</span>`,
+                        iconSize: [80, 12],
+                        iconAnchor: [40, -6]
+                    });
+                    const labelMarker = L.marker([t.lat, t.lon], { icon: label, interactive: false });
+                    labelMarker.addTo(labelsLayer);
+                    trackLabels[t.id] = labelMarker;
                 }
             });
 
-            // Update Sidebar Detail for active track
-            const at = targets[0]; // BOGEY
-            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-            set('target-callsign', at.callsign);
-            set('target-class', at.class);
-            set('sm-speed', (data.target.speedKts / 661).toFixed(2));
-            set('sm-altitude', (data.target.altitude / 1000).toFixed(0) + 'K');
-            set('sm-position', `${at.pos[0].toFixed(2)}°N ${at.pos[1].toFixed(2)}°E`);
-            set('sm-range', data.target.range.toFixed(1) + ' NM');
-            set('sm-fused-pct', data.fusedConfidence.toFixed(1) + '%');
+            // Update sidebar with active target
+            if (activeTarget) {
+                const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-            // Bars
-            const br = document.getElementById('bar-radar'), be = document.getElementById('bar-esm'), bs = document.getElementById('bar-sat');
-            if (br) br.style.width = data.sensors.radar.confidence + '%';
-            if (be) be.style.width = data.sensors.esm.confidence + '%';
-            if (bs) bs.style.width = data.sensors.satellite.confidence + '%';
+                set('target-callsign', activeTarget.callsign);
+                set('target-class', activeTarget.classId);
+                set('sm-speed', activeTarget.speed.toFixed(2));
+                set('sm-altitude', Math.round(activeTarget.altitude / 1000) + 'K');
+                set('sm-position', `${activeTarget.lat.toFixed(2)}°N ${activeTarget.lon.toFixed(2)}°E`);
+                set('sm-range', activeTarget.range.toFixed(1) + ' NM');
+
+                // Status badge
+                const badge = document.getElementById('target-status-badge');
+                if (badge) {
+                    badge.textContent = activeTarget.status;
+                    badge.className = `px-1.5 py-0.5 font-label-caps text-label-caps border ${
+                        activeTarget.status === 'HOSTILE' ? 'bg-error-container text-on-error-container border-error/30' :
+                        activeTarget.status === 'FRIENDLY' ? 'bg-primary-container text-on-primary-container border-primary/30' :
+                        'bg-warning-container text-on-warning-container border-warning/30'
+                    }`;
+                }
+
+                // Status dot
+                const dot = document.getElementById('status-dot');
+                const text = document.getElementById('status-text');
+                if (dot) {
+                    dot.className = `w-1.5 h-1.5 rounded-full ${
+                        activeTarget.status === 'HOSTILE' ? 'bg-error' :
+                        activeTarget.status === 'FRIENDLY' ? 'bg-primary' : 'bg-warning'
+                    }`;
+                }
+                if (text) {
+                    text.textContent = activeTarget.status === 'HOSTILE' ? 'TRACKING IN PROGRESS' : 
+                                   activeTarget.status === 'FRIENDLY' ? 'FRIENDLY AIR' : 'UNKNOWN - EVALUATING';
+                }
+
+                // Altitude trend
+                const trendEl = document.getElementById('sm-alt-trend');
+                const trendText = document.getElementById('sm-alt-trend-text');
+                if (trendEl && trendText) {
+                    trendText.textContent = activeTarget.altitudeTrend;
+                    const icon = trendEl.querySelector('.material-symbols-outlined');
+                    if (activeTarget.altitudeTrend === 'DESCENDING') {
+                        trendEl.className = 'mt-1 font-data-mono text-label-caps text-error flex items-center gap-1';
+                        if (icon) icon.textContent = 'arrow_downward';
+                    } else if (activeTarget.altitudeTrend === 'CLIMBING') {
+                        trendEl.className = 'mt-1 font-data-mono text-label-caps text-primary flex items-center gap-1';
+                        if (icon) icon.textContent = 'arrow_upward';
+                    } else {
+                        trendEl.className = 'mt-1 font-data-mono text-label-caps text-outline flex items-center gap-1';
+                        if (icon) icon.textContent = 'remove';
+                    }
+                }
+            }
+
+            // Update target list
+            renderTargetList();
         }
 
-        // Listen for data updates
-        window.addEventListener('sensor-update', updateAllTargets);
+        function renderTargetList() {
+            if (typeof SensorDataEngine === 'undefined') return;
+            
+            const container = document.getElementById('target-list');
+            if (!container) return;
 
-        // --- Lifecycle ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initMap();
+            const targets = SensorDataEngine.state?.targets || [];
+            const activeIdx = SensorDataEngine.state?.activeTargetIndex || 0;
+
+            container.innerHTML = '';
+            targets.forEach((t, idx) => {
+                const div = document.createElement('div');
+                div.className = `p-2 border cursor-pointer flex justify-between items-center ${
+                    idx === activeIdx ? 'bg-primary-container border-primary' : 'border-outline-variant hover:bg-surface-container'
+                }`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full ${t.status === 'HOSTILE' ? 'bg-error' : t.status === 'FRIENDLY' ? 'bg-primary' : 'bg-warning'}"></div>
+                        <span class="font-data-mono text-[12px] text-on-surface">${t.callsign}</span>
+                    </div>
+                    <span class="font-data-mono text-[10px] text-on-surface-variant">${t.range}NM</span>
+                `;
+                div.onclick = () => {
+                    SensorDataEngine.setActiveTarget(idx);
+                };
+                container.appendChild(div);
+            });
+        }
+
+        // === Sensor Fusion Bars ===
+        function updateFusionBars(data) {
+            if (!data || !data.sensors) return;
+            
+            const s = data.sensors;
+            const total = s.radar.confidence + s.esm.confidence + s.satellite.confidence;
+            
+            const br = document.getElementById('bar-radar');
+            const be = document.getElementById('bar-esm');
+            const bs = document.getElementById('bar-sat');
+            const fp = document.getElementById('sm-fused-pct');
+            
+            if (br) br.style.width = (s.radar.confidence / total * 100) + '%';
+            if (be) be.style.width = (s.esm.confidence / total * 100) + '%';
+            if (bs) bs.style.width = (s.satellite.confidence / total * 100) + '%';
+            if (fp) fp.textContent = data.fusedConfidence.toFixed(1) + '%';
+        }
+
+        // === Event Listeners ===
+        window.addEventListener('sensor-update', (e) => {
+            updateTargets();
+            updateFusionBars(e.detail);
         });
 
-        // For SPA navigation
+        // Export buttons
+        document.getElementById('btn-export-json')?.addEventListener('click', () => {
+            SensorDataEngine?.exportData();
+        });
+
+        document.getElementById('btn-export-csv')?.addEventListener('click', () => {
+            SensorDataEngine?.exportCSV();
+        });
+
+        // Audio toggle
+        document.getElementById('btn-audio')?.addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            SensorDataEngine?.setAudio(audioEnabled);
+            const btn = document.getElementById('btn-audio');
+            if (btn) {
+                btn.classList.toggle('bg-primary-container', audioEnabled);
+                btn.classList.toggle('border-primary', audioEnabled);
+            }
+        });
+
+        // Sensor filters
+        const filterState = { hostile: true, unknown: true, friendly: true };
+        document.querySelectorAll('[data-filter]').forEach(label => {
+            const key = label.dataset.filter;
+            const checkbox = label.querySelector('input');
+            if (checkbox) {
+                checkbox.checked = filterState[key];
+                checkbox.addEventListener('change', () => {
+                    filterState[key] = checkbox.checked;
+                    // Show/hide markers based on filter
+                    Object.keys(trackMarkers).forEach(id => {
+                        const target = SensorDataEngine?.state?.targets?.find(t => t.id === id);
+                        if (target) {
+                            const show = filterState[target.status.toLowerCase()];
+                            if (trackMarkers[id]) {
+                                show ? markersLayer.addLayer(trackMarkers[id]) : markersLayer.removeLayer(trackMarkers[id]);
+                            }
+                            if (trackLabels[id]) {
+                                show ? labelsLayer.addLayer(trackLabels[id]) : labelsLayer.removeLayer(trackLabels[id]);
+                            }
+                        }
+                    });
+                });
+            }
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initMap);
         window.addEventListener('load', () => {
-            if (document.getElementById('map-container')) initMap();
+            if (document.getElementById('map-container') && !mapInitialized) initMap();
         });
     </script>
 </body>
-
 </html>
