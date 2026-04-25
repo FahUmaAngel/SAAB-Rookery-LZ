@@ -14,6 +14,40 @@ const AISystem = {
         apiKey: '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'
     },
 
+    buildReasoning: (data) => {
+        const reasons = [];
+        const speed = Number(data.speed) || 0;
+        const distance = Number(data.distance) || 0;
+        const iff = Boolean(data.iff);
+
+        if (speed > 800) {
+            reasons.push({
+                label: 'High speed',
+                detail: `${Math.round(speed)} KTS exceeds normal civilian transit profile`,
+            });
+        }
+        if (distance < 50) {
+            reasons.push({
+                label: 'Close approach',
+                detail: `${distance.toFixed(1)} NM from the intercept zone requires rapid response`,
+            });
+        }
+        if (!iff) {
+            reasons.push({
+                label: 'No positive identification',
+                detail: 'IFF/transponder response is absent, so the track is treated as unknown',
+            });
+        }
+        if (!reasons.length) {
+            reasons.push({
+                label: 'Precautionary intercept',
+                detail: 'Available sensor data is inconclusive, so a visual intercept is recommended',
+            });
+        }
+
+        return reasons;
+    },
+
     /**
      * Call OpenRouter LLM for real tactical analysis
      */
@@ -80,13 +114,14 @@ const AISystem = {
     suggest: async (data) => {
         AISystem.state.currentPhase = 'SUGGEST';
         AISystem.log('SUGGEST', "AI Generating tactical suggestions...");
+        const reasoning = AISystem.buildReasoning(data);
         
         if (AISystem.state.apiKey) {
             const aiResponse = await AISystem.callOpenRouter(`Analyze this threat: Speed ${data.speed}kts, Distance ${data.distance}km, IFF ${data.iff ? 'Friendly' : 'Unknown'}. Provide a 1-sentence tactical recommendation for the C2 Commander. Be professional and decisive.`);
             if (aiResponse) {
                 const recommendations = [
-                    { id: 'ai-scramble', action: aiResponse, priority: 'CRITICAL' },
-                    { id: 'warn', action: 'Issue Radio Warning (Standard)', priority: 'MEDIUM' }
+                    { id: 'ai-scramble', action: aiResponse, priority: 'CRITICAL', reasoning },
+                    { id: 'warn', action: 'Issue Radio Warning (Standard)', priority: 'MEDIUM', reasoning }
                 ];
                 AISystem.state.suggestions = recommendations;
                 AISystem.log('SUGGEST', `AI Real Response: ${aiResponse}`);
@@ -95,8 +130,8 @@ const AISystem = {
         }
 
         const recommendations = [
-            { id: 'scramble', action: 'Scramble Gripen 01', priority: 'HIGH' },
-            { id: 'warn', action: 'Issue Radio Warning', priority: 'MEDIUM' }
+            { id: 'scramble', action: 'Scramble Gripen 01', priority: 'HIGH', reasoning },
+            { id: 'warn', action: 'Issue Radio Warning', priority: 'MEDIUM', reasoning }
         ];
         AISystem.state.suggestions = recommendations;
         AISystem.log('SUGGEST', `AI suggested: ${recommendations[0].action}`);

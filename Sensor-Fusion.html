@@ -11,11 +11,11 @@
 <!-- JSON Component: TopNavBar -->
 <div id="header-placeholder"></div>
 
-<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)] overflow-y-auto custom-scrollbar">
+<div id="main-wrapper" class="mt-12 w-full min-h-[calc(100vh-48px)]">
 <!-- JSON Component: SideNavBar -->
 <div id="sidebar-placeholder"></div>
 <!-- Main Content Area -->
-<main class="p-margin min-h-full flex flex-col gap-gutter pb-8">
+<main class="p-margin min-h-[calc(100vh-48px)] flex flex-col gap-gutter pb-8">
 <!-- Header Telemetry Block -->
 <header class="bg-surface-container border border-outline-variant p-panel-padding flex justify-between items-end relative rounded-none">
 <div class="absolute top-0 left-0 w-2 h-full bg-primary"></div>
@@ -662,11 +662,24 @@
                     const rec = document.getElementById('ai-recommendation');
                     const sug = AISystem.state.suggestions[0];
                     if (rec && sug) {
+                        const reasoningHtml = (sug.reasoning || []).map(r => `
+                            <div class="flex flex-col gap-0.5 border-l-2 border-sky-500/30 pl-2 py-1">
+                                <span class="font-label-caps text-[8px] text-sky-300 uppercase">${r.label}</span>
+                                <span class="font-data-mono text-[10px] text-on-surface-variant leading-snug">${r.detail}</span>
+                            </div>
+                        `).join('');
                         rec.innerHTML = `
                             <div class="bg-sky-500/10 border border-sky-500/30 p-2">
                                 <div class="flex items-center gap-1 mb-1"><span class="material-symbols-outlined text-[12px] text-sky-400">auto_awesome</span>
                                     <span class="font-label-caps text-[8px] text-sky-400">${sug.priority} PRIORITY</span></div>
                                 <p class="font-data-mono text-[10px] text-on-surface leading-relaxed">${sug.action}</p>
+                            </div>
+                            <div class="bg-surface-container-highest border border-outline-variant/30 p-2 flex flex-col gap-1.5">
+                                <div class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[12px] text-amber-400">fact_check</span>
+                                    <span class="font-label-caps text-[8px] text-amber-400">WHY AI SUGGESTED THIS</span>
+                                </div>
+                                ${reasoningHtml || '<div class="font-data-mono text-[10px] text-outline-variant">No supporting factors available.</div>'}
                             </div>
                             <div class="flex gap-2 mt-1">
                                 <button onclick="AISystem.approveAction('${sug.id}'); this.parentElement.parentElement.innerHTML='<div class=\\'text-green-400 font-data-mono text-[10px]\\'>✓ APPROVED — Action dispatched to GRIPEN-1</div>';"

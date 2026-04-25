@@ -7,8 +7,20 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <style>
         .bg-hex-grid {
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='103.923' viewBox='0 0 60 103.923' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 17.32v34.64L30 69.28 0 51.96V17.32zM30 103.923L0 86.603V51.96l30 17.32 30-17.32v34.643z' fill='none' stroke='rgba(135, 146, 155, 0.05)' stroke-width='1'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='103.923' viewBox='0 0 60 103.923' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 17.32v34.64L30 69.28 0 51.96V17.32zM30 103.923L0 86.603V51.96l30 17.32 30-17.32v34.643z' fill='none' stroke='rgba(56, 189, 248, 0.1)' stroke-width='1'/%3E%3C/svg%3E");
             background-size: 60px 103.923px;
+        }
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(1000%); }
+        }
+        @keyframes radar-sweep {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .radar-sweep-fan {
+            background: conic-gradient(from 0deg at 50% 50%, rgba(245, 158, 11, 0.15) 0deg, rgba(245, 158, 11, 0) 60deg);
+            animation: radar-sweep 10s linear infinite;
         }
     </style>
 <script src="tailwind.config.js"></script>
@@ -24,7 +36,7 @@
 <!-- Tactical Map Area (Fluid) -->
 <div class="flex-1 relative overflow-hidden bg-surface-dim border-r border-outline-variant/30">
 <!-- Base Map Image -->
-<div class="absolute inset-0 z-0 opacity-40 mix-blend-screen" data-alt="Satellite imagery view of dark ocean waters with landmass edges representing the Baltic Sea region in a high contrast tactical style" data-location="Baltic Sea" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAtY3EOyN-2ZK7CYOBzTJ4xQKYV__5E2ehu_hy5ahEUFszNcvNl0Pz1-Pqgg6xQyaT3V6-7WZO0vgJq9STQaf3JmCMa3QeI7FRabXDjj1ZIeDrQEuhmykTElB2sw3ho-V44ZY7z7ct83x81851Lg7xb-mY2KVVUowRV81tdWOa4FRQxrX6Gx70CI1klfD507P4BgmyJynQxq7ijdhfcfY7UiwPferM4-j2gl6gv13D2S0CXSOeXhXCu78A9-fRwymLXFl1uK5yzbj7i'); background-size: cover; background-position: center;">
+<div class="absolute inset-0 z-0 opacity-60 mix-blend-luminosity grayscale-[50%] contrast-[1.2]" data-alt="Satellite imagery view of dark ocean waters with landmass edges representing the Baltic Sea region in a high contrast tactical style" data-location="Baltic Sea" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAtY3EOyN-2ZK7CYOBzTJ4xQKYV__5E2ehu_hy5ahEUFszNcvNl0Pz1-Pqgg6xQyaT3V6-7WZO0vgJq9STQaf3JmCMa3QeI7FRabXDjj1ZIeDrQEuhmykTElB2sw3ho-V44ZY7z7ct83x81851Lg7xb-mY2KVVUowRV81tdWOa4FRQxrX6Gx70CI1klfD507P4BgmyJynQxq7ijdhfcfY7UiwPferM4-j2gl6gv13D2S0CXSOeXhXCu78A9-fRwymLXFl1uK5yzbj7i'); background-size: cover; background-position: center;">
 </div>
 <!-- Hex Grid -->
 <div class="absolute inset-0 z-10 bg-hex-grid pointer-events-none"></div>
@@ -36,10 +48,15 @@
                         <span class="font-data-mono text-data-mono text-primary/60 absolute top-4 uppercase tracking-tighter text-[10px]">Sovereign Airspace (12nm)</span>
                     </div>
 <!-- Radar Fan (Amber) -->
-<div class="absolute bottom-1/4 right-1/4 w-96 h-96 radar-sweep flex items-center justify-center" style="clip-path: polygon(50% 50%, 100% 0, 100% 100%); transform: rotate(-45deg);">
-<div class="absolute inset-0 border border-tertiary/30 rounded-full"></div>
+<div id="layer-radar" class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] flex items-center justify-center transition-opacity duration-500">
+    <div class="radar-sweep-fan absolute inset-0 rounded-full border border-tertiary/20"></div>
+    <div class="absolute inset-0 border border-tertiary/10 rounded-full scale-75"></div>
+    <div class="absolute inset-0 border border-tertiary/5 rounded-full scale-50"></div>
 </div>
-<span class="absolute bottom-1/4 right-1/4 font-data-mono text-data-mono text-tertiary/80 ml-48 mb-12">KALININGRAD RADAR</span>
+<span class="absolute bottom-1/4 right-1/4 font-data-mono text-data-mono text-tertiary/80 ml-48 mb-12 flex items-center gap-2">
+    <span class="w-2 h-2 bg-tertiary rounded-full animate-pulse"></span>
+    KALININGRAD RADAR (ELINT)
+</span>
                     <!-- Satellite Pass (ICEYE) -->
                     <div id="layer-satellite" class="absolute inset-0 overflow-hidden transition-opacity duration-500">
                         <svg class="opacity-50" height="100%" width="100%">
@@ -113,19 +130,29 @@
                         </div>
                     </div>
 </div>
-                <div class="absolute bottom-4 left-4 z-30 flex gap-2">
-                    <div
-                        class="bg-surface-container border border-outline-variant p-panel-padding flex gap-4 backdrop-blur-sm">
-                        <div class="flex flex-col">
-                            <span class="font-label-caps text-label-caps text-on-surface-variant mb-1">LAT / LON</span>
-                            <span id="sm-latlon" class="font-data-mono text-data-mono text-on-surface">57°18'N 19°05'E</span>
+                <!-- Map Controls Overlay -->
+                <div class="absolute top-4 left-4 z-30 flex flex-col gap-2">
+                    <div class="bg-surface-container/80 border border-outline-variant p-3 backdrop-blur-md">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                            <span class="font-label-caps text-[10px] text-on-surface tracking-widest">TACTICAL VIEWPORT v4.2</span>
                         </div>
-                        <div class="w-px bg-outline-variant"></div>
-                        <div class="flex flex-col">
-                            <span class="font-label-caps text-label-caps text-on-surface-variant mb-1">TIME (Z)</span>
-                            <span id="sm-zulu" class="font-data-mono text-data-mono text-on-surface">00:00:00Z</span>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex flex-col">
+                                <span class="font-label-caps text-[8px] text-outline-variant mb-1 uppercase">COORDINATES</span>
+                                <span id="sm-latlon" class="font-data-mono text-[11px] text-on-surface">57°18'N 19°05'E</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-label-caps text-[8px] text-outline-variant mb-1 uppercase">ZULU TIME</span>
+                                <span id="sm-zulu" class="font-data-mono text-[11px] text-on-surface">00:00:00Z</span>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Scanning Line Effect -->
+                <div class="absolute inset-0 z-10 pointer-events-none overflow-hidden opacity-10">
+                    <div class="w-full h-1 bg-primary/40 shadow-[0_0_15px_rgba(130,207,255,0.5)] animate-[scanline_8s_linear_infinite]"></div>
                 </div>
 </div>
 <!-- Sidebar Detail (Fixed Right) -->
@@ -137,14 +164,14 @@
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
                             ACTIVE TRACK
                         </h2>
-<span class="px-1.5 py-0.5 bg-error-container text-on-error-container font-label-caps text-label-caps border border-error/30">HOSTILE</span>
+<span id="track-status-badge" class="px-1.5 py-0.5 bg-error-container text-on-error-container font-label-caps text-label-caps border border-error/30">HOSTILE</span>
 </div>
 <div class="font-data-mono text-[16px] text-on-surface font-bold tracking-wider uppercase mb-1">
                         BOGEY_GOLF_42
                     </div>
 <div class="flex items-center gap-2 text-on-surface-variant">
-<div class="w-1.5 h-1.5 bg-error rounded-full"></div>
-<span class="font-data-mono text-data-mono">TRACKING IN PROGRESS</span>
+<div id="status-pulse" class="w-1.5 h-1.5 bg-error rounded-full animate-pulse"></div>
+<span id="status-text" class="font-data-mono text-data-mono">TRACKING IN PROGRESS</span>
 </div>
 </div>
 <!-- Telemetry Bento Grid -->
@@ -157,7 +184,7 @@
 </div>
 <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">TARGET SPEED</span>
 <div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
-                                0.85 <span class="font-data-mono text-data-mono text-primary/70">MACH</span>
+                                <span id="sm-speed">0.85</span> <span class="font-data-mono text-data-mono text-primary/70">MACH</span>
 </div>
 </div>
 <div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden">
@@ -166,10 +193,10 @@
 </div>
 <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">ALTITUDE</span>
 <div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
-                                32K <span class="font-data-mono text-data-mono text-primary/70">FT</span>
+                                <span id="sm-altitude">32K</span> <span class="font-data-mono text-data-mono text-primary/70">FT</span>
 </div>
-<div class="mt-1 font-data-mono text-label-caps text-error flex items-center gap-1">
-<span class="material-symbols-outlined text-[10px]">arrow_downward</span> DESCENDING
+<div id="sm-alt-trend" class="mt-1 font-data-mono text-label-caps text-error flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]">arrow_downward</span> <span id="sm-alt-trend-text">DESCENDING</span>
                             </div>
 </div>
 </div>
@@ -177,25 +204,44 @@
 <div class="bg-surface-container border border-outline-variant p-panel-padding mt-2 flex flex-col">
 <div class="flex justify-between items-center mb-4 border-b border-outline-variant/50 pb-2">
 <span class="font-label-caps text-label-caps text-on-surface-variant">SENSOR FUSION DATA</span>
-<span class="material-symbols-outlined text-[16px] text-tertiary">memory</span>
+<span id="sm-fused-pct" class="font-data-mono text-data-mono text-primary font-bold">94.2%</span>
 </div>
-<div class="grid grid-cols-2 gap-x-4 gap-y-3">
-<div class="flex flex-col">
-<span class="font-label-caps text-[8px] text-outline mb-1">ESM SIGNATURE</span>
-<span class="font-data-mono text-data-mono text-on-surface uppercase bg-surface-container-highest px-1 border border-outline-variant/30 inline-block w-max">FLANKER-H</span>
-</div>
-<div class="flex flex-col">
-<span class="font-label-caps text-[8px] text-outline mb-1">TRANSPONDER</span>
-<span class="font-data-mono text-data-mono text-error uppercase flex items-center gap-1">
-<div class="w-1 h-1 bg-error"></div> OFF
-                                </span>
-</div>
-<div class="flex flex-col col-span-2">
-<span class="font-label-caps text-[8px] text-outline mb-1">HEADING</span>
-<div class="flex items-center gap-2">
-<span class="font-data-mono text-data-mono text-on-surface">285° (WNW) TO GOTLAND</span>
-</div>
-</div>
+<div class="flex flex-col gap-3">
+    <!-- Confidence Bars -->
+    <div class="flex flex-col gap-1">
+        <div class="flex justify-between font-label-caps text-[8px] text-outline">
+            <span>FUSION CONFIDENCE BREAKDOWN</span>
+        </div>
+        <div class="flex h-1.5 w-full bg-surface-container-highest border border-outline-variant/30 overflow-hidden">
+            <div id="bar-radar" class="h-full bg-primary" style="width: 40%"></div>
+            <div id="bar-esm" class="h-full bg-tertiary border-l border-surface-dim" style="width: 35%"></div>
+            <div id="bar-sat" class="h-full bg-secondary border-l border-surface-dim" style="width: 25%"></div>
+        </div>
+        <div class="flex justify-between font-data-mono text-[8px] mt-1">
+            <span class="text-primary">RADAR</span>
+            <span class="text-tertiary">ESM</span>
+            <span class="text-secondary">SAT</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-x-4 gap-y-3 pt-2 border-t border-outline-variant/30">
+        <div class="flex flex-col">
+        <span class="font-label-caps text-[8px] text-outline mb-1">ESM SIGNATURE</span>
+        <span class="font-data-mono text-data-mono text-on-surface uppercase bg-surface-container-highest px-1 border border-outline-variant/30 inline-block w-max">FLANKER-H</span>
+        </div>
+        <div class="flex flex-col">
+        <span class="font-label-caps text-[8px] text-outline mb-1">TRANSPONDER</span>
+        <span class="font-data-mono text-data-mono text-error uppercase flex items-center gap-1">
+        <div class="w-1 h-1 bg-error"></div> OFF
+                                        </span>
+        </div>
+        <div class="flex flex-col col-span-2">
+        <span class="font-label-caps text-[8px] text-outline mb-1">HEADING</span>
+        <div class="flex items-center gap-2">
+        <span id="sm-heading" class="font-data-mono text-data-mono text-on-surface">285° (WNW) TO GOTLAND</span>
+        </div>
+        </div>
+    </div>
 </div>
 </div>
                     <!-- Row 3: Intel Summary -->
@@ -405,10 +451,28 @@
 
             // Status Badge
             const badge = document.getElementById('track-status-badge');
-            if (badge) {
-                if (d.threatScore > 80) { badge.textContent = 'HOSTILE'; badge.className = 'px-1.5 py-0.5 bg-error text-white font-label-caps text-label-caps border border-error animate-pulse'; }
-                else if (d.threatScore > 50) { badge.textContent = 'SUSPECT'; badge.className = 'px-1.5 py-0.5 bg-amber-500 text-black font-label-caps text-label-caps border border-amber-600'; }
-                else { badge.textContent = 'NEUTRAL'; badge.className = 'px-1.5 py-0.5 bg-sky-500 text-white font-label-caps text-label-caps border border-sky-600'; }
+            const statusPulse = document.getElementById('status-pulse');
+            const statusText = document.getElementById('status-text');
+            
+            if (badge && statusPulse && statusText) {
+                if (d.threatScore > 80) { 
+                    badge.textContent = 'HOSTILE'; 
+                    badge.className = 'px-1.5 py-0.5 bg-error text-white font-label-caps text-label-caps border border-error animate-pulse';
+                    statusPulse.className = 'w-1.5 h-1.5 bg-error rounded-full animate-pulse';
+                    statusText.textContent = 'THREAT CRITICAL - INTERCEPT AUTH';
+                }
+                else if (d.threatScore > 50) { 
+                    badge.textContent = 'SUSPECT'; 
+                    badge.className = 'px-1.5 py-0.5 bg-amber-500 text-black font-label-caps text-label-caps border border-amber-600';
+                    statusPulse.className = 'w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse';
+                    statusText.textContent = 'SHADOWING IN PROGRESS';
+                }
+                else { 
+                    badge.textContent = 'NEUTRAL'; 
+                    badge.className = 'px-1.5 py-0.5 bg-sky-500 text-white font-label-caps text-label-caps border border-sky-600';
+                    statusPulse.className = 'w-1.5 h-1.5 bg-sky-500 rounded-full';
+                    statusText.textContent = 'MONITORING TRACK';
+                }
             }
         });
     </script>
