@@ -2,153 +2,192 @@
 
 ## Purpose
 
-`Asset Tracking` is a sub-page under `Logs & Intel`.
+`Asset Tracking` is the resource overview page under `Logs & Intel`.
 
-The purpose of this page is to give the operator a simple overview of:
+Its purpose is to help the operator quickly understand:
 
 - which assets are available
-- which assets are airborne, on the field, in hangar, or under repair
+- which assets are airborne, on ground, in hangar, or under repair
 - how much fuel each asset has
-- where active assets are located on the map
+- where assets are located in the operational area
 - which asset is currently selected for closer inspection
 
-This page is meant to support Command and Control decision-making during a QRA / incidentberedskap scenario.
+This page supports Command and Control decision-making in a QRA / incidentberedskap scenario by focusing on asset readiness rather than full tactical command.
 
-## Why This Page Exists
+## What The Page Shows
 
-In a QRA workflow, the control center must quickly understand which aircraft or support assets can be used.
+### 1. KPI Cards
 
-This page helps answer practical questions such as:
-
-- Do we have aircraft ready to launch?
-- Which assets are already airborne?
-- Which assets are unavailable because of maintenance?
-- How much fuel does each active asset have?
-- Where are the currently active assets positioned in the operational area?
-
-Instead of showing the full tactical decision flow, this page focuses specifically on resource awareness.
-
-## Main Workflow
-
-The workflow on this page is intentionally simple:
-
-1. The operator enters the page and gets a quick readiness overview from the KPI cards at the top.
-2. The operator checks the `Asset Overview` table to see all major assets and their status.
-3. The operator can filter the list by `All`, `Airborne`, `Ready`, or `Repair`.
-4. The operator selects an asset from the table or from the map.
-5. The selected asset is shown in the `Selected Asset` panel with more detail.
-6. The map helps the operator understand where active resources are positioned in the Baltic operational area.
-
-## Page Structure
-
-### 1. Top KPI Cards
-
-These cards provide a fast summary of the situation:
+The top cards give a quick operational summary:
 
 - `Alert Level`
 - `Ready in 15`
 - `Airborne`
 - `Maintenance`
+- `In Hangar`
+- `On Field`
+- `Average Fuel`
 
-This gives the operator an immediate understanding of the current readiness state.
+These are meant to answer the first question an operator has:
 
-### 2. Asset Overview
+> What is our readiness right now?
 
-This is the main table on the page.
+### 2. Asset Overview Table
+
+The table is the main list of resources.
 
 It shows:
 
 - asset name
 - home base
-- state
+- current state
 - fuel level
-- location / sector
+- sector / location
 
-This is the main operational entry point for selecting and reviewing assets.
+The user can filter the table by:
 
-### 3. Theater Position Plot
+- `All`
+- `Airborne`
+- `Ready`
+- `Repair`
 
-This section shows the asset picture on a Baltic-area map.
+### 3. Asset Position Map
 
-It includes:
+This map gives geographical context for the assets.
+
+It shows:
 
 - air bases
-- airborne asset markers
-- selected asset label
-- geographic context such as Sweden, Finland, Gotland, and Kaliningrad
+- airborne assets
+- on-ground assets
+- assets in hangar
+- assets under repair
 
-The map is there to support situational awareness, not full tactical map control.
+The map is there for position awareness, not full tactical planning.
 
-### 4. Selected Asset
+### 4. Selected Asset Panel
 
-When the user clicks an asset in the table or on the map, the right-side detail panel updates.
-
-It displays:
+When an asset is selected, the right-side panel shows:
 
 - asset type
 - current state
+- exact coordinates
 - fuel
 - mission clock
-- datalink status
+- data link status
 - ROE state
-- short commander note
+- commander notes
 
-This makes it easier to understand the operational value of one specific resource.
+If the user clicks empty space on the map, the selected asset is cleared and the panel switches to a neutral `No Asset Selected` state.
 
 ### 5. Simple Status Guide
 
-This block explains the meaning of the main status categories:
+This section explains the main asset states in a simple way:
 
 - `Airborne`
 - `On Field / Ready`
 - `Repair`
 
-The goal is to make the page easier to understand for both users and presentation audiences.
+It is mainly there to make the page easier to explain during a presentation.
 
-## Example Operational Use
+## Main Workflow
 
-Example:
+The page workflow is intentionally simple:
 
-1. An unknown aircraft is detected over the Baltic region.
-2. The operator opens `Asset Tracking`.
-3. The operator checks which Gripen aircraft are already airborne and which are ready for launch.
-4. The operator reviews fuel levels and status of active aircraft.
-5. The operator selects a specific aircraft to inspect its detail panel.
-6. The map is used to understand where that resource is located relative to the operational area.
+1. The operator opens the page and reads the KPI cards.
+2. The operator checks the `Asset Overview` table.
+3. The operator filters the list if needed.
+4. The operator clicks an asset in the table or on the map.
+5. The `Selected Asset` panel updates with more detail.
+6. If the operator clicks empty map space, the selected asset is cleared.
 
-This supports resource selection before or during interception.
+This makes the page easy to navigate in a short demo.
 
-## Design Choice
+## Live Telemetry Behavior
 
-The page was simplified on purpose.
+The page includes simulated live updates to make the dashboard feel active.
 
-Instead of showing too many panels, the page focuses on four core ideas:
+These updates are front-end only and are meant for presentation/demo purposes.
 
-- readiness
-- status
-- fuel
-- position
+The live behavior includes:
 
-This makes it easier to explain and easier to use during a short demonstration.
+- airborne assets slowly changing position on the map
+- fuel values updating over time
+- `Mission Clock` increasing for airborne assets
+- `Ready in` countdown decreasing for assets on ground or in hangar
+- KPI cards updating automatically as values change
 
-## What This Page Does Not Try To Do
+This gives the impression of a live C2 dashboard without needing a backend.
 
-`Asset Tracking` is not the full tactical command page.
+## Asset States
 
-It does not replace:
+The main asset states used on the page are:
+
+- `Airborne`
+  The asset is currently in flight and active.
+
+- `On Field`
+  The asset is on the ground and available for rapid launch or tasking.
+
+- `Hangar`
+  The asset is inside a hangar and not immediately active, but can still be part of the readiness picture.
+
+- `Repair`
+  The asset is unavailable and should not be selected for operational use.
+
+## Data Link Meanings
+
+The page uses a simplified set of data link statuses:
+
+- `Connected`
+  The asset is connected to the C2 system and can exchange information in real time.
+
+- `Standby`
+  The asset is not currently active in the network, but can connect quickly.
+
+- `Command Node`
+  The asset acts as a central coordination or battle-management node in the network.
+
+- `Offline`
+  No active connection is available.
+
+These terms were simplified on purpose so they are easier to explain and defend in a presentation.
+
+## Why This Page Exists
+
+`Asset Tracking` does not replace the full tactical pages.
+
+It complements pages such as:
 
 - `Map View`
 - `Sensor Fusion`
 - `Comms`
 - `Mission Logs`
 
-Instead, it complements them by focusing only on fleet/resource awareness.
+Those pages focus on the larger incident picture.
+
+`Asset Tracking` focuses only on one question:
+
+> Which resources do we have, where are they, and how ready are they?
+
+## Example Use Case
+
+Example:
+
+1. An unknown aircraft is detected in the Baltic region.
+2. The operator opens `Asset Tracking`.
+3. The operator checks which assets are airborne and which are ready to launch.
+4. The operator reviews fuel and readiness values.
+5. The operator selects a specific aircraft to inspect its detail panel.
+6. The map is used to understand where that resource is positioned.
+
+This helps the operator understand available resources before or during an intercept response.
 
 ## Short Presentation Version
 
 You can explain the page like this:
 
-> Asset Tracking is the resource overview page. It shows which aircraft and support assets are available, which ones are active, how much fuel they have, where they are located, and whether they are ready or under repair. The operator can quickly select one asset and inspect its status in more detail.
+> Asset Tracking is the resource overview page. It shows which aircraft and support assets are available, where they are located, how much fuel they have, and whether they are active, ready, or under repair. The operator can select one asset for more detail, and the page also includes simulated live updates to make the status picture feel real-time.
 
 ## Technical Note
 
@@ -156,8 +195,8 @@ The page is implemented in:
 
 - `asset-tracking.html`
 
-Navigation to this page is enabled through:
+Navigation to the page is enabled through:
 
 - `shared-components.js`
 
-The page uses a lightweight front-end approach with static data and interactive selection through JavaScript.
+The page uses static front-end data with JavaScript-driven interaction and simulated live telemetry updates.
