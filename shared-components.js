@@ -6,7 +6,7 @@
 const SharedComponents = {
     style: `
         :root {
-            --sidebar-width: 80px;
+            --sidebar-width: 72px;
             --header-height: 48px;
             --ai-accent: #82cfff;
             --hitl-danger: #ff5252;
@@ -52,7 +52,16 @@ const SharedComponents = {
     header: `
         <header class="fixed top-0 w-full h-12 flex justify-between items-center px-4 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
             <div class="flex items-center gap-4">
-                <span class="text-lg font-black tracking-widest text-sky-500 dark:text-sky-400 font-['Space_Grotesk'] uppercase tracking-tighter text-xs">C2 // TACTICAL OVERWATCH</span>
+                <span class="text-lg font-black tracking-widest text-sky-500 dark:text-sky-400 font-['Space_Grotesk'] uppercase tracking-tighter text-xs mr-4">C2 // TACTICAL OVERWATCH</span>
+                <!-- Top Nav Links -->
+                <nav class="hidden md:flex items-center gap-6 font-['Space_Grotesk'] font-bold text-[10px] tracking-widest uppercase">
+                    <a href="./map-view.html" onclick="SharedComponents.handleNav(event, './map-view.html')" class="text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">map</span> MAP VIEW
+                    </a>
+                    <a href="./tactical-map.html" onclick="SharedComponents.handleNav(event, './tactical-map.html')" class="text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">explore</span> TACTICAL MAP
+                    </a>
+                </nav>
             </div>
             <div class="flex flex-1 justify-end items-center gap-6">
                 <!-- Search Bar -->
@@ -94,35 +103,12 @@ const SharedComponents = {
 
     sidebar: (currentPage) => {
         const menuItems = [
-            { 
-                id: 'map', 
-                label: 'Map View', 
-                icon: 'map', 
-                href: './map-view.html',
-                subItems: [
-                    { label: 'Map View', icon: 'map', href: './map-view.html' },
-                    { label: 'Tactical Map', icon: 'explore', href: './tactical-map.html' },
-                    { label: 'Threat Intel', icon: 'warning', href: '#' },
-                    { label: 'Battery Status', icon: 'battery_charging_full', href: '#' },
-                    { label: 'Dashboard', icon: 'dashboard', href: './logistics.html' }
-                ]
-            },
+            { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', href: './logistics.html' },
             { id: 'assets', label: 'Asset Ready', icon: 'flight_takeoff', href: './Asset-ready.html' },
             { id: 'fusion', label: 'Sensor Fusion', icon: 'sensors', href: './Sensor-Fusion.html' },
             { id: 'sensor-map', label: 'Sensor_map', icon: 'map_search', href: './sensor_map.html' },
             { id: 'comms', label: 'Comms', icon: 'satellite', href: './comms.html' },
-            { 
-                id: 'logs', 
-                label: 'Logs & Intel', 
-                icon: 'history_edu', 
-                href: './mission_logs.html',
-                subItems: [
-                    { label: 'Mission Logs', icon: 'history_edu', href: './mission_logs.html' },
-                    { label: 'Asset Tracking', icon: 'navigation', href: './asset-tracking.html' },
-                    { label: 'Telemetry', icon: 'query_stats', href: '#' },
-                    { label: 'Intel Brief', icon: 'description', href: '#' }
-                ]
-            },
+            { id: 'logs', label: 'Logs & Intel', icon: 'history_edu', href: './mission_logs.html' },
         ];
 
         const isExpanded = typeof document !== 'undefined' && document.body.classList.contains('sidebar-expanded');
@@ -134,7 +120,7 @@ const SharedComponents = {
             const hasSubmenu = item.subItems && item.subItems.length > 0;
             const baseClass = "flex flex-col items-center justify-center py-3 w-full active:scale-95 transition-all group";
             const activeClass = "bg-sky-950/30 text-sky-400 border-l-2 border-sky-500";
-            const inactiveClass = "text-slate-600 hover:bg-slate-900 hover:text-sky-200";
+            const inactiveClass = "text-slate-400 hover:bg-slate-800 hover:text-sky-300";
             
             let subHtml = '';
             if (hasSubmenu) {
@@ -176,9 +162,9 @@ const SharedComponents = {
             <aside class="fixed left-0 top-12 h-[calc(100vh-48px)] flex flex-col items-center py-4 z-40 bg-slate-950 border-r border-slate-800 overflow-x-hidden">
                 <div class="mb-6 flex flex-col items-center text-center border-b border-slate-800 pb-4 w-full px-2">
                     <div class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-full flex items-center justify-center mb-2 overflow-hidden shadow-inner shrink-0">
-                        <span class="material-symbols-outlined text-slate-600 text-[20px]">person</span>
+                        <span class="material-symbols-outlined text-slate-400 text-[20px]">person</span>
                     </div>
-                    <span class="text-[8px] font-['Space_Grotesk'] text-slate-500 font-bold uppercase tracking-widest text-center px-1 whitespace-nowrap">SECTOR 7<br/><span class="text-[7px] text-slate-600">BALTIC REGION</span></span>
+                    <span class="text-[8px] font-['Space_Grotesk'] text-slate-400 font-bold uppercase tracking-widest text-center px-1 whitespace-nowrap">SECTOR 7<br/><span class="text-[7px] text-slate-500">BALTIC REGION</span></span>
                 </div>
                 <nav class="flex flex-col w-full gap-1 flex-1 overflow-y-auto custom-scrollbar">
                     ${linksHtml}

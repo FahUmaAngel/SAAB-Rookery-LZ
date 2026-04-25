@@ -25,7 +25,35 @@
 <!-- SideNavBar -->
 <div id="sidebar-placeholder"></div>
 <!-- Main Content Area -->
-<main class="h-full p-gutter overflow-hidden flex flex-col gap-gutter lg:flex-row">
+<main class="h-full flex flex-1 w-full overflow-hidden hex-bg">
+    <!-- Subsidebar for Logs & Intel -->
+    <aside class="bg-slate-950/80 w-[180px] border-r border-slate-800 flex flex-col py-4 hidden md:flex shrink-0 h-full backdrop-blur-md">
+        <div class="px-4 mb-6">
+            <h2 class="text-sky-500 font-bold font-['Space_Grotesk'] uppercase text-xs tracking-widest">LOGS & INTEL</h2>
+            <div class="text-slate-400 text-[10px] uppercase font-semibold tracking-wider mt-1">HISTORICAL ANALYSIS</div>
+        </div>
+        <div class="flex-1 flex flex-col gap-1 font-['Space_Grotesk'] uppercase text-[11px] font-semibold tracking-wider">
+            <a class="bg-slate-900 text-sky-300 border-l-4 border-sky-500 px-4 py-3 flex items-center gap-3" href="./mission_logs.html">
+                <span class="material-symbols-outlined text-lg" data-icon="history_edu">history_edu</span>
+                Mission Logs
+            </a>
+            <a class="text-slate-400 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-800 hover:text-white transition-all" href="./asset-tracking.html">
+                <span class="material-symbols-outlined text-lg" data-icon="navigation">navigation</span>
+                Asset Tracking
+            </a>
+            <a class="text-slate-400 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-800 hover:text-white transition-all" href="#">
+                <span class="material-symbols-outlined text-lg" data-icon="query_stats">query_stats</span>
+                Telemetry
+            </a>
+            <a class="text-slate-400 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-800 hover:text-white transition-all" href="#">
+                <span class="material-symbols-outlined text-lg" data-icon="description">description</span>
+                Intel Brief
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <div class="flex-1 p-gutter overflow-y-auto h-full scrollbar-hide flex flex-col gap-gutter lg:flex-row w-full">
 <!-- Mission Archive List -->
 <section class="flex-1 flex flex-col bg-surface-container-low border border-slate-800 min-w-[400px]">
 <header class="p-panel-padding border-b border-slate-800 bg-surface-container-high flex justify-between items-center">
@@ -247,6 +275,7 @@
                     </button>
 </div>
 </section>
+    </div>
 </main>
 </div>
 <script src="./ai-system.js"></script>
