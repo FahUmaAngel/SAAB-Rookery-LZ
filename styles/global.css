@@ -47,3 +47,66 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #82cfff;
 }
+
+/* Spin Animation */
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Spectrum Bar Pulse */
+@keyframes spectrum-pulse {
+    0%, 100% { 
+        box-shadow: 0 0 0px rgba(241, 193, 0, 0);
+    }
+    50% { 
+        box-shadow: 0 0 8px rgba(241, 193, 0, 0.8);
+    }
+}
+.spectrum-active {
+    animation: spectrum-pulse 1s ease-in-out infinite;
+    background: linear-gradient(to top, rgba(241, 193, 0, 0.8), rgba(130, 207, 255, 0.3)) !important;
+}
+
+/* Glassmorphism Panel */
+.glass-panel {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(130, 207, 255, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 0 20px rgba(130, 207, 255, 0.05);
+}
+
+/* Staggered Fade-In Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+}
+
+/* Dynamic Glow Effect */
+.glow-primary {
+    box-shadow: 0 0 15px rgba(130, 207, 255, 0.3);
+}
+
+.glow-error {
+    box-shadow: 0 0 15px rgba(255, 82, 82, 0.3);
+}
+
+.glow-tertiary {
+    box-shadow: 0 0 15px rgba(241, 193, 0, 0.3);
+}
