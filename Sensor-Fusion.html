@@ -550,13 +550,15 @@
 
                 const btnFinalize = document.getElementById('btn-finalize');
                 if (btnFinalize) {
-                    if (phase >= 5) btnFinalize.classList.remove('opacity-50', 'cursor-not-allowed');
+                    const aiReadyToReport = typeof AISystem !== 'undefined' && AISystem.state?.approvedAction;
+                    if (phase >= 5 || aiReadyToReport) btnFinalize.classList.remove('opacity-50', 'cursor-not-allowed');
                     else btnFinalize.classList.add('opacity-50', 'cursor-not-allowed');
                 }
             }
 
             function finalizeReport() {
-                if (typeof SensorDataEngine === 'undefined' || SensorDataEngine.state.phase < 5) return;
+                const aiReadyToReport = typeof AISystem !== 'undefined' && AISystem.state?.approvedAction;
+                if (typeof SensorDataEngine === 'undefined' || (SensorDataEngine.state.phase < 5 && !aiReadyToReport)) return;
                 let report = typeof AISystem !== 'undefined' ? AISystem.generateReport() : null;
                 if (report) renderReportModal(report);
                 addCommEntry('C2 HQ', 'FINAL INCIDENT REPORT FILED.');
@@ -652,6 +654,7 @@
                                 <div class="font-data-mono text-[10px] text-on-surface-variant">${approved.summary}</div>
                                 <div class="text-[9px] font-label-caps text-amber-300 uppercase">STATUS: ${approved.status}</div>
                                 <div class="text-[10px] text-outline">${message}</div>
+                                <div class="text-[10px] text-sky-300 border-t border-outline-variant/20 pt-2">Awaiting commander report generation to close the action loop.</div>
                             </div>`;
                     }
                 }
@@ -675,7 +678,6 @@
             });
 
             window.addEventListener('ai-report-generated', (e) => {
-                renderReportModal(e.detail);
                 addCommEntry('AI', `▶ PHASE 5/5: REPORT — ${e.detail.resultOutcome}`);
             });
 

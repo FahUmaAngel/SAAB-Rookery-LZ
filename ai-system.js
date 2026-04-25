@@ -489,7 +489,7 @@ Provide a 2-sentence tactical recommendation for the C2 Commander. First sentenc
                 status: "Complete",
                 summary: outcome.summary
             };
-            AISystem.generateReport(outcome);
+            AISystem.log("PROTECT", `Approved action status: ${outcome.result}`);
         }, 2200);
     },
 
