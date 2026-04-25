@@ -388,7 +388,7 @@
                         letter-spacing:0.08em; color:#ffb4ab;
                         text-shadow: 0 0 6px rgba(255,180,171,0.5);
                         white-space:nowrap;
-                    ">TRK-U99</div>
+                    ">TRK-842</div>
                 </div>
             `,
             iconSize: [30, 40],
@@ -398,18 +398,18 @@
         L.marker(hostilePos, { icon: hostileIcon, zIndexOffset: 1000 }).addTo(map)
             .bindPopup(`
                 <div style="font-family:'Inter',monospace;">
-                    <div style="color:#ffb4ab; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">TRK-U99 — UNKNOWN / HOSTILE</div>
-                    <div style="color:#87929b; font-size:9px;">CLASSIFICATION: PENDING</div>
-                    <div style="color:#87929b; font-size:9px;">SPEED: 850 KTS</div>
-                    <div style="color:#87929b; font-size:9px;">ALT: 28,000 FT</div>
-                    <div style="color:#87929b; font-size:9px;">BRG: 270° TRUE (WEST)</div>
+                    <div style="color:#ffb4ab; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">TRK-842 — HOSTILE</div>
+                    <div style="color:#87929b; font-size:9px;">ID: SU-27 FLANKER</div>
+                    <div style="color:#87929b; font-size:9px;">SPEED: MACH 1.2</div>
+                    <div style="color:#87929b; font-size:9px;">ALT: 32,000 FT</div>
+                    <div style="color:#87929b; font-size:9px;">BRG: 274° TRUE</div>
                     <div style="color:#ffb4ab; font-size:9px; margin-top:4px; font-weight:600;">⚠ TRANSPONDER: OFF</div>
                 </div>
             `);
 
 
         // ── AI Probability Cone ──
-        // Widening polygon in front of TRK-U99 showing 10-min prediction
+        // Widening polygon in front of TRK-842 showing 10-min prediction
         const coneTip = hostilePos;
         const coneNarrow1 = [58.60, 20.5];
         const coneNarrow2 = [58.40, 20.5];
@@ -508,7 +508,7 @@
                 <div style="color:#87929b; font-size:9px;">ORIGIN: ${closestBase.fullName}</div>
                 <div style="color:#87929b; font-size:9px;">SPEED: MACH 1.6</div>
                 <div style="color:#87929b; font-size:9px;">ALT: 35,000 FT</div>
-                <div style="color:#87929b; font-size:9px;">MISSION: INTERCEPT TRK-U99</div>
+                <div style="color:#87929b; font-size:9px;">MISSION: INTERCEPT TRK-842</div>
                 <div style="color:#82cfff; font-size:9px; margin-top:4px; font-weight:600;">● TRANSPONDER: ON — SQUAWK 7401</div>
             </div>
         `);
