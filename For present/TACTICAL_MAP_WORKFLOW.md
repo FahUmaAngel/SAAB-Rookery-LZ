@@ -1,67 +1,67 @@
-# Workflow และอธิบายการทำงานของหน้า Tactical Map (`tactical-map.html`)
+# Tactical Map Workflow and Functionality Explanation (`tactical-map.html`)
 
-หน้า `tactical-map.html` เป็นศูนย์กลางบัญชาการ (Command Center) ที่เน้นการแสดงผลขั้นสูง (Advanced Visualizations) กว่าแผนที่ปกติ โดยมีฟีเจอร์เด่นคือ **Layer Toggling (การเปิด/ปิดชั้นข้อมูล)** และ **Dynamic Intercept Calculation (การคำนวณเส้นทางสกัดกั้นแบบไดนามิก)**
-
----
-
-## 1. โครงสร้างหลักของหน้าจอ (Layout & Structure)
-
-หน้าจอนี้แบ่งโครงสร้างคล้ายกับ `map-view.html` แต่มีเครื่องมือและหน้าปัดควบคุมที่ลึกซึ้งกว่า:
-
-1.  **Main Map Canvas (พื้นที่แผนที่หลัก):**
-    *   มีปุ่ม **Toggle Controls** ด้านล่าง (RADAR, SAT, BNDRY, QRA) สำหรับเปิด/ปิดชั้นข้อมูล (Layers) บนแผนที่
-    *   มีหน้าต่าง **Legend** อธิบายสัญลักษณ์ทางยุทธวิธี
-    *   มี **AI Geofencing Alert Zone** (ซ่อนอยู่) ซึ่งเป็น CSS Overlay ที่จะเด้งขึ้นมาแจ้งเตือนเมื่อเป้าหมายล้ำเส้น
-2.  **Right Sidebar (แผงข้อมูลเป้าหมายเชิงลึก):**
-    *   แสดง **Target Details** แบบเจาะจง (เช่น SU-27 Flanker, ความมั่นใจ 94%)
-    *   มาตรวัด **Telemetry Grid** แสดงความเร็ว (M 1.2), ระดับความสูง (32k ft), และทิศทาง (274° TRUE)
-    *   **Action Buttons:** ปุ่มสั่งการ เช่น "AI Tactical Scan", "Designate Target", และ "Scramble Intercept"
+The `tactical-map.html` page acts as the Command Center, focusing on advanced visualizations beyond standard mapping. Its standout features include **Layer Toggling** and **Dynamic Intercept Calculation**.
 
 ---
 
-## 2. ลำดับการทำงาน (Workflow)
+## 1. Layout & Structure
 
-### Step 1: โหลดโครงสร้างและ CSS Animations
-*   ใช้ Tailwind CSS และ Custom CSS สำหรับสร้าง Animations เฉพาะจุด เช่น:
-    *   `radarSweep`: เอฟเฟกต์เรดาร์กวาด
-    *   `friendlyChevron`: เอฟเฟกต์กะพริบของสัญลักษณ์เครื่องบินฝ่ายเรา (รูปทรงบั้ง)
-    *   `airbaseTriangle`: เอฟเฟกต์เรืองแสงของสัญลักษณ์ฐานทัพอากาศ (รูปสามเหลี่ยม)
+This page shares a similar structure with `map-view.html` but includes more profound tools and control dials:
 
-### Step 2: Initialize Leaflet Map และ Layer Groups
-ฟังก์ชัน `initTacticalMap()` จะถูกเรียกใช้เพื่อสร้างแผนที่:
-1.  โหลดแผนที่ฐาน (Dark theme) 
-2.  เตรียม `L.layerGroup` หลายๆ กลุ่มเพื่อรองรับการเปิด/ปิด (Toggle) ได้แก่:
-    *   `radarCoverageGroup` และ `radarSweepGroup` สำหรับสัญญาณเรดาร์
-    *   `boundaryGroup` สำหรับเส้นแบ่งเขตแดน
-    *   `qraGroup` สำหรับฐานทัพและเครื่องบินสกัดกั้น
-    *   `tracksGroup` สำหรับเป้าหมาย (แสดงตลอดเวลา)
-
-### Step 3: วาดชั้นข้อมูลยุทธวิธี (Tactical Layers)
-
-1.  **Radar Nodes:** วาดสถานีเรดาร์ 5 แห่ง พร้อมเอฟเฟกต์เรดาร์กวาด และผูกข้อมูลรัศมีทำการ (Radius) เข้าไปใน Popup
-2.  **Sweden Boundary:** วาดรูปหลายเหลี่ยม (Polygon) ตามพิกัดเพื่อแสดงเส้นแบ่งเขตแดนประเทศและน่านน้ำ
-3.  **Hostile Track (TRK-842):** วาดสัญลักษณ์เป้าหมายศัตรู (รูปข้าวหลามตัดสีแดง) พร้อมเส้นคาดการณ์ล่วงหน้า (Trajectory Line)
-
-### Step 4: Dynamic QRA & Interceptor Calculation (ไฮไลต์สำคัญ!)
-ในส่วนนี้ ระบบไม่ได้ฟิกซ์ตายตัวว่าเครื่องบินเราจะมาจากไหน แต่มีลอจิกการคำนวณ (Math) เข้ามาช่วย:
-1.  **คำนวณระยะทาง (Haversine Distance):** ระบบจะคำนวณระยะห่างระหว่างเป้าหมาย (Hostile) กับฐานทัพอากาศทั้ง 3 แห่ง (F16, F17, F21) เพื่อหาฐานทัพที่ **"ใกล้ที่สุด"** (Closest Base)
-2.  **สร้างเครื่องบินสกัดกั้น (Friendly Interceptor - INT-01):** เมื่อรู้ฐานที่ใกล้ที่สุด ระบบจะวาดเครื่องบินฝ่ายเรา (รูปบั้งสีฟ้า) ลอยขึ้นมาจากฐานนั้น
-3.  **คำนวณจุดตัด (Intercept Point):** ระบบจะคำนวณเวกเตอร์เพื่อหาจุดกึ่งกลางที่เครื่องบินเราจะพุ่งไปสกัดกั้นเป้าหมายบนเส้นทางบินของศัตรู และวาดเส้นปะนำทางไปบรรจบกันตรงนั้น
-
-### Step 5: ระบบเปิด/ปิดเลเยอร์ (Layer Toggling)
-*   เมื่อผู้ใช้คลิกปุ่มด้านล่าง (เช่น RADAR, SAT) ฟังก์ชัน `toggleLayer()` จะทำงาน
-*   ระบบจะทำการตรวจสอบว่า Layer นั้นถูกเพิ่มเข้าแผนที่หรือยัง ถ้ายังให้ `map.addLayer()` ถ้ามีแล้วให้ `map.removeLayer()` ทำให้การแสดงผลไหลลื่นโดยไม่ต้องรีเฟรชหน้า
-
-### Step 6: เชื่อมต่อกับระบบ AI (AI Integration)
-*   **การสั่ง Scan:** เมื่อผู้ใช้กดปุ่ม "AI Tactical Scan" ทางขวา จะไปเรียกฟังก์ชัน `window.AISystem.scan()` ในไฟล์ `ai-system.js`
-*   **Event Listener (`tacticalMapAIListener`):** แผนที่จะดักฟัง Event จาก AI
-    *   หาก AI เปลี่ยนสถานะเป็น `SUGGEST` -> ไอคอนเป้าหมายสีแดงบนแผนที่จะเรืองแสงสว่างขึ้นเป็นเวลา 3 วินาที
-    *   หาก AI เปลี่ยนสถานะเป็น `PROTECT` -> ป๊อปอัป **AI Geofence Zone** (กรอบสีแดงแจ้งเตือนการละเมิดพื้นที่) จะเด้งขึ้นมากลางหน้าจอทันที
+1.  **Main Map Canvas:**
+    *   Features **Toggle Controls** at the bottom (RADAR, SAT, BNDRY, QRA) to switch map layers on and off.
+    *   Includes a **Legend** window explaining tactical symbols.
+    *   Features a hidden **AI Geofencing Alert Zone** (a CSS Overlay) that pops up to warn when a target breaches the perimeter.
+2.  **Right Sidebar (In-depth Target Telemetry):**
+    *   Displays specific **Target Details** (e.g., SU-27 Flanker, 94% profile match).
+    *   Features a **Telemetry Grid** indicating speed (M 1.2), altitude (32k ft), and bearing (274° TRUE).
+    *   **Action Buttons:** Command buttons like "AI Tactical Scan", "Designate Target", and "Scramble Intercept".
 
 ---
 
-## 3. สรุปความสำคัญทางเทคนิค
+## 2. Workflow
 
-*   **Dynamic Algorithms:** การใช้สูตรคณิตศาสตร์พื้นผิวโลก (Haversine Formula) ในการหาฐานทัพที่ใกล้ที่สุด ทำให้แผนที่ดูฉลาดและตอบสนองตามสถานการณ์จริง
-*   **Layer Management:** การจัดกลุ่ม Marker ลงใน `L.layerGroup` ทำให้จัดการแผนที่ที่มีข้อมูลหนาแน่นได้ดี และเป็นมิตรกับประสิทธิภาพของเบราว์เซอร์ (Performance Optimization)
-*   **Event-Driven UI:** การอัปเดตหน้าจอใช้หลักการ Event Listener (ดักฟัง `ai-update`) ทำให้ Map View ไม่ต้องเขียนโค้ดผูกมัด (Tight Coupling) กับระบบ AI มากเกินไป รองรับการขยายสเกลในอนาคตได้ดี
+### Step 1: Load Structure and CSS Animations
+*   Utilizes Tailwind CSS and Custom CSS to create specific point animations, such as:
+    *   `radarSweep`: A sweeping radar effect.
+    *   `friendlyChevron`: A flashing effect for friendly aircraft symbols (chevron shape).
+    *   `airbaseTriangle`: A glowing effect for airbase symbols (triangle shape).
+
+### Step 2: Initialize Leaflet Map and Layer Groups
+The `initTacticalMap()` function is called to build the map:
+1.  Loads the base map (Dark theme).
+2.  Prepares multiple `L.layerGroup` instances to support toggling, including:
+    *   `radarCoverageGroup` and `radarSweepGroup` for radar signals.
+    *   `boundaryGroup` for boundary lines.
+    *   `qraGroup` for airbases and interceptor aircraft.
+    *   `tracksGroup` for targets (always visible).
+
+### Step 3: Draw Tactical Layers
+
+1.  **Radar Nodes:** Draws 5 radar stations with sweeping effects and binds operational radius data to popups.
+2.  **Sweden Boundary:** Draws a polygon using coordinates to delineate national and maritime boundaries.
+3.  **Hostile Track (TRK-842):** Draws the enemy target symbol (a red diamond) along with a predictive trajectory line.
+
+### Step 4: Dynamic QRA & Interceptor Calculation (Key Highlight!)
+Here, the system does not hardcode the origin of friendly aircraft. Instead, mathematical logic is applied:
+1.  **Distance Calculation (Haversine Distance):** The system calculates the distance between the hostile target and all 3 airbases (F16, F17, F21) to find the **Closest Base**.
+2.  **Spawn Friendly Interceptor (INT-01):** Once the closest base is determined, the system draws a friendly aircraft (blue chevron) taking off from that base.
+3.  **Calculate Intercept Point:** The system calculates vectors to find the midpoint where friendly aircraft will intercept the target along the enemy's flight path, drawing a dashed line to that rendezvous point.
+
+### Step 5: Layer Toggling System
+*   When a user clicks the bottom buttons (e.g., RADAR, SAT), the `toggleLayer()` function executes.
+*   The system checks if the layer is already added. If not, it runs `map.addLayer()`; if it is, it runs `map.removeLayer()`. This ensures smooth rendering without refreshing the page.
+
+### Step 6: AI Integration
+*   **Initiating a Scan:** Clicking "AI Tactical Scan" on the right calls the `window.AISystem.scan()` function in `ai-system.js`.
+*   **Event Listener (`tacticalMapAIListener`):** The map listens for events from the AI.
+    *   If the AI transitions to the `SUGGEST` phase -> The red target icon glows brightly for 3 seconds.
+    *   If the AI transitions to the `PROTECT` phase -> The **AI Geofence Zone** popup (a red box warning of area violation) immediately appears in the center of the screen.
+
+---
+
+## 3. Technical Significance Summary
+
+*   **Dynamic Algorithms:** Using the Haversine formula to find the closest airbase makes the map intelligent and responsive to real-world scenarios.
+*   **Layer Management:** Grouping markers into `L.layerGroup` allows for excellent management of dense map data and optimizes browser performance.
+*   **Event-Driven UI:** Updating the screen via Event Listeners (listening for `ai-update`) prevents tight coupling between the Map View and the AI system, facilitating future scalability.
