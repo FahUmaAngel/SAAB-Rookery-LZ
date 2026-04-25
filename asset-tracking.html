@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>C2 // Asset Tracking</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="tailwind.config.js"></script>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<div id="header-placeholder"></div>
+<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+<div id="sidebar-placeholder"></div>
+
+<main class="h-full p-gutter overflow-y-auto hex-bg">
+    <div class="max-w-[1700px] mx-auto flex flex-col gap-gutter pb-margin">
+        <header class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4 pt-2">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-1 border border-tertiary/40 bg-tertiary/10 text-[10px] font-label-caps text-tertiary uppercase tracking-[0.18em]">Logs &amp; Intel</span>
+                    <span class="px-2 py-1 border border-primary/30 bg-primary/10 text-[10px] font-label-caps text-primary uppercase tracking-[0.18em]">Asset Tracking</span>
+                </div>
+                <h1 class="font-headline-lg text-[30px] leading-none text-on-surface uppercase tracking-[0.18em]">Asset Tracking Dashboard</h1>
+                <p class="mt-2 font-data-mono text-data-mono text-on-surface-variant max-w-[900px]">
+                    A simple overview of which assets are available, where they are, and which ones are ready to support a QRA response.
+                </p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 min-w-0 xl:min-w-[540px]">
+                <div class="border border-outline-variant bg-surface-container p-3">
+                    <div class="text-[9px] font-label-caps text-outline uppercase">Alert Level</div>
+                    <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-error">Alpha</div>
+                    <div class="text-[10px] font-data-mono text-error/70">QRA armed</div>
+                </div>
+                <div class="border border-outline-variant bg-surface-container p-3">
+                    <div class="text-[9px] font-label-caps text-outline uppercase">Ready in 15</div>
+                    <div id="asset-kpi-ready" class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-primary">0</div>
+                    <div class="text-[10px] font-data-mono text-primary/70">launch-capable</div>
+                </div>
+                <div class="border border-outline-variant bg-surface-container p-3">
+                    <div class="text-[9px] font-label-caps text-outline uppercase">Airborne</div>
+                    <div id="asset-kpi-airborne" class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-tertiary">0</div>
+                    <div class="text-[10px] font-data-mono text-tertiary/70">tracked now</div>
+                </div>
+                <div class="border border-outline-variant bg-surface-container p-3">
+                    <div class="text-[9px] font-label-caps text-outline uppercase">Maintenance</div>
+                    <div id="asset-kpi-maint" class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-error">0</div>
+                    <div class="text-[10px] font-data-mono text-error/70">degraded assets</div>
+                </div>
+            </div>
+        </header>
+
+        <section class="bg-surface-container border border-outline-variant rounded-DEFAULT overflow-hidden">
+            <div class="flex items-center justify-between p-panel-padding border-b border-outline-variant bg-surface-container-high">
+                <div>
+                    <h2 class="font-headline-md text-headline-md uppercase tracking-[0.12em]">Asset Overview</h2>
+                    <p class="font-data-mono text-[10px] text-on-surface-variant mt-1">A compact list of the assets the operator needs to understand first.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" data-filter="all" class="asset-filter border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-label-caps text-primary uppercase tracking-[0.16em]">All</button>
+                    <button type="button" data-filter="airborne" class="asset-filter border border-outline-variant px-3 py-1 text-[10px] font-label-caps text-outline uppercase tracking-[0.16em]">Airborne</button>
+                    <button type="button" data-filter="ready" class="asset-filter border border-outline-variant px-3 py-1 text-[10px] font-label-caps text-outline uppercase tracking-[0.16em]">Ready</button>
+                    <button type="button" data-filter="repair" class="asset-filter border border-outline-variant px-3 py-1 text-[10px] font-label-caps text-outline uppercase tracking-[0.16em]">Repair</button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-px bg-outline-variant/20 p-px">
+                <div class="bg-surface-container p-4">
+                    <div class="text-[9px] font-label-caps text-outline uppercase">In Hangar</div>
+                    <div id="asset-kpi-hangar" class="mt-2 text-[28px] font-['Space_Grotesk'] font-bold text-on-surface">0</div>
+                </div>
+                <div class="bg-surface-container p-4">
+                    <div class="text-[9px] font-label-caps text-outline uppercase">On Field</div>
+                    <div id="asset-kpi-field" class="mt-2 text-[28px] font-['Space_Grotesk'] font-bold text-primary">0</div>
+                </div>
+                <div class="bg-surface-container p-4">
+                    <div class="text-[9px] font-label-caps text-outline uppercase">Average Fuel</div>
+                    <div id="asset-kpi-fuel" class="mt-2 text-[28px] font-['Space_Grotesk'] font-bold text-tertiary">0%</div>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-surface-container-low border-b border-outline-variant">
+                        <tr class="text-[10px] font-label-caps text-outline uppercase tracking-[0.18em]">
+                            <th class="py-3 px-4 font-normal">Asset</th>
+                            <th class="py-3 px-4 font-normal">Base</th>
+                            <th class="py-3 px-4 font-normal">State</th>
+                            <th class="py-3 px-4 font-normal">Fuel</th>
+                            <th class="py-3 px-4 font-normal">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody id="asset-table-body" class="font-data-mono text-[11px] text-on-surface"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 2xl:grid-cols-[1.1fr_0.9fr] gap-gutter items-start">
+            <div class="bg-surface-container border border-outline-variant rounded-DEFAULT overflow-hidden self-start">
+                <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+                    <div>
+                        <h2 class="font-headline-md text-headline-md uppercase tracking-[0.12em]">Theater Position Plot</h2>
+                        <p class="font-data-mono text-[10px] text-on-surface-variant mt-1">Airborne assets are projected over the Baltic operational area. Grounded platforms remain anchored to their home base.</p>
+                    </div>
+                    <span class="font-data-mono text-[10px] text-primary border border-primary/30 px-2 py-1">SYNCED TO C2 PLOT</span>
+                </div>
+                <div class="p-panel-padding">
+                    <div class="relative h-[420px] border border-outline-variant overflow-hidden bg-[linear-gradient(180deg,#10202c_0%,#0b151c_100%)]">
+                        <svg aria-hidden="true" class="absolute inset-0 h-full w-full" viewBox="0 0 1000 620">
+                            <defs>
+                                <linearGradient id="assetSeaGradient" x1="0" x2="0" y1="0" y2="1">
+                                    <stop offset="0%" stop-color="#183142"/>
+                                    <stop offset="52%" stop-color="#102532"/>
+                                    <stop offset="100%" stop-color="#0a141b"/>
+                                </linearGradient>
+                                <radialGradient id="assetSeaGlow" cx="52%" cy="38%" r="55%">
+                                    <stop offset="0%" stop-color="#4f8cb3" stop-opacity="0.28"/>
+                                    <stop offset="100%" stop-color="#4f8cb3" stop-opacity="0"/>
+                                </radialGradient>
+                                <filter id="assetCoastGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur stdDeviation="4" result="blur"/>
+                                    <feMerge>
+                                        <feMergeNode in="blur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+
+                            <rect width="1000" height="620" fill="url(#assetSeaGradient)"/>
+                            <rect width="1000" height="620" fill="url(#assetSeaGlow)"/>
+
+                            <g opacity="0.3" stroke="#335164" stroke-width="1">
+                                <line x1="120" y1="0" x2="120" y2="620"/>
+                                <line x1="250" y1="0" x2="250" y2="620"/>
+                                <line x1="380" y1="0" x2="380" y2="620"/>
+                                <line x1="510" y1="0" x2="510" y2="620"/>
+                                <line x1="640" y1="0" x2="640" y2="620"/>
+                                <line x1="770" y1="0" x2="770" y2="620"/>
+                                <line x1="0" y1="110" x2="1000" y2="110"/>
+                                <line x1="0" y1="220" x2="1000" y2="220"/>
+                                <line x1="0" y1="330" x2="1000" y2="330"/>
+                                <line x1="0" y1="440" x2="1000" y2="440"/>
+                                <line x1="0" y1="550" x2="1000" y2="550"/>
+                            </g>
+
+                            <g fill="#253238" stroke="#91afbf" stroke-opacity="0.6" stroke-width="2" filter="url(#assetCoastGlow)">
+                                <path d="M0 0 H262 L288 38 L302 84 L294 126 L270 162 L280 210 L258 254 L274 308 L254 354 L264 420 L238 484 L248 548 L230 620 H0 Z"/>
+                                <path d="M640 0 H1000 V190 L962 182 L926 160 L898 130 L872 118 L842 134 L818 164 L792 196 L758 194 L724 154 L700 108 L684 62 Z"/>
+                                <path d="M836 214 L892 220 L944 244 L1000 286 V620 H742 L724 568 L740 522 L718 470 L732 420 L766 362 L792 310 Z"/>
+                                <path d="M570 620 H1000 V522 L956 510 L916 488 L868 478 L818 486 L770 510 L718 532 L662 556 L618 586 Z"/>
+                                <path d="M681 178 L706 192 L714 228 L700 260 L674 266 L660 242 L662 206 Z"/>
+                                <path d="M654 304 L667 324 L662 374 L650 428 L636 424 L636 364 L642 320 Z"/>
+                                <path d="M598 492 L615 500 L620 520 L606 532 L590 526 L586 506 Z"/>
+                            </g>
+
+                            <g fill="none" stroke="#82cfff" stroke-opacity="0.28" stroke-width="2" stroke-dasharray="8 8">
+                                <path d="M312 338 C410 292 520 274 638 286"/>
+                                <path d="M286 402 C390 370 522 360 668 382"/>
+                                <path d="M302 234 C410 216 540 214 698 228"/>
+                            </g>
+
+                            <g font-family="Inter, sans-serif" font-size="13" font-weight="700" letter-spacing="3">
+                                <text x="146" y="88" fill="#8ca2af">SWEDEN</text>
+                                <text x="720" y="82" fill="#8ca2af">FINLAND</text>
+                                <text x="868" y="262" fill="#8ca2af">LATVIA</text>
+                                <text x="864" y="332" fill="#8ca2af">LITHUANIA</text>
+                                <text x="810" y="520" fill="#8ca2af">POLAND</text>
+                                <text x="736" y="470" fill="#ffb4ab">KALININGRAD</text>
+                                <text x="458" y="338" fill="#82cfff" opacity="0.72">BALTIC SEA</text>
+                                <text x="680" y="170" fill="#d4dde3" font-size="11" letter-spacing="2">GOTLAND</text>
+                                <text x="640" y="298" fill="#d4dde3" font-size="10" letter-spacing="2">OLAND</text>
+                            </g>
+                        </svg>
+
+                        <div class="absolute top-[27%] left-[33%] z-10 -translate-x-1/2 -translate-y-1/2">
+                            <div class="w-2.5 h-2.5 rounded-full bg-primary border border-sky-100 shadow-[0_0_12px_rgba(130,207,255,0.85)]"></div>
+                            <div class="absolute left-4 -top-1 px-2 py-1 rounded-sm bg-slate-950/60 backdrop-blur-sm border border-primary/20 shadow-[0_4px_14px_rgba(0,0,0,0.24)] text-[9px] font-data-mono text-primary whitespace-nowrap">F7 SATENAS</div>
+                        </div>
+                        <div class="absolute top-[52%] left-[28%] z-10 -translate-x-1/2 -translate-y-1/2">
+                            <div class="w-2.5 h-2.5 rounded-full bg-primary border border-sky-100 shadow-[0_0_12px_rgba(130,207,255,0.85)]"></div>
+                            <div class="absolute left-4 -top-1 px-2 py-1 rounded-sm bg-slate-950/60 backdrop-blur-sm border border-primary/20 shadow-[0_4px_14px_rgba(0,0,0,0.24)] text-[9px] font-data-mono text-primary whitespace-nowrap">F17 KALLINGE</div>
+                        </div>
+                        <div class="absolute top-[16%] left-[24%] z-10 -translate-x-1/2 -translate-y-1/2">
+                            <div class="w-2.5 h-2.5 rounded-full bg-primary border border-sky-100 shadow-[0_0_12px_rgba(130,207,255,0.85)]"></div>
+                            <div class="absolute left-4 -top-1 px-2 py-1 rounded-sm bg-slate-950/60 backdrop-blur-sm border border-primary/20 shadow-[0_4px_14px_rgba(0,0,0,0.24)] text-[9px] font-data-mono text-primary whitespace-nowrap">F21 LULEA</div>
+                        </div>
+
+                        <div class="absolute bottom-4 left-4 z-10 flex max-w-[calc(100%-2rem)] flex-wrap items-center gap-x-3 gap-y-2 rounded-sm bg-slate-950/60 backdrop-blur-sm border border-outline-variant/60 px-3 py-2 text-[9px] font-data-mono text-on-surface shadow-[0_6px_18px_rgba(0,0,0,0.28)]">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-primary border border-sky-100"></span>
+                                <span>Air Base</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rotate-45 bg-primary border border-sky-100"></span>
+                                <span>Airborne Asset</span>
+                            </div>
+                        </div>
+
+                        <div id="asset-map-layer" class="absolute inset-0 z-20"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-gutter">
+                <section class="bg-surface-container border border-outline-variant rounded-DEFAULT overflow-hidden">
+                    <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+                        <h2 class="font-headline-md text-headline-md uppercase tracking-[0.12em]">Selected Asset</h2>
+                        <span class="font-data-mono text-[10px] text-outline">Click a row to inspect</span>
+                    </div>
+                    <div id="asset-detail" class="p-panel-padding space-y-4">
+                        <div class="border border-primary/30 bg-primary/10 p-4">
+                            <div class="text-[10px] font-label-caps text-primary uppercase tracking-[0.18em]">Gripen 201</div>
+                            <div class="mt-2 text-[26px] font-['Space_Grotesk'] font-bold text-on-surface">Intercept Pair Lead</div>
+                            <div class="mt-1 text-[12px] font-data-mono text-on-surface-variant">F17 Kallinge | Airborne | Baltic south sector</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="border border-outline-variant bg-surface-container-low p-3">
+                                <div class="text-[9px] font-label-caps text-outline uppercase">Fuel</div>
+                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-tertiary">64%</div>
+                            </div>
+                            <div class="border border-outline-variant bg-surface-container-low p-3">
+                                <div class="text-[9px] font-label-caps text-outline uppercase">Mission Clock</div>
+                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-on-surface">28 min</div>
+                            </div>
+                            <div class="border border-outline-variant bg-surface-container-low p-3">
+                                <div class="text-[9px] font-label-caps text-outline uppercase">Data Link</div>
+                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-primary">Linked</div>
+                            </div>
+                            <div class="border border-outline-variant bg-surface-container-low p-3">
+                                <div class="text-[9px] font-label-caps text-outline uppercase">ROE State</div>
+                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-error">VID</div>
+                            </div>
+                        </div>
+                        <div class="border border-outline-variant bg-surface-container-low p-4">
+                            <div class="text-[9px] font-label-caps text-outline uppercase">Commander Notes</div>
+                            <p class="mt-2 text-[12px] leading-relaxed text-on-surface-variant">
+                                Lead pair is shadowing the target from international airspace with radar discipline maintained via secure datalink. Relief pair should be prepared if fuel drops below bingo threshold before escort out is complete.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="bg-surface-container border border-outline-variant rounded-DEFAULT overflow-hidden">
+                    <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+                        <h2 class="font-headline-md text-headline-md uppercase tracking-[0.12em]">Simple Status Guide</h2>
+                        <span class="material-symbols-outlined text-primary text-[18px]">info</span>
+                    </div>
+                    <div class="p-panel-padding space-y-3 text-[12px] text-on-surface-variant">
+                        <div class="border border-outline-variant bg-surface-container-low p-3">
+                            <div class="text-[10px] font-label-caps text-primary uppercase tracking-[0.18em]">Airborne</div>
+                            <p class="mt-2">The asset is currently active and plotted on the theater map.</p>
+                        </div>
+                        <div class="border border-outline-variant bg-surface-container-low p-3">
+                            <div class="text-[10px] font-label-caps text-tertiary uppercase tracking-[0.18em]">On Field / Ready</div>
+                            <p class="mt-2">The asset is on the ground but available for rapid launch or tasking.</p>
+                        </div>
+                        <div class="border border-outline-variant bg-surface-container-low p-3">
+                            <div class="text-[10px] font-label-caps text-error uppercase tracking-[0.18em]">Repair</div>
+                            <p class="mt-2">The asset is unavailable and should not be considered for QRA selection.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <script>
+            (() => {
+                const assets = [
+                    {
+                        id: "GRP-201",
+                        name: "Gripen 201",
+                        type: "JAS 39C Gripen",
+                        role: "QRA Interceptor",
+                        base: "F17 Kallinge",
+                        sector: "Baltic South",
+                        state: "Airborne",
+                        disposition: "field",
+                        fuel: 64,
+                        mission: "VID on bogey",
+                        readiness: "Ready in 00:00",
+                        latlon: "56.82N / 18.61E",
+                        mapTop: 58,
+                        mapLeft: 67,
+                        color: "primary",
+                        note: "Lead interceptor tracking unknown air contact in parallel shadow.",
+                        missionClock: "28 min",
+                        datalink: "Linked",
+                        roe: "VID",
+                        maintenance: "None"
+                    },
+                    {
+                        id: "GRP-204",
+                        name: "Gripen 204",
+                        type: "JAS 39C Gripen",
+                        role: "QRA Wingman",
+                        base: "F17 Kallinge",
+                        sector: "Baltic South",
+                        state: "Airborne",
+                        disposition: "field",
+                        fuel: 61,
+                        mission: "Escort support",
+                        readiness: "Ready in 00:00",
+                        latlon: "56.57N / 18.94E",
+                        mapTop: 62,
+                        mapLeft: 72,
+                        color: "tertiary",
+                        note: "Wingman positioned offset to maintain visual warning options.",
+                        missionClock: "28 min",
+                        datalink: "Linked",
+                        roe: "Warning ladder",
+                        maintenance: "None"
+                    },
+                    {
+                        id: "GRP-312",
+                        name: "Gripen 312",
+                        type: "JAS 39E Gripen",
+                        role: "Hot Spare Pair",
+                        base: "F7 Satenas",
+                        sector: "Hangar 2",
+                        state: "Hangar",
+                        disposition: "hangar",
+                        fuel: 96,
+                        mission: "15 min standby",
+                        readiness: "Ready in 08:00",
+                        latlon: "58.43N / 12.71E",
+                        mapTop: 27,
+                        mapLeft: 33,
+                        color: "primary",
+                        note: "Armed, fueled and crewed for relief launch if escort extends.",
+                        missionClock: "Standby",
+                        datalink: "Warm",
+                        roe: "Scramble",
+                        maintenance: "None"
+                    },
+                    {
+                        id: "SKL-901",
+                        name: "Skeldar 901",
+                        type: "UAV",
+                        role: "Maritime ISR",
+                        base: "F17 Kallinge",
+                        sector: "Southern coast",
+                        state: "On Field",
+                        disposition: "field",
+                        fuel: 72,
+                        mission: "Coastal ISR relay",
+                        readiness: "Ready in 06:00",
+                        latlon: "55.95N / 15.61E",
+                        mapTop: 68,
+                        mapLeft: 51,
+                        color: "primary",
+                        note: "Feeding broad-area maritime picture and route verification.",
+                        missionClock: "42 min",
+                        datalink: "Streaming",
+                        roe: "Observe",
+                        maintenance: "Sensor cleaning due +6h"
+                    },
+                    {
+                        id: "GLF-551",
+                        name: "GlobalEye 551",
+                        type: "AEW&C",
+                        role: "Battle Management",
+                        base: "Forward Orbit",
+                        sector: "Northern Baltic",
+                        state: "Airborne",
+                        disposition: "field",
+                        fuel: 78,
+                        mission: "Air picture control",
+                        readiness: "On station",
+                        latlon: "58.94N / 20.42E",
+                        mapTop: 35,
+                        mapLeft: 77,
+                        color: "primary",
+                        note: "Providing radar custody and secure tasking to fighters.",
+                        missionClock: "1h 14m",
+                        datalink: "Network host",
+                        roe: "Control",
+                        maintenance: "None"
+                    },
+                    {
+                        id: "GRP-118",
+                        name: "Gripen 118",
+                        type: "JAS 39C Gripen",
+                        role: "Reserve Interceptor",
+                        base: "F21 Lulea",
+                        sector: "Bay 4",
+                        state: "Repair",
+                        disposition: "repair",
+                        fuel: 18,
+                        mission: "Radar calibration hold",
+                        readiness: "Down for 12h",
+                        latlon: "65.54N / 22.12E",
+                        mapTop: 16,
+                        mapLeft: 24,
+                        color: "error",
+                        note: "Unavailable due to radar array calibration and cooling loop checks.",
+                        missionClock: "Offline",
+                        datalink: "Offline",
+                        roe: "N/A",
+                        maintenance: "Radar array calibration"
+                    },
+                    {
+                        id: "GRP-407",
+                        name: "Gripen 407",
+                        type: "JAS 39E Gripen",
+                        role: "Turnaround Pair",
+                        base: "F7 Satenas",
+                        sector: "Apron West",
+                        state: "On Field",
+                        disposition: "field",
+                        fuel: 48,
+                        mission: "Rearm and refuel",
+                        readiness: "Ready in 21:00",
+                        latlon: "58.41N / 12.69E",
+                        mapTop: 31,
+                        mapLeft: 35,
+                        color: "tertiary",
+                        note: "Returned from training sortie and can be regenerated for QRA if needed.",
+                        missionClock: "Turnaround",
+                        datalink: "Available",
+                        roe: "Scramble",
+                        maintenance: "Refuel plus missile upload"
+                    }
+                ];
+
+                const stateTone = {
+                    Airborne: "text-primary border-primary/30 bg-primary/10",
+                    "On Field": "text-tertiary border-tertiary/30 bg-tertiary/10",
+                    Hangar: "text-on-surface border-outline-variant bg-surface-container-high",
+                    Repair: "text-error border-error/30 bg-error/10"
+                };
+
+                const filterButtons = document.querySelectorAll(".asset-filter");
+                const tableBody = document.getElementById("asset-table-body");
+                const mapLayer = document.getElementById("asset-map-layer");
+                const detail = document.getElementById("asset-detail");
+                let activeFilter = "all";
+                let selectedAssetId = "GRP-201";
+
+                function filteredAssets() {
+                    if (activeFilter === "all") return assets;
+                    if (activeFilter === "airborne") return assets.filter(asset => asset.state === "Airborne");
+                    if (activeFilter === "ready") return assets.filter(asset => asset.state === "On Field" || asset.state === "Hangar");
+                    if (activeFilter === "repair") return assets.filter(asset => asset.state === "Repair");
+                    return assets;
+                }
+
+                function renderKPIs() {
+                    const readyCount = assets.filter(asset => asset.readiness.startsWith("Ready in") && asset.state !== "Repair").length;
+                    const airborneCount = assets.filter(asset => asset.state === "Airborne").length;
+                    const maintCount = assets.filter(asset => asset.state === "Repair").length;
+                    const hangarCount = assets.filter(asset => asset.state === "Hangar").length;
+                    const fieldCount = assets.filter(asset => asset.state === "On Field").length;
+                    const avgFuel = Math.round(assets.reduce((sum, asset) => sum + asset.fuel, 0) / assets.length);
+
+                    document.getElementById("asset-kpi-ready").textContent = readyCount;
+                    document.getElementById("asset-kpi-airborne").textContent = airborneCount;
+                    document.getElementById("asset-kpi-maint").textContent = maintCount;
+                    document.getElementById("asset-kpi-hangar").textContent = hangarCount;
+                    document.getElementById("asset-kpi-field").textContent = fieldCount;
+                    document.getElementById("asset-kpi-fuel").textContent = `${avgFuel}%`;
+                }
+
+                function renderTable() {
+                    const visibleAssets = filteredAssets();
+                    if (!visibleAssets.some(asset => asset.id === selectedAssetId)) {
+                        selectedAssetId = visibleAssets[0]?.id || assets[0].id;
+                    }
+
+                    tableBody.innerHTML = visibleAssets.map(asset => `
+                        <tr data-asset-id="${asset.id}" tabindex="0" class="asset-row border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors cursor-pointer focus:outline-none focus:bg-surface-container-high ${asset.id === selectedAssetId ? "bg-surface-container-high" : ""}">
+                            <td class="py-3 px-4">
+                                <div class="font-bold text-primary">${asset.name}</div>
+                                <div class="text-[10px] text-on-surface-variant">${asset.type}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div>${asset.base}</div>
+                                <div class="text-[10px] text-outline">${asset.readiness}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-1 border text-[10px] font-label-caps uppercase tracking-[0.14em] ${stateTone[asset.state]}">${asset.state}</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-20 h-1.5 bg-surface-variant overflow-hidden">
+                                        <div class="h-full ${asset.fuel < 30 ? "bg-error" : asset.fuel < 55 ? "bg-tertiary" : "bg-primary"}" style="width:${asset.fuel}%"></div>
+                                    </div>
+                                    <span class="${asset.fuel < 30 ? "text-error" : asset.fuel < 55 ? "text-tertiary" : "text-on-surface"}">${asset.fuel}%</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div>${asset.sector}</div>
+                                <div class="text-[10px] text-outline">${asset.latlon}</div>
+                            </td>
+                        </tr>
+                    `).join("");
+                }
+
+                function renderMap() {
+                    mapLayer.innerHTML = assets.map(asset => {
+                        const isSelected = asset.id === selectedAssetId;
+                        const isAirborne = asset.state === "Airborne";
+                        return `
+                            <button type="button" data-map-asset-id="${asset.id}" class="absolute pointer-events-auto" style="top:${asset.mapTop}%; left:${asset.mapLeft}%;">
+                                <div class="relative -translate-x-1/2 -translate-y-1/2">
+                                    <div class="${isAirborne ? "rotate-45" : "rounded-full"} ${asset.state === "Repair" ? "bg-error border-error" : asset.color === "tertiary" ? "bg-tertiary border-tertiary" : "bg-primary border-primary"} w-3 h-3 border ${isSelected ? "shadow-[0_0_16px_rgba(130,207,255,0.9)] scale-125" : "shadow-[0_0_10px_rgba(130,207,255,0.45)]"}"></div>
+                                    ${isSelected ? `<div class="absolute inset-[-10px] rounded-full border border-primary/40 animate-ping"></div>` : ""}
+                                    ${isSelected ? `
+                                        <div class="absolute top-full left-1/2 mt-2 -translate-x-1/2 px-2 py-1 rounded-sm bg-slate-950/60 backdrop-blur-sm shadow-[0_4px_14px_rgba(0,0,0,0.24)] border ${asset.state === "Repair" ? "border-error/30 text-error" : "border-outline-variant/70 text-on-surface"} text-[9px] font-data-mono whitespace-nowrap">
+                                            ${asset.name}
+                                        </div>
+                                    ` : ""}
+                                </div>
+                            </button>
+                        `;
+                    }).join("");
+                }
+
+                function renderDetail() {
+                    const asset = assets.find(item => item.id === selectedAssetId) || assets[0];
+                    const tone = asset.state === "Repair" ? "border-error/30 bg-error/10 text-error" : asset.state === "Airborne" ? "border-primary/30 bg-primary/10 text-primary" : "border-tertiary/30 bg-tertiary/10 text-tertiary";
+
+                    detail.innerHTML = `
+                        <div class="border ${tone} p-4">
+                            <div class="text-[10px] font-label-caps uppercase tracking-[0.18em]">${asset.type}</div>
+                            <div class="mt-2 text-[26px] font-['Space_Grotesk'] font-bold ${asset.state === "Repair" ? "text-on-error-container" : "text-on-surface"}">${asset.name}</div>
+                            <div class="mt-1 text-[12px] font-data-mono ${asset.state === "Repair" ? "text-on-error-container/80" : "text-on-surface-variant"}">${asset.base} | ${asset.state} | ${asset.latlon}</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="border border-outline-variant bg-surface-container-low p-3">
+                                <div class="text-[9px] font-label-caps text-outline uppercase">Fuel</div>
+                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold ${asset.fuel < 30 ? "text-error" : asset.fuel < 55 ? "text-tertiary" : "text-primary"}">${asset.fuel}%</div>
+                            </div>
+                            <div class="border border-outline-variant bg-surface-container-low p-3">
+                                <div class="text-[9px] font-label-caps text-outline uppercase">Mission Clock</div>
+                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-on-surface">${asset.missionClock}</div>
+                            </div>
+                            <div class="border border-outline-variant bg-surface-container-low p-3">
+                                <div class="text-[9px] font-label-caps text-outline uppercase">Data Link</div>
+                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold text-primary">${asset.datalink}</div>
+                            </div>
+                            <div class="border border-outline-variant bg-surface-container-low p-3">
+                                <div class="text-[9px] font-label-caps text-outline uppercase">ROE State</div>
+                                <div class="mt-2 text-[22px] font-['Space_Grotesk'] font-bold ${asset.roe === "N/A" ? "text-outline" : asset.roe === "Warning ladder" ? "text-error" : "text-tertiary"}">${asset.roe}</div>
+                            </div>
+                        </div>
+                        <div class="border border-outline-variant bg-surface-container-low p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="text-[9px] font-label-caps text-outline uppercase">Commander Notes</div>
+                                <span class="text-[10px] font-data-mono text-outline">${asset.readiness}</span>
+                            </div>
+                            <p class="mt-2 text-[12px] leading-relaxed text-on-surface-variant">${asset.note}</p>
+                        </div>
+                    `;
+                }
+
+                filterButtons.forEach(button => {
+                    button.addEventListener("click", () => {
+                        activeFilter = button.dataset.filter;
+                        filterButtons.forEach(item => {
+                            item.className = "asset-filter border border-outline-variant px-3 py-1 text-[10px] font-label-caps text-outline uppercase tracking-[0.16em]";
+                        });
+                        button.className = "asset-filter border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-label-caps text-primary uppercase tracking-[0.16em]";
+                        renderTable();
+                        renderMap();
+                        renderDetail();
+                    });
+                });
+
+                tableBody.addEventListener("click", (event) => {
+                    const row = event.target.closest("[data-asset-id]");
+                    if (!row) return;
+                    selectedAssetId = row.dataset.assetId;
+                    renderTable();
+                    renderMap();
+                    renderDetail();
+                });
+
+                tableBody.addEventListener("keydown", (event) => {
+                    if (event.key !== "Enter" && event.key !== " ") return;
+                    const row = event.target.closest("[data-asset-id]");
+                    if (!row) return;
+                    event.preventDefault();
+                    selectedAssetId = row.dataset.assetId;
+                    renderTable();
+                    renderMap();
+                    renderDetail();
+                });
+
+                mapLayer.addEventListener("click", (event) => {
+                    const marker = event.target.closest("[data-map-asset-id]");
+                    if (!marker) return;
+                    selectedAssetId = marker.dataset.mapAssetId;
+                    renderTable();
+                    renderMap();
+                    renderDetail();
+                });
+
+                renderKPIs();
+                renderTable();
+                renderMap();
+                renderDetail();
+            })();
+        </script>
+    </div>
+</main>
+</div>
+
+<script src="./shared-components.js"></script>
+</body>
+</html>

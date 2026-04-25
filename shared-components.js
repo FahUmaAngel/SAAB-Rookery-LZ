@@ -118,7 +118,7 @@ const SharedComponents = {
                 href: './mission_logs.html',
                 subItems: [
                     { label: 'Mission Logs', icon: 'history_edu', href: './mission_logs.html' },
-                    { label: 'Asset Tracking', icon: 'navigation', href: '#' },
+                    { label: 'Asset Tracking', icon: 'navigation', href: './asset-tracking.html' },
                     { label: 'Telemetry', icon: 'query_stats', href: '#' },
                     { label: 'Intel Brief', icon: 'description', href: '#' }
                 ]
@@ -258,7 +258,7 @@ const SharedComponents = {
         const allowedPaths = [
             'map-view.html', 'tactical-map.html', 'logistics.html',
             'Asset-ready.html', 'Sensor-Fusion.html', 'sensor_map.html',
-            'comms.html', 'mission_logs.html'
+            'comms.html', 'mission_logs.html', 'asset-tracking.html'
         ];
         const filename = url.split('/').pop().split('?')[0];
         if (!allowedPaths.includes(filename)) {
