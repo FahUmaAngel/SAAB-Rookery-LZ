@@ -17,6 +17,13 @@
   @keyframes dashFlow { to { stroke-dashoffset:-18; } }
   @keyframes actionGlow { 0%,100%{filter:drop-shadow(0 0 0 rgba(130,207,255,0));opacity:.72} 50%{filter:drop-shadow(0 0 7px rgba(130,207,255,.65));opacity:1} }
   @keyframes impactPulse { 0%,100%{ transform:scale(1); opacity:.35; } 50%{ transform:scale(1.35); opacity:.85; } }
+  @keyframes opsPanelSweep { 0%{transform:translateX(-120%);opacity:0} 18%{opacity:.75} 52%{opacity:.18} 100%{transform:translateX(140%);opacity:0} }
+  @keyframes opsBorderPulse { 0%,100%{border-color:rgba(51,65,85,.92);box-shadow:0 0 0 rgba(130,207,255,0)} 50%{border-color:rgba(130,207,255,.42);box-shadow:0 0 18px rgba(130,207,255,.09)} }
+  @keyframes opsAmberPulse { 0%,100%{border-color:rgba(251,191,36,.32);box-shadow:0 0 0 rgba(251,191,36,0)} 50%{border-color:rgba(251,191,36,.82);box-shadow:0 0 20px rgba(251,191,36,.14)} }
+  @keyframes opsRowIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes opsDataFlicker { 0%,100%{opacity:1} 47%{opacity:.74} 50%{opacity:1} 53%{opacity:.82} }
+  @keyframes opsMapDrift { 0%,100%{transform:translate3d(0,0,0)} 50%{transform:translate3d(8px,-5px,0)} }
+  @keyframes opsPing { 0%{transform:scale(.4);opacity:.8} 70%{transform:scale(2.8);opacity:0} 100%{opacity:0} }
   .intel-card { background:linear-gradient(180deg,rgba(15,23,42,.78),rgba(2,6,23,.55)); }
   .scanline-overlay::after { content:""; position:absolute; inset:-60% 0; pointer-events:none; background:linear-gradient(to bottom,transparent 0%,rgba(130,207,255,.05) 47%,rgba(130,207,255,.13) 50%,rgba(130,207,255,.05) 53%,transparent 100%); animation:scanline 6.5s linear infinite; }
   .bar-animate { transform-origin:left center; animation:barLoad .9s ease-out both; }
@@ -27,6 +34,55 @@
   .action-dash { animation:dashFlow 1.2s linear infinite; }
   .action-glow { animation:actionGlow 1.6s ease-in-out infinite; }
   .impact-pulse { transform-box:fill-box; transform-origin:center; animation:impactPulse 1.4s ease-in-out infinite; }
+  .ops-console .scanline-overlay::after { display:block; animation-duration:4.8s; }
+  .ops-console [data-ops-panel],
+  .ops-console article,
+  .ops-console aside { position:relative; overflow:hidden; animation:opsBorderPulse 7s ease-in-out infinite; }
+  .ops-console [data-ops-panel]::before,
+  .ops-console article::before,
+  .ops-console aside::before {
+    content:""; position:absolute; inset:0 auto 0 -40%; width:38%; pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(130,207,255,.08),transparent);
+    animation:opsPanelSweep 6.5s linear infinite;
+  }
+  .ops-console [data-ops-hot] { animation:opsAmberPulse 2.4s ease-in-out infinite; }
+  .ops-console .ops-value,
+  .ops-console .ops-status-pill,
+  .ops-console .font-data-mono { animation:opsDataFlicker 5.5s steps(1,end) infinite; }
+  .ops-console .bar-animate { animation:barLoad .9s ease-out both, opsDataFlicker 4s steps(1,end) infinite; }
+  .ops-console .feed-priority { animation:softPulse 1.8s ease-in-out infinite; }
+  .ops-console .action-glow { animation:actionGlow 1.4s ease-in-out infinite; }
+  .ops-console .impact-pulse { animation:impactPulse 1.2s ease-in-out infinite; }
+  .ops-console [style*="radarSpin"] { opacity:.62; }
+  .ops-console .hex-bg { animation:opsMapDrift 18s ease-in-out infinite; }
+  .ops-console #live-track-dot::after {
+    content:""; position:absolute; inset:-8px; border:1px solid rgba(255,180,171,.55);
+    animation:opsPing 1.6s ease-out infinite;
+  }
+  .ops-console #audit-log > div,
+  .ops-console #intel-feed > div { animation:opsRowIn .38s ease-out, opsDataFlicker 6s steps(1,end) infinite; }
+  .ops-table { border-collapse:collapse; width:100%; }
+  .ops-table td,.ops-table th { border-bottom:1px solid rgba(51,65,85,.72); padding:.5rem .65rem; vertical-align:top; }
+  .ops-table th { color:#94a3b8; font-size:9px; text-transform:uppercase; font-family:monospace; font-weight:600; letter-spacing:0; text-align:left; }
+  .ops-table td { font-family:monospace; font-size:11px; color:#cbd5e1; }
+  .ops-cell-label { color:#64748b; font-size:8px; text-transform:uppercase; font-family:monospace; }
+  .ops-value { color:#e2e8f0; font-family:monospace; font-size:12px; }
+  .ops-alert { color:#fbbf24; }
+  .ops-critical { color:#ffb4ab; }
+  .ops-ok { color:#34d399; }
+  .ops-status-pill { border:1px solid rgba(100,116,139,.72); padding:.125rem .4rem; font-family:monospace; font-size:9px; text-transform:uppercase; white-space:nowrap; }
+  .ops-row-grid { display:grid; grid-template-columns:88px minmax(0,1fr) 92px; gap:.65rem; align-items:start; }
+  .confidence-bar { height:4px; background:#0f172a; overflow:hidden; }
+  .confidence-bar > span { display:block; height:100%; }
+  .ops-clickable { cursor:pointer; transition:background-color .18s ease,border-color .18s ease,transform .18s ease; }
+  .ops-clickable:hover { transform:translateY(-1px); background-color:rgba(15,23,42,.72); border-color:rgba(130,207,255,.55); }
+  .ops-selected { outline:1px solid rgba(130,207,255,.68); box-shadow:0 0 20px rgba(130,207,255,.12); }
+  .ops-control-btn { border:1px solid rgba(51,65,85,.9); background:rgba(15,23,42,.58); padding:.45rem .6rem; font-family:monospace; font-size:10px; text-transform:uppercase; color:#cbd5e1; transition:all .18s ease; }
+  .ops-control-btn:hover,.ops-control-btn.active { border-color:rgba(130,207,255,.75); color:#82cfff; background:rgba(14,116,144,.14); }
+  .ops-hidden-layer { display:none !important; }
+  .operator-controls { min-height:132px; border-color:rgba(130,207,255,.55) !important; background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(2,6,23,.82)); }
+  .operator-controls > * { position:relative; z-index:1; }
+  .operator-controls .ops-control-btn { position:relative; z-index:3; pointer-events:auto; min-height:38px; padding:.6rem .8rem; }
 </style>
 </head>
 <body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
@@ -34,29 +90,33 @@
 <div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
 <div id="sidebar-placeholder"></div>
 
-<main class="h-full overflow-y-auto p-gutter flex flex-col gap-gutter">
+<main class="ops-console h-full overflow-y-auto p-gutter flex flex-col gap-gutter">
 
   <!-- Page Header -->
   <header class="border border-outline-variant bg-surface-container p-panel-padding flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
     <div class="flex flex-col gap-2">
       <span class="font-label-caps text-label-caps text-primary uppercase flex items-center gap-2">
         <span class="material-symbols-outlined text-[16px]">description</span>
-        INTEL BRIEF // LOGS &amp; INTEL
+        AIR SURVEILLANCE WORKSTATION // INCIDENT FILE
       </span>
-      <h1 class="font-headline-lg text-headline-lg text-on-surface uppercase">Baltic QRA // BOGEY-731 VID Complete</h1>
+      <h1 class="font-headline-lg text-headline-lg text-on-surface uppercase">Recognized Air Picture // BOGEY-731</h1>
       <div class="flex flex-col gap-1 font-data-mono text-[10px] mt-1">
-        <div><span class="text-slate-500 mr-2">TRACK</span><span class="text-error">BOGEY-731 | TU-22M3 + 2x SU-27 | XPDR NEG | NO FPL CORRELATION</span></div>
-        <div><span class="text-slate-500 mr-2">STATUS</span><span class="text-primary">QRA PAIR AIRBORNE | VID COMPLETE | ROE STEP 2 IN PROGRESS</span></div>
+        <div><span class="text-slate-500 mr-2">CLASS</span><span class="text-error">UNKNOWN / MIL ASSESSED | XPDR NEG | NO FPL CORRELATION</span></div>
+        <div><span class="text-slate-500 mr-2">TASK</span><span class="text-primary">MONITOR | IDENTIFY | DOCUMENT | REPORT</span></div>
       </div>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full lg:w-auto lg:min-w-[320px]">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full lg:w-auto lg:min-w-[520px]">
       <div class="border border-slate-800 bg-surface-container-high p-3">
-        <div class="font-label-caps text-[8px] text-slate-500 uppercase">ROE State</div>
-        <div class="font-data-mono text-[13px] text-tertiary mt-1">Weapons Tight</div>
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Track Quality</div>
+        <div class="font-data-mono text-[13px] text-primary mt-1">A2 / FUSED</div>
       </div>
       <div class="border border-slate-800 bg-surface-container-high p-3">
-        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Readiness</div>
-        <div class="font-data-mono text-[13px] text-primary mt-1">2-Ship Alert</div>
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">ROE</div>
+        <div class="font-data-mono text-[13px] text-tertiary mt-1">WT / HOLD</div>
+      </div>
+      <div class="border border-slate-800 bg-surface-container-high p-3">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Custody</div>
+        <div class="font-data-mono text-[13px] text-emerald-300 mt-1">OPEN</div>
       </div>
       <div class="border border-slate-800 bg-surface-container-high p-3">
         <div class="font-label-caps text-[8px] text-slate-500 uppercase">T+ Elapsed</div>
@@ -66,113 +126,206 @@
     </div>
   </header>
 
-  <!-- Action Alert Rail -->
-  <section class="border border-error/40 bg-error/10 overflow-hidden">
-    <div class="flex items-center border-b border-error/20 bg-black/30">
-      <div class="bg-error text-slate-950 font-label-caps text-[10px] uppercase px-3 py-2 shrink-0 flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-[15px]">bolt</span>
-        ACTION
-      </div>
-      <div class="action-ticker flex-1 font-data-mono text-[10px] text-error">
-        <div class="action-ticker-track">
-          <span class="px-5">QRA SCRAMBLE AUTHENTICATED</span>
-          <span class="px-5">GRIPEN 01/02 ASSIGNED HOT VECTOR 040</span>
-          <span class="px-5">GUARD 121.500 CHALLENGE ACTIVE</span>
-          <span class="px-5">BOGEY-731 CLOSING ADIZ BOUNDARY</span>
-          <span class="px-5">VID FRAME SET SEALED</span>
-          <span class="px-5">QRA SCRAMBLE AUTHENTICATED</span>
-          <span class="px-5">GRIPEN 01/02 ASSIGNED HOT VECTOR 040</span>
-          <span class="px-5">GUARD 121.500 CHALLENGE ACTIVE</span>
-          <span class="px-5">BOGEY-731 CLOSING ADIZ BOUNDARY</span>
-          <span class="px-5">VID FRAME SET SEALED</span>
+  <!-- Interactive Controls -->
+  <section data-ops-panel class="operator-controls border border-primary/50 bg-surface-container-high p-4 flex flex-col gap-4 shadow-[0_0_28px_rgba(130,207,255,0.10)]">
+    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-primary">tune</span>
+          <span class="font-label-caps text-label-caps uppercase text-primary">Operator Controls</span>
         </div>
+        <div class="font-data-mono text-[10px] text-slate-500 uppercase">Track selection, map layers, and local operator logging</div>
       </div>
-      <div id="live-action-state" class="font-data-mono text-[10px] text-tertiary px-3 py-2 border-l border-error/20 shrink-0">PHASE 4 // WARN</div>
+      <div class="flex flex-wrap gap-2">
+        <button type="button" class="ops-control-btn active" data-track-button="BOGEY-731" data-operator-action="select-track" data-track-id="BOGEY-731" onclick="selectTrack('BOGEY-731')">BOGEY-731</button>
+        <button type="button" class="ops-control-btn" data-track-button="QRA-01" data-operator-action="select-track" data-track-id="QRA-01" onclick="selectTrack('QRA-01')">QRA-01</button>
+        <button type="button" class="ops-control-btn" data-track-button="QRA-02" data-operator-action="select-track" data-track-id="QRA-02" onclick="selectTrack('QRA-02')">QRA-02</button>
+        <button type="button" class="ops-control-btn active" id="vectors-toggle" data-operator-action="toggle-layer" data-layer="vectors" onclick="toggleMapLayer('vectors')">Vectors</button>
+        <button type="button" class="ops-control-btn active" id="trails-toggle" data-operator-action="toggle-layer" data-layer="trails" onclick="toggleMapLayer('trails')">Trails</button>
+        <button type="button" class="ops-control-btn" data-operator-action="log-note" onclick="injectOperatorEvent()">Log Note</button>
+        <button type="button" class="ops-control-btn" data-operator-action="clear-audit" onclick="clearAuditLog()">Clear Audit</button>
+      </div>
+    </div>
+    <div id="selected-track-readout" class="font-data-mono text-[11px] text-on-surface-variant border border-primary/25 bg-black/35 p-3">
+      SELECTED BOGEY-731 | UNKNOWN/MIL ASSESSED | XPDR NEG | NO FPL MATCH | ACTION: MAINTAIN VID STANDOFF
     </div>
   </section>
 
-  <!-- Commander Readout -->
-  <section class="grid grid-cols-1 xl:grid-cols-[1.1fr_0.9fr_0.8fr] gap-gutter">
-    <article class="intel-card border border-outline-variant p-panel-padding flex flex-col gap-3">
+  <!-- Watch Floor Status -->
+  <section data-ops-panel class="border border-outline-variant bg-surface-container-low">
+    <div class="grid grid-cols-1 lg:grid-cols-[180px_minmax(0,1fr)_220px]">
+      <div data-ops-hot class="border-b lg:border-b-0 lg:border-r border-outline-variant p-3 bg-surface-container-high">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Current Work Item</div>
+        <div id="live-action-state" class="font-data-mono text-[11px] text-tertiary mt-1">ROE STEP 2 // RADIO CHALLENGE</div>
+      </div>
+      <div class="p-3 grid grid-cols-1 md:grid-cols-4 gap-2 font-data-mono text-[10px]">
+        <div><span class="ops-cell-label block">Last Event</span><span class="ops-value">VID imagery received</span></div>
+        <div><span class="ops-cell-label block">Next Required</span><span class="ops-value ops-alert">2nd guard call</span></div>
+        <div><span class="ops-cell-label block">Authority</span><span class="ops-value">Stril supervisor</span></div>
+        <div><span class="ops-cell-label block">Report Ref</span><span class="ops-value">INC-2024-BALTIC-042</span></div>
+      </div>
+      <div class="border-t lg:border-t-0 lg:border-l border-outline-variant p-3 bg-black/20">
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase">Operator Note</div>
+        <div class="font-data-mono text-[10px] text-slate-300 mt-1">No fire-control illumination. Maintain evidence chain.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Operational Summary -->
+  <section class="grid grid-cols-1 xl:grid-cols-[1.2fr_1fr_0.9fr] gap-gutter">
+    <article data-ops-panel class="border border-outline-variant bg-surface-container-low flex flex-col">
       <div class="flex items-center justify-between border-b border-slate-800 pb-2">
         <h2 class="font-label-caps text-label-caps uppercase text-slate-400 flex items-center gap-2">
-          <span class="material-symbols-outlined text-[16px] text-primary">summarize</span>
-          Commander's Readout
+          <span class="material-symbols-outlined text-[16px] text-primary">table_chart</span>
+          Track Summary
         </h2>
-        <span class="font-data-mono text-[9px] text-primary border border-primary/30 px-1.5">LIVE BRIEF</span>
+        <span class="font-data-mono text-[9px] text-primary border border-primary/30 px-1.5">RAP</span>
       </div>
-      <p class="font-body-sm text-[12px] leading-relaxed text-on-surface-variant">
-        BOGEY-731 is assessed as a Russian long-range aviation package operating in international airspace east of Gotland.
-        Track remains uncooperative: no IFF reply, no correlated flight plan, and no acknowledgement on guard frequency.
-        Swedish QRA maintains visual contact under Weapons Tight. Tasks are to deter boundary penetration, preserve chain of custody,
-        and avoid unnecessary escalation while documenting the intercept.
-      </p>
-      <div class="grid grid-cols-3 gap-2 font-data-mono text-[10px]">
-        <div class="border border-slate-800 bg-black/30 p-2"><span class="block text-slate-500 text-[8px]">ASSESS</span><span class="text-tertiary">PROBING</span></div>
-        <div class="border border-slate-800 bg-black/30 p-2"><span class="block text-slate-500 text-[8px]">POSTURE</span><span class="text-primary">CONTROLLED</span></div>
-        <div class="border border-error/30 bg-error/5 p-2"><span class="block text-slate-500 text-[8px]">ROE</span><span class="text-error">TIGHT</span></div>
-      </div>
+      <table class="ops-table">
+        <tbody>
+          <tr><th>Track</th><td>BOGEY-731</td><th>Source</th><td>Primary radar + QRA VID</td></tr>
+          <tr><th>Assessment</th><td>Russian LRA package, uncooperative</td><th>Confidence</th><td class="ops-alert">Medium-high</td></tr>
+          <tr><th>Position</th><td>International airspace east of Gotland</td><th>Boundary</th><td id="live-dist-summary" class="ops-critical">11.8 NM</td></tr>
+          <tr><th>Status</th><td>No IFF / no FPL match / no guard response</td><th>Intent</th><td>Probe / presence operation</td></tr>
+        </tbody>
+      </table>
     </article>
 
-    <article class="intel-card border border-outline-variant p-panel-padding flex flex-col gap-3">
+    <article data-ops-panel class="border border-outline-variant bg-surface-container-low flex flex-col">
       <div class="flex items-center justify-between border-b border-slate-800 pb-2">
         <h2 class="font-label-caps text-label-caps uppercase text-slate-400 flex items-center gap-2">
           <span class="material-symbols-outlined text-[16px] text-tertiary">verified_user</span>
-          Evidence Chain
+          Evidence Custody
         </h2>
-        <span class="font-data-mono text-[9px] text-emerald-300">4/5 SEALED</span>
+        <span class="font-data-mono text-[9px] text-emerald-300">3 SOURCES ACTIVE</span>
       </div>
-      <div class="grid grid-cols-1 gap-1.5 font-data-mono text-[10px]">
-        <div class="flex items-center justify-between border border-slate-800 bg-black/25 p-2"><span>Primary radar plot chain</span><span class="text-emerald-300">HASHED</span></div>
-        <div class="flex items-center justify-between border border-slate-800 bg-black/25 p-2"><span>EO/IR VID frame set</span><span class="text-emerald-300">SEALED</span></div>
-        <div class="flex items-center justify-between border border-slate-800 bg-black/25 p-2"><span>Guard 121.500 voice log</span><span class="text-tertiary">CAPTURING</span></div>
-      </div>
+      <table class="ops-table">
+        <tbody>
+          <tr><th>Radar Plot Chain</th><td class="ops-ok">Hashed</td></tr>
+          <tr><th>EO/IR VID Frame Set</th><td class="ops-ok">Sealed</td></tr>
+          <tr><th>Guard 121.500 Voice Log</th><td class="ops-alert">Recording</td></tr>
+          <tr><th>Operator Actions</th><td>Audit trail enabled</td></tr>
+        </tbody>
+      </table>
     </article>
 
-    <article class="intel-card border border-error/30 bg-error/5 p-panel-padding flex flex-col gap-3 active-threat-frame">
+    <article data-ops-panel data-ops-hot class="border border-outline-variant bg-surface-container-low flex flex-col">
       <div class="flex items-center justify-between border-b border-error/20 pb-2">
-        <h2 class="font-label-caps text-label-caps uppercase text-error flex items-center gap-2">
-          <span class="material-symbols-outlined text-[16px]">priority_high</span>
-          Decision Focus
+        <h2 class="font-label-caps text-label-caps uppercase text-slate-400 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[16px] text-tertiary">rule</span>
+          Supervisor Decisions
         </h2>
-        <span class="w-1.5 h-1.5 rounded-full bg-error inline-block" style="animation:blink 0.8s infinite"></span>
+        <span class="font-data-mono text-[9px] text-tertiary">ROE STEP 2</span>
       </div>
-      <div class="font-data-mono text-[10px] text-on-surface-variant leading-relaxed">
-        <div><span class="text-slate-500 mr-1">NOW</span><span class="text-error">Transmit second guard challenge before ROE Step 3.</span></div>
-        <div><span class="text-slate-500 mr-1">NEXT</span><span class="text-tertiary">Hold visual shadow until outbound turn is confirmed.</span></div>
-        <div><span class="text-slate-500 mr-1">AVOID</span><span class="text-slate-300">Fire-control illumination unless boundary violation is imminent.</span></div>
-      </div>
+      <table class="ops-table">
+        <tbody>
+          <tr><th>Now</th><td class="ops-alert">Transmit second guard challenge</td></tr>
+          <tr><th>Hold</th><td>No fire-control radar tasking</td></tr>
+          <tr><th>Next Gate</th><td>ROE Step 3 only if boundary penetration imminent</td></tr>
+          <tr><th>Report</th><td>Keep incident summary factual, time-stamped</td></tr>
+        </tbody>
+      </table>
     </article>
   </section>
 
-  <!-- Engagement Queue -->
+  <!-- Task Queue -->
   <section class="grid grid-cols-1 md:grid-cols-4 gap-2">
-    <div id="queue-vector" class="border border-sky-500/35 bg-sky-950/20 p-3 flex items-center gap-3">
-      <span class="material-symbols-outlined text-sky-300 action-glow">flight_takeoff</span>
-      <div><div class="font-label-caps text-[8px] text-slate-500 uppercase">01 Intercept</div><div class="font-data-mono text-[11px] text-sky-300">VECTOR 040</div></div>
+    <div id="queue-vector" data-ops-panel onclick="completeTask('vector')" class="ops-clickable border border-slate-700 bg-surface-container-low p-3 flex items-center gap-3">
+      <span class="material-symbols-outlined text-sky-300">flight_takeoff</span>
+      <div><div class="font-label-caps text-[8px] text-slate-500 uppercase">01 Vector</div><div class="font-data-mono text-[11px] text-sky-300">Assigned / active</div></div>
     </div>
-    <div id="queue-warn" class="border border-error/40 bg-error/10 p-3 flex items-center gap-3 active-threat-frame">
-      <span class="material-symbols-outlined text-error">campaign</span>
-      <div><div class="font-label-caps text-[8px] text-slate-500 uppercase">02 Challenge</div><div class="font-data-mono text-[11px] text-error">GUARD 121.500</div></div>
+    <div id="queue-warn" data-ops-panel data-ops-hot onclick="completeTask('challenge')" class="ops-clickable border border-amber-500/50 bg-amber-950/10 p-3 flex items-center gap-3">
+      <span class="material-symbols-outlined text-tertiary">campaign</span>
+      <div><div class="font-label-caps text-[8px] text-slate-500 uppercase">02 Challenge</div><div class="font-data-mono text-[11px] text-tertiary">Due now</div></div>
     </div>
-    <div id="queue-shadow" class="border border-tertiary/35 bg-tertiary/10 p-3 flex items-center gap-3">
+    <div id="queue-shadow" data-ops-panel onclick="completeTask('shadow')" class="ops-clickable border border-slate-700 bg-surface-container-low p-3 flex items-center gap-3">
       <span class="material-symbols-outlined text-tertiary">near_me</span>
-      <div><div class="font-label-caps text-[8px] text-slate-500 uppercase">03 Shadow</div><div class="font-data-mono text-[11px] text-tertiary">300 M STANDOFF</div></div>
+      <div><div class="font-label-caps text-[8px] text-slate-500 uppercase">03 Shadow</div><div class="font-data-mono text-[11px] text-slate-300">Maintain standoff</div></div>
     </div>
-    <div id="queue-seal" class="border border-emerald-500/35 bg-emerald-950/20 p-3 flex items-center gap-3">
+    <div id="queue-seal" data-ops-panel onclick="completeTask('custody')" class="ops-clickable border border-slate-700 bg-surface-container-low p-3 flex items-center gap-3">
       <span class="material-symbols-outlined text-emerald-300">lock</span>
-      <div><div class="font-label-caps text-[8px] text-slate-500 uppercase">04 Seal</div><div class="font-data-mono text-[11px] text-emerald-300">CUSTODY LOG</div></div>
+      <div><div class="font-label-caps text-[8px] text-slate-500 uppercase">04 Custody</div><div class="font-data-mono text-[11px] text-emerald-300">Auto-log active</div></div>
     </div>
+  </section>
+
+  <!-- Authority, Sources, Audit -->
+  <section class="grid grid-cols-1 xl:grid-cols-[0.95fr_1fr_1.2fr] gap-gutter">
+    <article data-ops-panel class="border border-outline-variant bg-surface-container-low">
+      <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+        <h3 class="font-label-caps text-label-caps uppercase text-slate-400">ROE Authority Matrix</h3>
+        <span class="ops-status-pill text-tertiary border-tertiary/50">Weapons Tight</span>
+      </div>
+      <table class="ops-table">
+        <tbody>
+          <tr><th>Allowed</th><td>Shadow, VID, radio challenge, record all comms</td></tr>
+          <tr><th>Requires Approval</th><td class="ops-alert">Final visual warning, flare employment, tactical maneuver inside 3 NM</td></tr>
+          <tr><th>Prohibited</th><td class="ops-critical">Fire-control illumination or weapons release without sovereign breach and command authority</td></tr>
+          <tr><th>Decision Owner</th><td>Stril supervisor with QRA lead confirmation</td></tr>
+        </tbody>
+      </table>
+    </article>
+
+    <article data-ops-panel class="border border-outline-variant bg-surface-container-low">
+      <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+        <h3 class="font-label-caps text-label-caps uppercase text-slate-400">Source Confidence</h3>
+        <span class="ops-status-pill text-primary border-primary/50">Fused A2</span>
+      </div>
+      <div class="p-panel-padding flex flex-col gap-3 font-data-mono text-[10px]">
+        <div class="ops-clickable p-1" onclick="inspectSource('Primary Radar', '0.94', 'Stable plot chain. Used for position, speed, and boundary model.')">
+          <div class="flex justify-between mb-1"><span>Primary Radar</span><span class="ops-ok">0.94</span></div>
+          <div class="confidence-bar"><span class="bg-emerald-300 w-[94%]"></span></div>
+        </div>
+        <div class="ops-clickable p-1" onclick="inspectSource('QRA Visual ID', '0.88', 'VID frame set confirms platform family and escort count.')">
+          <div class="flex justify-between mb-1"><span>QRA Visual ID</span><span class="ops-ok">0.88</span></div>
+          <div class="confidence-bar"><span class="bg-emerald-300 w-[88%]"></span></div>
+        </div>
+        <div class="ops-clickable p-1" onclick="inspectSource('ELINT Correlation', '0.71', 'Emitter profile supports assessment but is not independently decisive.')">
+          <div class="flex justify-between mb-1"><span>ELINT Correlation</span><span class="ops-alert">0.71</span></div>
+          <div class="confidence-bar"><span class="bg-tertiary w-[71%]"></span></div>
+        </div>
+        <div class="ops-clickable p-1" onclick="inspectSource('Open Source Context', '0.42', 'Context only. Not used as primary operational evidence.')">
+          <div class="flex justify-between mb-1"><span>Open Source Context</span><span class="text-slate-400">0.42</span></div>
+          <div class="confidence-bar"><span class="bg-slate-500 w-[42%]"></span></div>
+        </div>
+      </div>
+      <div id="source-detail" class="mx-panel-padding mb-panel-padding border border-slate-800 bg-black/25 p-2 font-data-mono text-[10px] text-slate-400">
+        Select a source row to inspect confidence rationale.
+      </div>
+    </article>
+
+    <article data-ops-panel class="border border-outline-variant bg-surface-container-low flex flex-col min-h-[240px]">
+      <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
+        <h3 class="font-label-caps text-label-caps uppercase text-slate-400">Audit Timeline</h3>
+        <span class="ops-status-pill text-emerald-300 border-emerald-500/50">Auto Logged</span>
+      </div>
+      <div id="audit-log" class="p-panel-padding flex flex-col gap-2 overflow-y-auto max-h-[260px]">
+        <div class="ops-row-grid font-data-mono text-[10px] border-b border-slate-800 pb-2">
+          <span class="text-slate-500">ZULU --:--</span>
+          <span class="text-on-surface-variant">Custody log opened for incident file INC-2024-BALTIC-042.</span>
+          <span class="ops-status-pill text-emerald-300 border-emerald-500/50 text-center">Logged</span>
+        </div>
+        <div class="ops-row-grid font-data-mono text-[10px] border-b border-slate-800 pb-2">
+          <span class="text-slate-500">T+00:00</span>
+          <span class="text-on-surface-variant">BOGEY-731 correlated with no IFF reply and no flight-plan match.</span>
+          <span class="ops-status-pill text-primary border-primary/50 text-center">Fused</span>
+        </div>
+        <div class="ops-row-grid font-data-mono text-[10px] border-b border-slate-800 pb-2">
+          <span class="text-slate-500">T+00:00</span>
+          <span class="text-on-surface-variant">ROE state set to Weapons Tight; supervisor approval required for escalation.</span>
+          <span class="ops-status-pill text-tertiary border-tertiary/50 text-center">ROE</span>
+        </div>
+      </div>
+    </article>
   </section>
 
   <!-- Track Visualization + Source Summary -->
   <section class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-gutter xl:h-[520px]">
-    <div class="border border-outline-variant bg-surface-container-low relative overflow-hidden min-w-0 min-h-[520px] xl:min-h-0 xl:h-full scanline-overlay">
+    <div data-ops-panel class="border border-outline-variant bg-surface-container-low relative overflow-hidden min-w-0 min-h-[520px] xl:min-h-0 xl:h-full scanline-overlay">
       <div class="absolute inset-0 hex-bg opacity-40"></div>
       <div class="absolute inset-x-0 top-0 h-10 bg-surface-container-high border-b border-outline-variant z-10 flex items-center justify-between px-4">
-        <span class="font-label-caps text-label-caps text-slate-400 uppercase">Baltic Track Reconstruction</span>
-        <span class="font-data-mono text-[10px] text-primary">TRACK FILE // GOTLAND NE APPROACH</span>
-        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-error inline-block" style="animation:blink 1.4s infinite"></span><span class="font-data-mono text-[9px] text-error">UNCOOPERATIVE</span></span>
+        <span class="font-label-caps text-label-caps text-slate-400 uppercase">Geospatial Plot</span>
+        <span class="font-data-mono text-[10px] text-primary">RAP TRACK FILE // GOTLAND NE</span>
+        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-tertiary inline-block"></span><span class="font-data-mono text-[9px] text-tertiary">SUPERVISOR REVIEW</span></span>
       </div>
       <div class="absolute inset-0 pt-10">
         <!-- Radar sweep overlay: SVG rings + animated conic-gradient sweep -->
@@ -206,26 +359,32 @@
             <text x="52" y="38" font-family="monospace" font-size="2.2" fill="rgba(130,207,255,0.22)" text-anchor="start">15NM</text>
             <text x="52" y="23" font-family="monospace" font-size="2.2" fill="rgba(130,207,255,0.22)" text-anchor="start">30NM</text>
             <!-- Track history trail (JS-driven, oldest→newest = trail-0→trail-4) -->
-            <circle id="trail-0" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.05)"/>
-            <circle id="trail-1" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.12)"/>
-            <circle id="trail-2" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.20)"/>
-            <circle id="trail-3" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.30)"/>
-            <circle id="trail-4" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.42)"/>
+            <g id="track-trails-layer">
+              <circle id="trail-0" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.05)"/>
+              <circle id="trail-1" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.12)"/>
+              <circle id="trail-2" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.20)"/>
+              <circle id="trail-3" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.30)"/>
+              <circle id="trail-4" cx="21" cy="26" r="0.9" fill="rgba(255,90,90,0.42)"/>
+            </g>
             <!-- Enemy formation: TU-22M3 + 2x SU-27 (JS-animated, bearing ~310°, r≈38) -->
             <rect id="pip-tu22"  x="19.25" y="24.25" width="3.5" height="3.5" fill="rgba(255,60,60,0.20)" stroke="rgba(255,90,90,0.95)" stroke-width="0.6" transform="rotate(45 21 26)" style="animation:blink 1.1s infinite"/>
             <rect id="pip-su27a" x="21.70" y="23.00" width="2.8" height="2.8" fill="rgba(255,60,60,0.15)" stroke="rgba(255,90,90,0.80)" stroke-width="0.5" transform="rotate(45 23.1 24.4)" style="animation:blink 1.4s infinite"/>
             <rect id="pip-su27b" x="17.50" y="26.20" width="2.8" height="2.8" fill="rgba(255,60,60,0.15)" stroke="rgba(255,90,90,0.80)" stroke-width="0.5" transform="rotate(45 18.9 27.6)" style="animation:blink 1.6s infinite"/>
             <!-- Enemy approach vector (JS-animated start point) -->
-            <line id="pip-vec" x1="21" y1="26" x2="50" y2="50" stroke="rgba(255,90,90,0.18)" stroke-width="0.35" stroke-dasharray="1.5 1.5"/>
+            <g id="track-vectors-layer">
+              <line id="pip-vec" x1="21" y1="26" x2="50" y2="50" stroke="rgba(255,90,90,0.18)" stroke-width="0.35" stroke-dasharray="1.5 1.5"/>
+            </g>
             <!-- Enemy label (JS-animated) -->
             <text id="pip-bogey-lbl" x="9" y="22" font-family="monospace" font-size="2.8" fill="rgba(255,90,90,0.75)" letter-spacing="0.2">BOGEY</text>
             <!-- Friendly: 2x JAS-39 Gripen (SSE intercept, bearing ~160°, r≈24) -->
             <polygon id="gripen-1" class="action-glow" points="59,71.5 57,75.5 61,75.5" fill="rgba(130,207,255,0.20)" stroke="rgba(130,207,255,0.90)" stroke-width="0.45"/>
             <polygon id="gripen-2" class="action-glow" points="55,69.5 53,73.5 57,73.5" fill="rgba(130,207,255,0.20)" stroke="rgba(130,207,255,0.90)" stroke-width="0.45"/>
             <!-- Intercept vector -->
-            <line id="intercept-vector-1" class="action-dash" x1="57" y1="72" x2="32" y2="38" stroke="rgba(130,207,255,0.32)" stroke-width="0.45" stroke-dasharray="2 2"/>
-            <line id="intercept-vector-2" class="action-dash" x1="55" y1="70" x2="30" y2="40" stroke="rgba(130,207,255,0.18)" stroke-width="0.35" stroke-dasharray="1 2"/>
-            <circle id="intercept-bubble" class="impact-pulse" cx="35" cy="41" r="2.2" fill="none" stroke="rgba(130,207,255,0.45)" stroke-width="0.35"/>
+            <g id="intercept-vectors-layer">
+              <line id="intercept-vector-1" class="action-dash" x1="57" y1="72" x2="32" y2="38" stroke="rgba(130,207,255,0.32)" stroke-width="0.45" stroke-dasharray="2 2"/>
+              <line id="intercept-vector-2" class="action-dash" x1="55" y1="70" x2="30" y2="40" stroke="rgba(130,207,255,0.18)" stroke-width="0.35" stroke-dasharray="1 2"/>
+              <circle id="intercept-bubble" class="impact-pulse" cx="35" cy="41" r="2.2" fill="none" stroke="rgba(130,207,255,0.45)" stroke-width="0.35"/>
+            </g>
             <!-- Friendly label -->
             <text x="62" y="78" font-family="monospace" font-size="2.8" fill="rgba(130,207,255,0.75)" letter-spacing="0.2">QRA</text>
             <!-- Center pip -->
@@ -276,19 +435,26 @@
     <aside class="border border-outline-variant bg-surface-container-low flex flex-col overflow-hidden w-full xl:w-[320px] xl:min-w-[320px] xl:max-w-[320px] min-h-[360px] xl:h-full">
       <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between shrink-0">
         <div class="flex flex-col gap-0.5">
-          <span class="font-label-caps text-[8px] text-slate-500 uppercase tracking-widest">Intel Feed</span>
-          <span class="font-data-mono text-[11px] text-on-surface uppercase tracking-wider">LIVE // STRIL C2</span>
+          <span class="font-label-caps text-[8px] text-slate-500 uppercase tracking-widest">Event Feed</span>
+          <span class="font-data-mono text-[11px] text-on-surface uppercase tracking-wider">LIVE // AUDIT SOURCES</span>
         </div>
         <div class="flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-primary inline-block" style="animation:blink 1.4s infinite"></span>
           <span class="font-data-mono text-[9px] text-primary">DATALINK ACTIVE</span>
         </div>
       </div>
+      <div class="border-b border-slate-800 bg-black/20 p-2 flex flex-wrap gap-1">
+        <button type="button" class="ops-control-btn active" data-feed-filter="ALL" onclick="setFeedFilter('ALL')">All</button>
+        <button type="button" class="ops-control-btn" data-feed-filter="ROE" onclick="setFeedFilter('ROE')">ROE</button>
+        <button type="button" class="ops-control-btn" data-feed-filter="RADAR" onclick="setFeedFilter('RADAR')">Radar</button>
+        <button type="button" class="ops-control-btn" data-feed-filter="QRA" onclick="setFeedFilter('QRA')">QRA</button>
+        <button type="button" class="ops-control-btn" data-feed-filter="DIPLO" onclick="setFeedFilter('DIPLO')">Diplo</button>
+      </div>
       <!-- Live scrolling intel feed -->
       <div id="intel-feed" class="flex-1 overflow-y-auto flex flex-col divide-y divide-slate-800/40"></div>
       <!-- Pinned threat data -->
       <div class="border-t border-slate-800 bg-slate-900/60 p-3 shrink-0">
-        <div class="font-label-caps text-[8px] text-slate-500 uppercase mb-1.5">Active Threat // LIVE</div>
+        <div class="font-label-caps text-[8px] text-slate-500 uppercase mb-1.5">Selected Track // LIVE</div>
         <div class="grid grid-cols-2 gap-x-4 gap-y-1 font-data-mono text-[10px]">
           <div><span class="text-slate-500">Track: </span><span class="text-error">TU-22M3</span></div>
           <div><span class="text-slate-500">Escort: </span><span class="text-error">2x SU-27</span></div>
@@ -306,7 +472,7 @@
     <div class="flex items-center justify-between border-b border-outline-variant pb-2">
       <h2 class="font-label-caps text-label-caps uppercase text-slate-400 flex items-center gap-2">
         <span class="material-symbols-outlined text-[16px]">account_tree</span>
-        QRA Intercept Matrix // Incidentberedskap 5-Step ROE Ladder
+        QRA Procedure Matrix // Incidentberedskap ROE Ladder
       </h2>
       <span class="font-data-mono text-[10px] text-slate-600">STRIL C2 AUTHORIZATION REQUIRED</span>
     </div>
@@ -448,7 +614,7 @@
   <section class="grid grid-cols-1 xl:grid-cols-3 gap-gutter">
 
     <!-- Sensor Fusion Inputs -->
-    <div class="border border-outline-variant bg-surface-container-low">
+    <div data-ops-panel class="border border-outline-variant bg-surface-container-low">
       <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
         <h3 class="font-label-caps text-label-caps uppercase text-slate-400">Sensor Fusion Inputs</h3>
         <span class="material-symbols-outlined text-[16px] text-primary">hub</span>
@@ -487,10 +653,10 @@
       </div>
     </div>
 
-    <!-- Threat Vector Matrix -->
-    <div class="border border-outline-variant bg-surface-container-low">
+    <!-- Risk Assessment Matrix -->
+    <div data-ops-panel class="border border-outline-variant bg-surface-container-low">
       <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
-        <h3 class="font-label-caps text-label-caps uppercase text-slate-400">Threat Vector Matrix</h3>
+        <h3 class="font-label-caps text-label-caps uppercase text-slate-400">Risk / Evidence Assessment</h3>
         <span class="material-symbols-outlined text-[16px] text-error">warning</span>
       </div>
       <div class="p-panel-padding flex flex-col gap-4 font-data-mono text-data-mono">
@@ -522,15 +688,15 @@
       </div>
     </div>
 
-    <!-- Brief Actions -->
-    <div class="border border-outline-variant bg-surface-container-low flex flex-col">
+    <!-- Operator Actions -->
+    <div data-ops-panel class="border border-outline-variant bg-surface-container-low flex flex-col">
       <div class="p-panel-padding border-b border-outline-variant bg-surface-container-high flex items-center justify-between">
-        <h3 class="font-label-caps text-label-caps uppercase text-slate-400">Brief Actions</h3>
+        <h3 class="font-label-caps text-label-caps uppercase text-slate-400">Operator Actions</h3>
         <button type="button" onclick="openChecklistModal()" title="Open Mission Checklist" aria-label="Open Mission Checklist" class="hover:text-white transition-colors cursor-pointer"><span class="material-symbols-outlined text-[16px] text-tertiary hover:text-white transition-colors">checklist</span></button>
       </div>
       <div class="p-panel-padding flex flex-col gap-2 flex-1">
         <button id="escalate-sim-button" type="button" onclick="toggleEscalationMode()" class="border border-error bg-error/10 text-error py-3 font-label-caps text-label-caps uppercase flex items-center justify-center gap-2 hover:bg-error/20 transition-colors">
-          <span class="material-symbols-outlined text-[16px]">priority_high</span> Advance ROE Sim
+          <span class="material-symbols-outlined text-[16px]">priority_high</span> Advance Training State
         </button>
         <button id="reset-sim-button" type="button" onclick="resetSimulation()" class="border border-slate-700 bg-surface text-slate-300 py-3 font-label-caps text-label-caps uppercase flex items-center justify-center gap-2 hover:bg-surface-bright transition-colors">
           <span class="material-symbols-outlined text-[16px]">restart_alt</span> Reset Track File
@@ -546,7 +712,7 @@
         </button>
         <div class="mt-auto border-t border-slate-800 pt-3 flex flex-col gap-2">
           <div id="ai-scan-result" class="hidden border border-sky-500/30 bg-sky-950/20 p-3">
-            <div class="font-label-caps text-[8px] text-sky-500 uppercase mb-1">AI Scan Result</div>
+            <div class="font-label-caps text-[8px] text-sky-500 uppercase mb-1">C2 Assessment Result</div>
             <div id="ai-scan-text" class="font-data-mono text-[10px] text-sky-300"></div>
           </div>
         </div>
@@ -815,6 +981,9 @@ let scanInProgress = false;
 let scanRunId = 0;
 let escalationMode = false;
 let lastEscalationBand = 'vid';
+let selectedTrack = 'BOGEY-731';
+let activeFeedFilter = 'ALL';
+const completedTasks = new Set();
 
 function closeModal(id) {
   const modal = document.getElementById(id);
@@ -851,6 +1020,140 @@ function setText(id, val, cls) {
   if (cls) el.className = cls;
 }
 
+function auditTimeLabel() {
+  const m = String(Math.floor(liveState.elapsed / 60)).padStart(2,'0');
+  const s = String(liveState.elapsed % 60).padStart(2,'0');
+  return `T+${m}:${s}`;
+}
+
+function addAuditItem(text, status = 'Logged', tone = 'primary') {
+  const log = document.getElementById('audit-log');
+  if (!log) return;
+  const toneClass = tone === 'warn'
+    ? 'text-tertiary border-tertiary/50'
+    : tone === 'critical'
+      ? 'text-error border-error/50'
+      : tone === 'ok'
+        ? 'text-emerald-300 border-emerald-500/50'
+        : 'text-primary border-primary/50';
+  const div = document.createElement('div');
+  div.className = 'ops-row-grid font-data-mono text-[10px] border-b border-slate-800 pb-2';
+  div.innerHTML = `
+    <span class="text-slate-500">${auditTimeLabel()}</span>
+    <span class="text-on-surface-variant">${text}</span>
+    <span class="ops-status-pill ${toneClass} text-center">${status}</span>
+  `;
+  log.insertBefore(div, log.firstChild);
+  while (log.children.length > 8) log.removeChild(log.lastChild);
+}
+
+function setButtonGroupActive(selector, value, attr) {
+  document.querySelectorAll(selector).forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute(attr) === value);
+  });
+}
+
+function selectTrack(trackId) {
+  selectedTrack = trackId;
+  setButtonGroupActive('[data-track-button]', trackId, 'data-track-button');
+  const readout = document.getElementById('selected-track-readout');
+  const states = {
+    'BOGEY-731': 'SELECTED BOGEY-731 | UNKNOWN/MIL ASSESSED | XPDR NEG | NO FPL MATCH | ACTION: MAINTAIN VID STANDOFF',
+    'QRA-01': 'SELECTED QRA-01 | JAS 39 | LEAD | RADAR SILENT | ACTION: HOLD VISUAL POSITION',
+    'QRA-02': 'SELECTED QRA-02 | JAS 39 | WINGMAN | LINK 16 ACTIVE | ACTION: MAINTAIN FORMATION OFFSET'
+  };
+  if (readout) readout.textContent = states[trackId] || states['BOGEY-731'];
+  addAuditItem(`${trackId} selected by operator.`, 'Select', trackId === 'BOGEY-731' ? 'primary' : 'ok');
+}
+
+function toggleMapLayer(layer) {
+  const ids = layer === 'vectors'
+    ? ['track-vectors-layer', 'intercept-vectors-layer']
+    : ['track-trails-layer'];
+  const btn = document.getElementById(layer + '-toggle');
+  const shouldHide = btn ? btn.classList.contains('active') : false;
+  ids.forEach(id => {
+    const layerEl = document.getElementById(id);
+    if (layerEl) layerEl.classList.toggle('ops-hidden-layer', shouldHide);
+  });
+  if (btn) btn.classList.toggle('active', !shouldHide);
+  addAuditItem(`${layer.toUpperCase()} overlay ${shouldHide ? 'hidden' : 'shown'} on geospatial plot.`, 'Overlay', 'primary');
+}
+
+function completeTask(task) {
+  const taskMap = {
+    vector: ['queue-vector', 'Vector task acknowledged; QRA geometry remains active.', 'Vector'],
+    challenge: ['queue-warn', 'Guard 121.500 challenge marked complete by operator.', 'ROE 2'],
+    shadow: ['queue-shadow', 'Shadow task acknowledged; standoff monitoring continues.', 'Shadow'],
+    custody: ['queue-seal', 'Custody task checked; report package remains open.', 'Custody']
+  };
+  const entry = taskMap[task];
+  if (!entry) return;
+  completedTasks.add(task);
+  const el = document.getElementById(entry[0]);
+  if (el) {
+    el.classList.add('ops-selected');
+    const value = el.querySelector('.font-data-mono:last-child');
+    if (value) value.textContent = 'ACK / LOGGED';
+  }
+  addAuditItem(entry[1], entry[2], task === 'challenge' ? 'warn' : 'ok');
+  addFeedItem({ src:'OPERATOR', col:'#34d399', icon:'done', tag:'ACK', text:entry[1] });
+}
+
+function inspectSource(name, score, detail) {
+  const box = document.getElementById('source-detail');
+  if (box) box.textContent = `${name} | confidence ${score} | ${detail}`;
+  addAuditItem(`Source inspected: ${name} confidence ${score}.`, 'Source', score >= '0.80' ? 'ok' : 'primary');
+}
+
+function clearAuditLog() {
+  const log = document.getElementById('audit-log');
+  if (!log) return;
+  log.replaceChildren();
+  addAuditItem('Audit view cleared locally; system record remains retained.', 'Cleared', 'warn');
+}
+
+function injectOperatorEvent() {
+  addAuditItem('Operator note added: continue monitoring and preserve custody chain.', 'Note', 'primary');
+  addFeedItem({ src:'OPERATOR', col:'#82cfff', icon:'edit_note', tag:'NOTE', text:'Operator note added | continue monitoring and preserve custody chain' });
+}
+
+function setFeedFilter(filter) {
+  activeFeedFilter = filter;
+  setButtonGroupActive('[data-feed-filter]', filter, 'data-feed-filter');
+  renderFeed();
+  addAuditItem(`Event feed filter set to ${filter}.`, 'Filter', 'primary');
+}
+
+function handleOperatorControl(event) {
+  const btn = event.target.closest('[data-operator-action]');
+  if (!btn) return;
+  const action = btn.dataset.operatorAction;
+  if (action === 'select-track') {
+    selectTrack(btn.dataset.trackId || 'BOGEY-731');
+  } else if (action === 'toggle-layer') {
+    toggleMapLayer(btn.dataset.layer || 'vectors');
+  } else if (action === 'log-note') {
+    injectOperatorEvent();
+  } else if (action === 'clear-audit') {
+    clearAuditLog();
+  }
+}
+
+function focusPhase(phase) {
+  const labels = {
+    1: 'Track correlation reviewed by operator.',
+    2: 'QRA launch details reviewed by operator.',
+    3: 'VID evidence reviewed by operator.',
+    4: 'ROE warning ladder reviewed by operator.',
+    5: 'Escort and report closeout reviewed by operator.'
+  };
+  document.querySelectorAll('[id^="phase-card-"]').forEach(card => card.classList.remove('ops-selected'));
+  const card = document.getElementById('phase-card-' + phase);
+  if (card) card.classList.add('ops-selected');
+  addAuditItem(labels[phase] || 'Procedure phase reviewed by operator.', `Phase ${phase}`, phase === 4 ? 'warn' : 'primary');
+}
+
 function toggleEscalationMode() {
   escalationMode = !escalationMode;
   updateEscalationButton();
@@ -858,6 +1161,12 @@ function toggleEscalationMode() {
   addFeedItem(escalationMode
     ? { src:'STRIL SUPERVISOR', col:'#ffb4ab', icon:'priority_high', tag:'SIM', text:'ROE simulation advanced | timeline compressed | Stril approval gates live' }
     : { src:'STRIL SUPERVISOR', col:'#82cfff', icon:'pause_circle', tag:'SIM', text:'ROE simulation paused | maintaining current intercept geometry' }
+  );
+  addAuditItem(escalationMode
+    ? 'Training state advanced; live incident controls remain informational.'
+    : 'Training state paused; current track geometry retained.',
+    escalationMode ? 'Training' : 'Hold',
+    escalationMode ? 'warn' : 'primary'
   );
 }
 
@@ -868,8 +1177,8 @@ function updateEscalationButton() {
     ? 'border border-error bg-error text-slate-950 py-3 font-label-caps text-label-caps uppercase flex items-center justify-center gap-2 hover:bg-red-300 transition-colors'
     : 'border border-error bg-error/10 text-error py-3 font-label-caps text-label-caps uppercase flex items-center justify-center gap-2 hover:bg-error/20 transition-colors';
   btn.innerHTML = escalationMode
-    ? '<span class="material-symbols-outlined text-[16px]">pause_circle</span> ROE Sim Running'
-    : '<span class="material-symbols-outlined text-[16px]">priority_high</span> Advance ROE Sim';
+    ? '<span class="material-symbols-outlined text-[16px]">pause_circle</span> Training State Running'
+    : '<span class="material-symbols-outlined text-[16px]">priority_high</span> Advance Training State';
 }
 
 function resetSimulation() {
@@ -888,16 +1197,24 @@ function resetSimulation() {
   setText('live-elapsed', 'T+00:00');
   setText('live-speed', '980 km/h');
   setText('live-dist', '11.8 NM', 'font-data-mono text-tertiary');
+  setText('live-dist-summary', '11.8 NM', 'ops-critical');
   setText('live-dist-mini', '11.8 NM', 'font-data-mono text-tertiary');
   setText('live-cpa', '09.4 NM', 'text-error text-right');
   setText('live-closure', '544 kt', 'text-tertiary text-right');
-  setText('live-action-state', 'PHASE 3B // VID SHADOW', 'font-data-mono text-[10px] text-tertiary px-3 py-2 border-l border-error/20 shrink-0');
+  setText('live-action-state', 'ROE STEP 2 // RADIO CHALLENGE', 'font-data-mono text-[11px] text-tertiary mt-1');
   setText('live-roe-gate', 'VID', 'text-primary text-right');
   setText('live-qra-pos', 'SSE / 18 NM', 'text-sky-300 text-right');
   setText('live-alt', '8200 m');
   const dot = document.getElementById('live-track-dot');
   if (dot) dot.style.left = liveState.dotLeft + '%';
   seedFeed();
+  const auditLog = document.getElementById('audit-log');
+  if (auditLog) {
+    auditLog.replaceChildren();
+    addAuditItem('ROE state set to Weapons Tight; supervisor approval required for escalation.', 'ROE', 'warn');
+    addAuditItem('BOGEY-731 correlated with no IFF reply and no flight-plan match.', 'Fused', 'primary');
+    addAuditItem('Custody log opened for incident file INC-2024-BALTIC-042.', 'Logged', 'ok');
+  }
   addFeedItem({ src:'STRIL SUPERVISOR', col:'#82cfff', icon:'restart_alt', tag:'RESET', text:'Track file reset | BOGEY-731 restored to initial approach geometry' });
 }
 
@@ -945,20 +1262,21 @@ function updatePhaseCards(band) {
 function setQueueState(id, state, baseClass) {
   const el = document.getElementById(id);
   if (!el) return;
+  if (completedTasks.has(id.replace('queue-', '').replace('warn', 'challenge').replace('seal', 'custody'))) return;
   if (state === 'active') {
-    el.className = baseClass + ' active-threat-frame';
+    el.className = 'ops-clickable ' + baseClass + ' border-tertiary/70 bg-tertiary/10';
   } else if (state === 'done') {
-    el.className = 'border border-emerald-500/35 bg-emerald-950/20 p-3 flex items-center gap-3 opacity-80';
+    el.className = 'ops-clickable border border-slate-700 bg-surface-container-low p-3 flex items-center gap-3 opacity-80';
   } else {
-    el.className = baseClass + ' opacity-55';
+    el.className = 'ops-clickable ' + baseClass + ' opacity-55';
   }
 }
 
 function updateEngagementQueue(band) {
-  setQueueState('queue-vector', band === 'vid' ? 'active' : 'done', 'border border-sky-500/35 bg-sky-950/20 p-3 flex items-center gap-3');
-  setQueueState('queue-warn', band === 'warn' || band === 'flare' ? 'active' : band === 'escort' ? 'done' : 'idle', 'border border-error/40 bg-error/10 p-3 flex items-center gap-3');
-  setQueueState('queue-shadow', band === 'escort' ? 'active' : band === 'flare' ? 'done' : 'idle', 'border border-tertiary/35 bg-tertiary/10 p-3 flex items-center gap-3');
-  setQueueState('queue-seal', band === 'escort' ? 'active' : 'idle', 'border border-emerald-500/35 bg-emerald-950/20 p-3 flex items-center gap-3');
+  setQueueState('queue-vector', band === 'vid' ? 'active' : 'done', 'border border-slate-700 bg-surface-container-low p-3 flex items-center gap-3');
+  setQueueState('queue-warn', band === 'warn' || band === 'flare' ? 'active' : band === 'escort' ? 'done' : 'idle', 'border border-amber-500/50 bg-amber-950/10 p-3 flex items-center gap-3');
+  setQueueState('queue-shadow', band === 'escort' ? 'active' : band === 'flare' ? 'done' : 'idle', 'border border-slate-700 bg-surface-container-low p-3 flex items-center gap-3');
+  setQueueState('queue-seal', band === 'escort' ? 'active' : 'idle', 'border border-slate-700 bg-surface-container-low p-3 flex items-center gap-3');
 }
 
 const trackHistory = [];
@@ -1009,12 +1327,12 @@ function startLiveData() {
     const distCls = 'font-data-mono ' + (liveState.distance < 9 ? 'text-error' : 'text-tertiary');
     const phaseBand = liveState.distance < 7.4 ? 'escort' : liveState.distance < 8.8 ? 'flare' : liveState.distance < 10.2 ? 'warn' : 'vid';
     const actionState = phaseBand === 'escort'
-      ? 'PHASE 5 // ESCORT OUT'
+      ? 'CLOSEOUT // SHADOW OUTBOUND'
       : phaseBand === 'flare'
-        ? 'PHASE 4B // FLARE WINDOW'
+        ? 'ROE STEP 3 // SUPERVISOR HOLD'
         : phaseBand === 'warn'
-          ? 'PHASE 4A // RADIO WARN'
-          : 'PHASE 3B // VID SHADOW';
+          ? 'ROE STEP 2 // RADIO CHALLENGE'
+          : 'VID // MAINTAIN STANDOFF';
     const roeGate = phaseBand === 'escort' ? 'SHADOW' : phaseBand === 'flare' ? 'FLARE' : phaseBand === 'warn' ? 'WARN' : 'VID';
     const qraRange = Math.max(4.5, 18 - liveState.elapsed * (escalationMode ? 0.13 : 0.05)).toFixed(1) + ' NM';
 
@@ -1022,10 +1340,11 @@ function startLiveData() {
     set('live-elapsed', elStr);
     set('live-speed', liveState.speed + ' km/h');
     set('live-dist', distStr, distCls);
+    set('live-dist-summary', distStr, liveState.distance < 9 ? 'ops-critical' : 'ops-alert');
     set('live-dist-mini', distStr, distCls);
     set('live-cpa', cpaStr, 'text-error text-right');
     set('live-closure', closureStr, 'text-tertiary text-right');
-    set('live-action-state', actionState, phaseBand === 'flare' ? 'font-data-mono text-[10px] text-error px-3 py-2 border-l border-error/20 shrink-0' : 'font-data-mono text-[10px] text-tertiary px-3 py-2 border-l border-error/20 shrink-0');
+    set('live-action-state', actionState, phaseBand === 'flare' ? 'font-data-mono text-[11px] text-error mt-1' : 'font-data-mono text-[11px] text-tertiary mt-1');
     set('live-roe-gate', roeGate, phaseBand === 'flare' ? 'text-error text-right' : phaseBand === 'escort' ? 'text-emerald-300 text-right' : 'text-primary text-right');
     set('live-qra-pos', 'SSE / ' + qraRange, 'text-sky-300 text-right');
     updatePhaseCards(phaseBand);
@@ -1039,6 +1358,13 @@ function startLiveData() {
         vid: { src:'VISUAL ID', col:'#82cfff', icon:'visibility', tag:'VID', text:'VID hold | QRA maintains 300 m standoff and EO/IR stream' }
       };
       addFeedItem(eventByBand[phaseBand]);
+      const auditByBand = {
+        warn: ['Second guard challenge transmitted on 121.500 MHz; no acknowledgement recorded.', 'ROE 2', 'warn'],
+        flare: ['ROE Step 3 condition reached in training state; final visual warning remains supervisor-held.', 'Hold', 'critical'],
+        escort: ['Outbound turn detected; QRA pair maintains shadow until separation criteria met.', 'Closeout', 'ok'],
+        vid: ['VID standoff maintained; EO/IR stream remains attached to custody log.', 'VID', 'primary']
+      };
+      addAuditItem(auditByBand[phaseBand][0], auditByBand[phaseBand][1], auditByBand[phaseBand][2]);
     }
     liveState.alt = 8200 + Math.round((Math.random() - 0.5) * 120);
     set('live-alt', liveState.alt + ' m');
@@ -1074,15 +1400,26 @@ const INTEL_ITEMS = [
 ];
 
 let _feedIdx = 3;
+const feedItems = [];
+
+function renderFeed() {
+  const feed = document.getElementById('intel-feed');
+  if (!feed) return;
+  feed.replaceChildren();
+  const filtered = feedItems.filter(entry => activeFeedFilter === 'ALL' || entry.item.tag === activeFeedFilter || entry.item.src.includes(activeFeedFilter));
+  filtered.slice(0, 6).forEach(entry => feed.appendChild(makeFeedItem(entry.item, entry.timeLabel)));
+}
 
 function seedFeed() {
   const feed = document.getElementById('intel-feed');
   if (!feed) return;
   feed.replaceChildren();
+  feedItems.length = 0;
   const now = new Date();
   const pad = n => String(n).padStart(2,'0');
   const zuluNow = `ZULU ${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}`;
-  for (let i = 0; i < 3; i++) feed.appendChild(makeFeedItem(INTEL_ITEMS[i], zuluNow));
+  for (let i = 0; i < 3; i++) feedItems.push({ item: INTEL_ITEMS[i], timeLabel: zuluNow });
+  renderFeed();
   _feedIdx = 3;
 }
 
@@ -1114,12 +1451,11 @@ function makeFeedItem(item, timeLabel) {
 }
 
 function addFeedItem(item) {
-  const feed = document.getElementById('intel-feed');
-  if (!feed) return;
   const m = String(Math.floor(liveState.elapsed / 60)).padStart(2,'0');
   const s = String(liveState.elapsed % 60).padStart(2,'0');
-  feed.insertBefore(makeFeedItem(item, `T+${m}:${s}`), feed.firstChild);
-  while (feed.children.length > 6) feed.removeChild(feed.lastChild);
+  feedItems.unshift({ item, timeLabel: `T+${m}:${s}` });
+  while (feedItems.length > 18) feedItems.pop();
+  renderFeed();
 }
 
 /* ── Scan Modal ── */
@@ -1364,12 +1700,24 @@ document.addEventListener('keydown', (event) => {
   closeScanModal();
 });
 
+window.selectTrack = selectTrack;
+window.toggleMapLayer = toggleMapLayer;
+window.injectOperatorEvent = injectOperatorEvent;
+window.clearAuditLog = clearAuditLog;
+window.setFeedFilter = setFeedFilter;
+
 document.addEventListener('DOMContentLoaded', () => {
   startLiveData();
   initFeed();
   updateRadarPips();
   updatePhaseCards('vid');
   updateEngagementQueue('vid');
+  for (let phase = 1; phase <= 5; phase++) {
+    const card = document.getElementById('phase-card-' + phase);
+    if (!card) continue;
+    card.classList.add('ops-clickable');
+    card.addEventListener('click', () => focusPhase(phase));
+  }
 });
 </script>
 </body></html>
