@@ -143,7 +143,7 @@ Provide a 2-sentence tactical recommendation for the C2 Commander. First sentenc
                     { id: 'warn', action: 'Issue Radio Warning (Standard)', priority: 'MEDIUM' }
                 ];
                 AISystem.state.suggestions = recommendations;
-                AISystem.log('SUGGEST', `AI Real Response: ${aiResponse}`);
+                AISystem.log('SUGGEST', `AI Effector Selection: ${aiResponse}`);
                 return recommendations;
             }
         }
@@ -153,7 +153,7 @@ Provide a 2-sentence tactical recommendation for the C2 Commander. First sentenc
             { id: 'warn', action: 'Issue Radio Warning', priority: 'MEDIUM' }
         ];
         AISystem.state.suggestions = recommendations;
-        AISystem.log('SUGGEST', `AI suggested: ${recommendations[0].action}`);
+        AISystem.log('SUGGEST', `AI suggested fallback effector: ${suggestedEffector}`);
         return recommendations;
     },
 
