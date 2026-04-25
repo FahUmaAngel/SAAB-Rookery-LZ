@@ -367,7 +367,7 @@
         //  HOSTILE TRACK — TRK-U99
         // ══════════════════════════════════════════
 
-        const hostilePos = [58.5, 21.8];
+        const hostilePos = [58.8, 22.5];
         const hostileHeading = 270; // West
 
         // Diamond icon
@@ -388,7 +388,7 @@
                         letter-spacing:0.08em; color:#ffb4ab;
                         text-shadow: 0 0 6px rgba(255,180,171,0.5);
                         white-space:nowrap;
-                    ">TRK-U99</div>
+                    ">TRK-842</div>
                 </div>
             `,
             iconSize: [30, 40],
@@ -398,18 +398,18 @@
         L.marker(hostilePos, { icon: hostileIcon, zIndexOffset: 1000 }).addTo(map)
             .bindPopup(`
                 <div style="font-family:'Inter',monospace;">
-                    <div style="color:#ffb4ab; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">TRK-U99 — UNKNOWN / HOSTILE</div>
-                    <div style="color:#87929b; font-size:9px;">CLASSIFICATION: PENDING</div>
-                    <div style="color:#87929b; font-size:9px;">SPEED: 850 KTS</div>
-                    <div style="color:#87929b; font-size:9px;">ALT: 28,000 FT</div>
-                    <div style="color:#87929b; font-size:9px;">BRG: 270° TRUE (WEST)</div>
+                    <div style="color:#ffb4ab; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">TRK-842 — HOSTILE</div>
+                    <div style="color:#87929b; font-size:9px;">ID: SU-27 FLANKER</div>
+                    <div style="color:#87929b; font-size:9px;">SPEED: MACH 1.2</div>
+                    <div style="color:#87929b; font-size:9px;">ALT: 32,000 FT</div>
+                    <div style="color:#87929b; font-size:9px;">BRG: 274° TRUE</div>
                     <div style="color:#ffb4ab; font-size:9px; margin-top:4px; font-weight:600;">⚠ TRANSPONDER: OFF</div>
                 </div>
             `);
 
 
         // ── AI Probability Cone ──
-        // Widening polygon in front of TRK-U99 showing 10-min prediction
+        // Widening polygon in front of TRK-842 showing 10-min prediction
         const coneTip = hostilePos;
         const coneNarrow1 = [58.60, 20.5];
         const coneNarrow2 = [58.40, 20.5];
@@ -443,7 +443,7 @@
         L.marker([58.5, 18.5], { icon: coneLabel, interactive: false }).addTo(map);
 
         // Trajectory "center line" through the cone
-        L.polyline([hostilePos, [58.5, 16.5]], {
+        L.polyline([hostilePos, [58.3, 16.0]], {
             color: '#ffb4ab',
             weight: 1,
             dashArray: '4 8',
@@ -453,64 +453,124 @@
 
 
         // ══════════════════════════════════════════
-        //  FRIENDLY TRACK — BLU-01
+        //  FRIENDLY INTERCEPTOR — INT-01
         // ══════════════════════════════════════════
 
-        const friendlyPos = [57.0, 16.5]; // Scrambled from F17 heading NE
+        const trajectoryEnd = [58.3, 16.0];
 
+        // Use the exact base from tactical-map.html (F16 Uppsala) to ensure the same intercept direction
+        let closestBase = { lat: 59.8586, lng: 17.6389, fullName: 'F16 UPPSALA' };
+
+        // Interceptor spawns offset from closest base, flying toward the hostile trajectory
+        // Place INT-01 partway between the closest base and the hostile's predicted intercept point
+        const interceptMidLat = (hostilePos[0] + trajectoryEnd[0]) / 2;
+        const interceptMidLng = (hostilePos[1] + trajectoryEnd[1]) / 2;
+        const intPos = [
+            closestBase.lat + (interceptMidLat - closestBase.lat) * 0.45,
+            closestBase.lng + (interceptMidLng - closestBase.lng) * 0.45
+        ];
+
+        // Calculate where the intercept vector meets the hostile trajectory
+        const interceptPoint = [
+            interceptMidLat,
+            interceptMidLng
+        ];
+
+        // Friendly chevron/triangle icon
         const friendlyIcon = L.divIcon({
             className: '',
             html: `
-                <div style="position:relative; width:30px; height:36px;">
-                    <div class="friendly-dot" style="
-                        position:absolute; top:4px; left:50%; transform:translateX(-50%);
-                        width:10px; height:10px; border-radius:50%;
-                        background: #82cfff;
-                        border: 2px solid #c6e7ff;
-                    "></div>
+                <div style="position:relative; width:30px; height:40px;" class="friendly-chevron">
+                    <svg width="20" height="18" viewBox="0 0 20 18" style="position:absolute;top:2px;left:5px;">
+                        <polygon points="10,0 20,18 0,18" fill="rgba(130,207,255,0.3)" stroke="#82cfff" stroke-width="1.5"/>
+                    </svg>
                     <div style="
-                        position:absolute; bottom:0; left:50%; transform:translateX(-50%);
-                        font-family:'Inter',monospace; font-size:9px; font-weight:700;
-                        letter-spacing:0.08em; color:#82cfff;
+                        position:absolute; bottom:0; left:50%; transform: translateX(-50%);
+                        font-family: 'Inter', monospace;
+                        font-size: 9px;
+                        font-weight: 700;
+                        letter-spacing: 0.08em;
+                        color: #82cfff;
                         text-shadow: 0 0 6px rgba(130,207,255,0.5);
-                        white-space:nowrap;
-                    ">BLU-01</div>
+                        white-space: nowrap;
+                    ">INT-01</div>
                 </div>
             `,
-            iconSize: [30, 36],
-            iconAnchor: [15, 18]
+            iconSize: [30, 40],
+            iconAnchor: [15, 20]
         });
 
-        L.marker(friendlyPos, { icon: friendlyIcon, zIndexOffset: 1000 }).addTo(map)
-            .bindPopup(`
-                <div style="font-family:'Inter',monospace;">
-                    <div style="color:#82cfff; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">BLU-01 — FRIENDLY</div>
-                    <div style="color:#87929b; font-size:9px;">TYPE: JAS 39 GRIPEN</div>
-                    <div style="color:#87929b; font-size:9px;">ORIGIN: F17 KALLINGE</div>
-                    <div style="color:#87929b; font-size:9px;">MISSION: INTERCEPT TRK-U99</div>
-                    <div style="color:#87929b; font-size:9px;">SPEED: MACH 1.4</div>
-                    <div style="color:#87929b; font-size:9px;">ALT: 30,000 FT</div>
-                    <div style="color:#82cfff; font-size:9px; margin-top:4px; font-weight:600;">● SQUAWK: 7401</div>
-                </div>
-            `);
+        const friendlyMarker = L.marker(intPos, { icon: friendlyIcon, zIndexOffset: 1000 }).addTo(map);
+        friendlyMarker.bindPopup(`
+            <div style="font-family: 'Inter', monospace;">
+                <div style="color:#82cfff; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">INT-01 — FRIENDLY</div>
+                <div style="color:#87929b; font-size:9px;">TYPE: JAS 39 GRIPEN</div>
+                <div style="color:#87929b; font-size:9px;">ORIGIN: ${closestBase.fullName}</div>
+                <div style="color:#87929b; font-size:9px;">SPEED: MACH 1.6</div>
+                <div style="color:#87929b; font-size:9px;">ALT: 35,000 FT</div>
+                <div style="color:#87929b; font-size:9px;">MISSION: INTERCEPT TRK-842</div>
+                <div style="color:#82cfff; font-size:9px; margin-top:4px; font-weight:600;">● TRANSPONDER: ON — SQUAWK 7401</div>
+            </div>
+        `);
 
-        // BLU-01 departure trail from F17
-        L.polyline([[56.2600, 15.2636], friendlyPos], {
+        // Departure line from base to INT-01
+        L.polyline([[closestBase.lat, closestBase.lng], intPos], {
             color: '#82cfff',
             weight: 1,
             dashArray: '3 6',
-            opacity: 0.25,
+            opacity: 0.3,
             interactive: false
         }).addTo(map);
 
-        // BLU-01 intercept heading toward TRK-U99
-        L.polyline([friendlyPos, [58.0, 19.5]], {
+        // Intercept vector line from INT-01 to intercept point on hostile trajectory
+        L.polyline([intPos, interceptPoint], {
             color: '#82cfff',
             weight: 1.5,
             dashArray: '6 4',
-            opacity: 0.4,
+            opacity: 0.6,
             interactive: false
         }).addTo(map);
+
+        // Intercept point marker (blinking target)
+        const interceptDotIcon = L.divIcon({
+            className: '',
+            html: `
+                <div style="position:relative; width:16px; height:16px;">
+                    <div style="
+                        position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                        width:8px; height:8px; border-radius:50%;
+                        border: 1.5px solid #82cfff;
+                        background: rgba(130,207,255,0.15);
+                        animation: nodePulse 1.5s ease-in-out infinite;
+                    "></div>
+                    <div style="
+                        position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                        width:16px; height:16px; border-radius:50%;
+                        border: 1px solid rgba(130,207,255,0.2);
+                    "></div>
+                </div>
+            `,
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+        });
+        const interceptDot = L.marker(interceptPoint, { icon: interceptDotIcon, zIndexOffset: 900, interactive: false }).addTo(map);
+
+        // Intercept point label
+        const interceptLabel = L.divIcon({
+            className: '',
+            html: `<div style="
+                font-family: 'Inter', monospace;
+                font-size: 8px;
+                font-weight: 600;
+                letter-spacing: 0.08em;
+                color: rgba(130,207,255,0.7);
+                white-space: nowrap;
+                pointer-events: none;
+            ">INTERCEPT PT</div>`,
+            iconSize: [80, 12],
+            iconAnchor: [40, -6]
+        });
+        L.marker(interceptPoint, { icon: interceptLabel, interactive: false }).addTo(map);
 
 
         // ══════════════════════════════════════════
