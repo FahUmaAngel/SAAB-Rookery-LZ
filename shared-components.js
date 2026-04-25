@@ -6,37 +6,17 @@
 const SharedComponents = {
     style: `
         :root {
-            --sidebar-width: 80px;
+            --sidebar-width: 64px;
             --header-height: 48px;
             --ai-accent: #82cfff;
             --hitl-danger: #ff5252;
         }
-        body.sidebar-expanded {
-            --sidebar-width: 260px;
-        }
         #main-wrapper {
             padding-left: var(--sidebar-width);
-            transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             width: 100%;
         }
         aside {
             width: var(--sidebar-width);
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .submenu-item {
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: all 0.2s ease-out;
-            pointer-events: none;
-        }
-        .sidebar-expanded .submenu-item {
-            opacity: 1;
-            transform: translateX(0);
-            pointer-events: auto;
-        }
-        .sidebar-expanded .menu-label {
-            opacity: 1;
-            width: auto;
         }
         .custom-scrollbar::-webkit-scrollbar {
             width: 2px;
@@ -52,7 +32,16 @@ const SharedComponents = {
     header: `
         <header class="fixed top-0 w-full h-12 flex justify-between items-center px-4 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
             <div class="flex items-center gap-4">
-                <span class="text-lg font-black tracking-widest text-sky-500 dark:text-sky-400 font-['Space_Grotesk'] uppercase tracking-tighter text-xs">C2 // TACTICAL OVERWATCH</span>
+                <span class="text-lg font-black tracking-widest text-sky-500 dark:text-sky-400 font-['Space_Grotesk'] uppercase tracking-tighter text-xs mr-4">C2 // TACTICAL OVERWATCH</span>
+                <!-- Top Nav Links -->
+                <nav class="hidden md:flex items-center gap-6 font-['Space_Grotesk'] font-bold text-[10px] tracking-widest uppercase">
+                    <a href="./map-view.html" onclick="SharedComponents.handleNav(event, './map-view.html')" class="text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">map</span> MAP VIEW
+                    </a>
+                    <a href="./tactical-map.html" onclick="SharedComponents.handleNav(event, './tactical-map.html')" class="text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">explore</span> TACTICAL MAP
+                    </a>
+                </nav>
             </div>
             <div class="flex flex-1 justify-end items-center gap-6">
                 <!-- Search Bar -->
@@ -94,80 +83,32 @@ const SharedComponents = {
 
     sidebar: (currentPage) => {
         const menuItems = [
-            { 
-                id: 'map', 
-                label: 'Map View', 
-                icon: 'map', 
-                href: './map-view.html',
-                subItems: [
-                    { label: 'Map View', icon: 'map', href: './map-view.html' },
-                    { label: 'Tactical Map', icon: 'explore', href: './tactical-map.html' },
-                    { label: 'Threat Intel', icon: 'warning', href: '#' },
-                    { label: 'Battery Status', icon: 'battery_charging_full', href: '#' },
-                    { label: 'Dashboard', icon: 'dashboard', href: './logistics.html' }
-                ]
-            },
+            { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', href: './logistics.html' },
             { id: 'assets', label: 'Asset Ready', icon: 'flight_takeoff', href: './Asset-ready.html' },
             { id: 'fusion', label: 'Sensor Fusion', icon: 'sensors', href: './Sensor-Fusion.html' },
             { id: 'sensor-map', label: 'Sensor_map', icon: 'map_search', href: './sensor_map.html' },
             { id: 'comms', label: 'Comms', icon: 'satellite', href: './comms.html' },
-            { 
-                id: 'logs', 
-                label: 'Logs & Intel', 
-                icon: 'history_edu', 
-                href: './mission_logs.html',
-                subItems: [
-                    { label: 'Mission Logs', icon: 'history_edu', href: './mission_logs.html' },
-                    { label: 'Asset Tracking', icon: 'navigation', href: './asset-tracking.html' },
-                    { label: 'Telemetry', icon: 'query_stats', href: '#' },
-                    { label: 'Intel Brief', icon: 'description', href: '#' }
-                ]
-            },
+            { id: 'logs', label: 'Logs & Intel', icon: 'history_edu', href: './mission_logs.html' },
         ];
 
-        const isExpanded = typeof document !== 'undefined' && document.body.classList.contains('sidebar-expanded');
-
         const linksHtml = menuItems.map(item => {
-            const isParentActive = currentPage.includes(item.href.replace('./', '')) && item.href !== '#';
-            const isChildActive = item.subItems ? item.subItems.some(sub => currentPage.includes(sub.href.replace('./', '')) && sub.href !== '#') : false;
-            const isActive = isParentActive || isChildActive;
-            const hasSubmenu = item.subItems && item.subItems.length > 0;
+            const isActive = currentPage.includes(item.href.replace('./', '')) && item.href !== '#';
             const baseClass = "flex flex-col items-center justify-center py-3 w-full active:scale-95 transition-all group";
             const activeClass = "bg-sky-950/30 text-sky-400 border-l-2 border-sky-500";
-            const inactiveClass = "text-slate-600 hover:bg-slate-900 hover:text-sky-200";
-            
-            let subHtml = '';
-            if (hasSubmenu) {
-                const isSubmenuVisible = isExpanded && isActive;
-                subHtml = `
-                    <div class="submenu-container ${isSubmenuVisible ? '' : 'hidden'} flex flex-col w-full bg-slate-900/50 mt-1 border-y border-slate-800/50">
-                        ${item.subItems.map(sub => {
-                            const isSubActive = currentPage.includes(sub.href.replace('./', '')) && sub.href !== '#';
-                            return `
-                            <a href="${sub.href}" class="submenu-item flex items-center gap-3 px-6 py-2 text-[10px] ${isSubActive ? 'text-sky-400 bg-sky-500/10' : 'text-slate-500'} hover:text-sky-400 hover:bg-sky-500/5 transition-colors" ${sub.href !== '#' ? `onclick="SharedComponents.handleNav(event, '${sub.href}')"` : ''}>
-                                <span class="material-symbols-outlined text-[14px]">${sub.icon}</span>
-                                <span class="menu-label whitespace-nowrap">${sub.label}</span>
-                            </a>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
-            }
+            const inactiveClass = "text-slate-400 hover:bg-slate-800 hover:text-sky-300";
 
             return `
                 <div class="w-full flex flex-col items-center">
                     <a class="${baseClass} ${isActive ? activeClass : inactiveClass}" 
                        href="${item.href}" 
-                       onclick="${hasSubmenu ? `SharedComponents.toggleSubmenu(event, this)` : `SharedComponents.handleNav(event, '${item.href}')`}">
+                       onclick="SharedComponents.handleNav(event, '${item.href}')">
                         <div class="flex items-center justify-center w-full relative">
                             <span class="material-symbols-outlined mb-1 ${isActive ? 'group-hover:animate-pulse' : ''}" style="${isActive ? "font-variation-settings: 'FILL' 1;" : ""}">
                                 ${item.icon}
                             </span>
-                            ${hasSubmenu ? `<span class="material-symbols-outlined text-[12px] absolute right-1 top-1 text-slate-700 group-hover:text-sky-500 transition-transform duration-200" style="transform: ${isExpanded && isActive ? 'rotate(90deg)' : 'rotate(0deg)'}">chevron_right</span>` : ''}
                         </div>
-                        <span class="font-['Space_Grotesk'] font-medium uppercase text-[10px] text-center px-1 menu-label">${item.label}</span>
+                        <span class="font-['Space_Grotesk'] font-medium uppercase text-[9px] text-center px-1 menu-label leading-[1.1]">${item.label}</span>
                     </a>
-                    ${subHtml}
                 </div>
             `;
         }).join('');
@@ -176,9 +117,9 @@ const SharedComponents = {
             <aside class="fixed left-0 top-12 h-[calc(100vh-48px)] flex flex-col items-center py-4 z-40 bg-slate-950 border-r border-slate-800 overflow-x-hidden">
                 <div class="mb-6 flex flex-col items-center text-center border-b border-slate-800 pb-4 w-full px-2">
                     <div class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-full flex items-center justify-center mb-2 overflow-hidden shadow-inner shrink-0">
-                        <span class="material-symbols-outlined text-slate-600 text-[20px]">person</span>
+                        <span class="material-symbols-outlined text-slate-400 text-[20px]">person</span>
                     </div>
-                    <span class="text-[8px] font-['Space_Grotesk'] text-slate-500 font-bold uppercase tracking-widest text-center px-1 whitespace-nowrap">SECTOR 7<br/><span class="text-[7px] text-slate-600">BALTIC REGION</span></span>
+                    <span class="text-[8px] font-['Space_Grotesk'] text-slate-400 font-bold uppercase tracking-widest text-center px-1 whitespace-nowrap">SECTOR 7<br/><span class="text-[7px] text-slate-500">BALTIC REGION</span></span>
                 </div>
                 <nav class="flex flex-col w-full gap-1 flex-1 overflow-y-auto custom-scrollbar">
                     ${linksHtml}
@@ -191,28 +132,6 @@ const SharedComponents = {
                 </div>
             </aside>
         `;
-    },
-
-    toggleSubmenu: (event, el) => {
-        event.preventDefault();
-        const submenu = el.nextElementSibling;
-        if (!submenu) return;
-        const icon = el.querySelector('.absolute.right-1');
-        const isExpanded = document.body.classList.contains('sidebar-expanded');
-
-        if (isExpanded && !submenu.classList.contains('hidden')) {
-            document.body.classList.remove('sidebar-expanded');
-            submenu.classList.add('hidden');
-            if (icon) icon.style.transform = 'rotate(0deg)';
-        } else {
-            // Close other submenus first if needed (optional)
-            document.querySelectorAll('.submenu-container').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.absolute.right-1').forEach(i => i.style.transform = 'rotate(0deg)');
-            
-            document.body.classList.add('sidebar-expanded');
-            submenu.classList.remove('hidden');
-            if (icon) icon.style.transform = 'rotate(90deg)';
-        }
     },
 
     initHeader: (currentPage) => {
