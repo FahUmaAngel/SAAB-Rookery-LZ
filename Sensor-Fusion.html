@@ -550,26 +550,45 @@
 
                 const btnFinalize = document.getElementById('btn-finalize');
                 if (btnFinalize) {
-                    if (phase >= 5) btnFinalize.classList.remove('opacity-50', 'cursor-not-allowed');
+                    const aiReadyToReport = typeof AISystem !== 'undefined' && AISystem.state?.approvedAction;
+                    if (phase >= 5 || aiReadyToReport) btnFinalize.classList.remove('opacity-50', 'cursor-not-allowed');
                     else btnFinalize.classList.add('opacity-50', 'cursor-not-allowed');
                 }
             }
 
             function finalizeReport() {
-                if (typeof SensorDataEngine === 'undefined' || SensorDataEngine.state.phase < 5) return;
+                const aiReadyToReport = typeof AISystem !== 'undefined' && AISystem.state?.approvedAction;
+                if (typeof SensorDataEngine === 'undefined' || (SensorDataEngine.state.phase < 5 && !aiReadyToReport)) return;
                 let report = typeof AISystem !== 'undefined' ? AISystem.generateReport() : null;
+                if (report) renderReportModal(report);
+                addCommEntry('C2 HQ', 'FINAL INCIDENT REPORT FILED.');
+            }
+
+            function renderReportModal(report) {
                 const modal = document.getElementById('report-modal');
                 const content = document.getElementById('report-content');
-                if (modal && content && report) {
-                    content.innerHTML = `<div class="space-y-4">
-                        <div class="flex justify-between border-b border-outline-variant pb-2"><span>TIMESTAMP:</span> <span>${report.timestamp}</span></div>
-                        <div class="flex justify-between border-b border-outline-variant pb-2"><span>THREAT LEVEL:</span> <span class="text-error font-bold">${report.finalThreatLevel}</span></div>
-                        <div class="text-primary font-bold uppercase mt-4">Event Timeline</div>
-                        ${report.events.map(e => `<div class="flex gap-4 text-[10px] border-b border-outline-variant/10 py-1"><span class="text-outline w-16">${e.timestamp}</span><span class="flex-1">${e.message}</span></div>`).join('')}
-                    </div>`;
-                    modal.classList.remove('hidden');
-                }
-                addCommEntry('C2 HQ', 'FINAL INCIDENT REPORT FILED.');
+                if (!modal || !content || !report) return;
+
+                content.innerHTML = `<div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 border-b border-outline-variant pb-4">
+                        <div class="flex justify-between"><span class="text-outline">TIMESTAMP:</span> <span>${report.timestamp}</span></div>
+                        <div class="flex justify-between"><span class="text-outline">THREAT LEVEL:</span> <span class="text-error font-bold">${report.finalThreatLevel}</span></div>
+                        <div class="flex justify-between md:col-span-2"><span class="text-outline">APPROVED ACTION:</span> <span class="text-sky-300 text-right">${report.approvedAction || 'N/A'}</span></div>
+                    </div>
+                    <div class="bg-surface-container-highest border border-outline-variant/30 p-4 space-y-2">
+                        <div class="text-primary font-bold uppercase">${report.resultTitle || 'Action Result'}</div>
+                        <p class="text-on-surface leading-relaxed">${report.resultSummary || ''}</p>
+                        <p class="text-green-400">${report.resultOutcome || ''}</p>
+                    </div>
+                    <div class="text-primary font-bold uppercase mt-4">Event Timeline</div>
+                    ${report.events.map(e => `<div class="flex gap-4 text-[10px] border-b border-outline-variant/10 py-1"><span class="text-outline w-16">${e.timestamp}</span><span class="flex-1">${e.message}</span></div>`).join('')}
+                </div>`;
+                modal.classList.remove('hidden');
+            }
+
+            function handleAIApproval(actionId) {
+                if (typeof AISystem === 'undefined') return;
+                AISystem.approveAction(actionId);
             }
 
             // ═══════════════════════════════════════════════════
@@ -594,7 +613,7 @@
             }
 
             window.addEventListener('ai-update', (e) => {
-                const { phase } = e.detail;
+                const { phase, message } = e.detail;
                 updateAIPipeline(phase);
                 if (phase === 'SUGGEST' && typeof AISystem !== 'undefined' && AISystem.state.suggestions.length) {
                     const rec = document.getElementById('ai-recommendation');
@@ -614,13 +633,52 @@
                             </div>
                             <div class="bg-surface-container-highest border border-outline-variant/30 p-2 flex flex-col gap-1.5">${reasoningHtml}</div>
                             <div class="flex gap-2 mt-1">
-                                <button onclick="AISystem.approveAction('${sug.id}'); this.parentElement.parentElement.innerHTML='<div class=\\'text-green-400 font-data-mono text-[10px]\\'>✓ APPROVED</div>';"
+                                <button onclick="handleAIApproval('${sug.id}')"
                                     class="flex-1 py-1.5 bg-sky-500/20 border border-sky-500 text-sky-400 font-label-caps text-[9px] hover:bg-sky-500/30 transition-colors">APPROVE</button>
                                 <button onclick="AISystem.rejectAction('${sug.id}'); this.parentElement.parentElement.innerHTML='<div class=\\'text-error font-data-mono text-[10px]\\'>✗ REJECTED</div>';"
                                     class="flex-1 py-1.5 bg-surface border border-outline text-outline font-label-caps text-[9px] hover:bg-surface-bright transition-colors">REJECT</button>
                             </div>`;
                     }
                 }
+                if (phase === 'PROTECT' && typeof AISystem !== 'undefined' && AISystem.state.approvedAction) {
+                    const approved = AISystem.state.approvedAction;
+                    const rec = document.getElementById('ai-recommendation');
+                    if (rec) {
+                        rec.innerHTML = `
+                            <div class="bg-amber-500/10 border border-amber-500/30 p-3 flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-amber-400">shield</span>
+                                    <span class="font-label-caps text-[8px] text-amber-400">PROTECT PHASE ACTIVE</span>
+                                </div>
+                                <div class="font-data-mono text-[10px] text-on-surface">${approved.action}</div>
+                                <div class="font-data-mono text-[10px] text-on-surface-variant">${approved.summary}</div>
+                                <div class="text-[9px] font-label-caps text-amber-300 uppercase">STATUS: ${approved.status}</div>
+                                <div class="text-[10px] text-outline">${message}</div>
+                                <div class="text-[10px] text-sky-300 border-t border-outline-variant/20 pt-2">Awaiting commander report generation to close the action loop.</div>
+                            </div>`;
+                    }
+                }
+                if (phase === 'REPORT' && typeof AISystem !== 'undefined' && AISystem.state.lastReport) {
+                    const rec = document.getElementById('ai-recommendation');
+                    const report = AISystem.state.lastReport;
+                    if (rec) {
+                        rec.innerHTML = `
+                            <div class="bg-green-500/10 border border-green-500/30 p-3 flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-green-400">task_alt</span>
+                                    <span class="font-label-caps text-[8px] text-green-400">REPORT GENERATED</span>
+                                </div>
+                                <div class="font-data-mono text-[10px] text-on-surface">${report.resultTitle}</div>
+                                <div class="font-data-mono text-[10px] text-on-surface-variant">${report.resultOutcome}</div>
+                                <button onclick="renderReportModal(AISystem.state.lastReport)"
+                                    class="mt-1 py-1.5 bg-green-500/20 border border-green-500 text-green-300 font-label-caps text-[9px] hover:bg-green-500/30 transition-colors">OPEN REPORT</button>
+                            </div>`;
+                    }
+                }
+            });
+
+            window.addEventListener('ai-report-generated', (e) => {
+                addCommEntry('AI', `▶ PHASE 5/5: REPORT — ${e.detail.resultOutcome}`);
             });
 
             window.addEventListener('ai-signal-analysis', (e) => {

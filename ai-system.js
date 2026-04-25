@@ -256,7 +256,32 @@ const AISystem = {
         logs: [],
         suggestions: [],
         hitlPending: false,
-        apiKey: globalThis.OPENROUTER_API_KEY || ""
+        apiKey: globalThis.OPENROUTER_API_KEY || "",
+        approvedAction: null,
+        lastReport: null
+    },
+
+    buildActionOutcome: (action) => {
+        const effectorType = action?.effector?.type || "";
+        if (effectorType === "INTERCEPTOR" || /gripen|interceptor|scramble/i.test(action?.action || "")) {
+            return {
+                title: "Interceptor sortie completed",
+                summary: "Gripen 01 launched, established radar contact, executed visual intercept, and forced the track to alter course away from sovereign airspace.",
+                result: "Target shadowed and escorted clear without weapons release."
+            };
+        }
+        if (effectorType === "GBAD") {
+            return {
+                title: "Air defense posture raised",
+                summary: "Ground-based air defense batteries activated engagement envelopes and deterred further penetration into defended airspace.",
+                result: "Target remained outside the defended zone after the posture shift."
+            };
+        }
+        return {
+            title: "Reconnaissance response completed",
+            summary: "The approved reconnaissance asset acquired the track and confirmed intent through close observation and sensor fusion.",
+            result: "Target behavior was documented and handed back to command for follow-on monitoring."
+        };
     },
 
     buildReasoning: (data) => {
@@ -438,8 +463,16 @@ Provide a 2-sentence tactical recommendation for the C2 Commander. First sentenc
         AISystem.state.currentPhase = "PROTECT";
         const action = AISystem.state.suggestions.find((suggestion) => suggestion.id === actionId);
         if (!action) return;
+        AISystem.state.approvedAction = {
+            id: action.id,
+            action: action.action,
+            priority: action.priority,
+            effector: action.effector || null,
+            status: "Executing",
+            summary: "Commander approval received. Tasking asset and monitoring execution."
+        };
         AISystem.log("PROTECT", `HUMAN APPROVED: ${action.action}`);
-        AISystem.generateReport();
+        AISystem.log("PROTECT", `Executing approved action: ${action.action}`);
 
         if (actionId.includes("scramble") || actionId.includes("ai-scramble")) {
             setTimeout(() => {
@@ -448,6 +481,16 @@ Provide a 2-sentence tactical recommendation for the C2 Commander. First sentenc
                 ]);
             }, 1500);
         }
+
+        const outcome = AISystem.buildActionOutcome(action);
+        setTimeout(() => {
+            AISystem.state.approvedAction = {
+                ...AISystem.state.approvedAction,
+                status: "Complete",
+                summary: outcome.summary
+            };
+            AISystem.log("PROTECT", `Approved action status: ${outcome.result}`);
+        }, 2200);
     },
 
     /**
@@ -596,14 +639,22 @@ Provide a 2-sentence tactical recommendation for the C2 Commander. First sentenc
     /**
      * Phase 5: REPORT - Generate mission summary
      */
-    generateReport: () => {
+    generateReport: (outcomeOverride = null) => {
         AISystem.state.currentPhase = "REPORT";
+        const approvedAction = AISystem.state.approvedAction;
+        const outcome = outcomeOverride || AISystem.buildActionOutcome(approvedAction || AISystem.state.suggestions[0]);
         const report = {
             timestamp: new Date().toISOString(),
             events: AISystem.state.logs,
-            finalThreatLevel: AISystem.state.threatScore > 70 ? "CRITICAL" : "STABLE"
+            finalThreatLevel: AISystem.state.threatScore > 70 ? "CRITICAL" : "STABLE",
+            approvedAction: approvedAction?.action || "No approved action recorded",
+            resultTitle: outcome.title,
+            resultSummary: outcome.summary,
+            resultOutcome: outcome.result
         };
-        AISystem.log("REPORT", `Mission report generated - Threat: ${report.finalThreatLevel}`);
+        AISystem.state.lastReport = report;
+        AISystem.log("REPORT", `Mission report generated - ${outcome.result}`);
+        dispatchEvent(new CustomEvent("ai-report-generated", { detail: report }));
         return report;
     },
 
