@@ -105,7 +105,14 @@ const SharedComponents = {
         const menuItems = [
             { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', href: './logistics.html' },
             { id: 'assets', label: 'Asset Ready', icon: 'flight_takeoff', href: './Asset-ready.html' },
-            { id: 'fusion', label: 'Sensor Fusion', icon: 'sensors', href: './Sensor-Fusion.html' },
+            { 
+                id: 'fusion', label: 'Sensor Fusion', icon: 'sensors', href: './Sensor-Fusion.html',
+                subItems: [
+                    { label: 'Dashboard', icon: 'sensors', href: './Sensor-Fusion.html' },
+                    { label: 'AI Scan', icon: 'psychology', href: './Sensor-Fusion.html#ai-scan' },
+                    { label: 'Signal Analysis', icon: 'graphic_eq', href: './Sensor-Fusion.html#sigint' },
+                ]
+            },
             { id: 'sensor-map', label: 'Sensor_map', icon: 'map_search', href: './sensor_map.html' },
             { id: 'comms', label: 'Comms', icon: 'satellite', href: './comms.html' },
             { id: 'logs', label: 'Logs & Intel', icon: 'history_edu', href: './mission_logs.html' },

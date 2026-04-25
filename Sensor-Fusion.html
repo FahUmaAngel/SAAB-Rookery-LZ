@@ -9,97 +9,93 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="tailwind.config.js"></script>
 </head>
+<body class="bg-background text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- JSON Component: TopNavBar -->
+<div id="header-placeholder"></div>
 
-<body
-    class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
-    <!-- JSON Component: TopNavBar -->
-    <div id="header-placeholder"></div>
-
-    <div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
-        <!-- JSON Component: SideNavBar -->
-        <div id="sidebar-placeholder"></div>
-        <!-- Main Content Area -->
-        <main class="p-margin h-full flex flex-col gap-gutter">
-            <!-- Header Telemetry Block -->
-            <header
-                class="bg-surface-container border border-outline-variant p-panel-padding flex justify-between items-end relative overflow-hidden rounded-none">
-                <div class="absolute top-0 left-0 w-2 h-full bg-primary"></div>
-                <div class="flex flex-col pl-4">
-                    <span
-                        class="font-label-caps text-label-caps text-primary tracking-widest mb-1 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
-                        ACTIVE QRA ENGAGEMENT // TIER 1
-                    </span>
-                    <h1 class="font-headline-lg text-headline-lg text-on-surface uppercase m-0">INCIDENT #2024-08-12:
-                        <span class="text-primary">BOGEY_GOLF_42</span></h1>
-                </div>
-                <div class="flex gap-6 text-right">
-                    <div class="flex flex-col">
-                        <span class="font-label-caps text-label-caps text-outline-variant">SYSTEM STATUS</span>
-                        <span class="font-data-mono text-data-mono text-secondary">SECURE LK</span>
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="font-label-caps text-label-caps text-outline-variant">ROE STATE</span>
-                        <span class="font-data-mono text-data-mono text-tertiary">WEAPONS TIGHT</span>
-                    </div>
-                </div>
-            </header>
+<div id="main-wrapper" class="mt-12 w-full min-h-[calc(100vh-48px)]">
+<!-- JSON Component: SideNavBar -->
+<div id="sidebar-placeholder"></div>
+<!-- Main Content Area -->
+<main class="p-margin min-h-[calc(100vh-48px)] flex flex-col gap-gutter pb-8">
+<!-- Header Telemetry Block -->
+<header class="bg-surface-container border border-outline-variant p-panel-padding flex justify-between items-end relative rounded-none">
+<div class="absolute top-0 left-0 w-2 h-full bg-primary"></div>
+<div class="flex flex-col pl-4">
+<span class="font-label-caps text-label-caps text-primary tracking-widest mb-1 flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+                    ACTIVE QRA ENGAGEMENT // TIER 1
+                </span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface uppercase m-0">INCIDENT #2024-08-12: <span class="text-primary">BOGEY_GOLF_42</span></h1>
+</div>
+<div class="flex gap-6 text-right">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline-variant">SYSTEM STATUS</span>
+<span id="sys-status" class="font-data-mono text-data-mono text-secondary">SECURE LK</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline-variant">ROE STATE</span>
+<span id="roe-state" class="font-data-mono text-data-mono text-tertiary">WEAPONS TIGHT</span>
+</div>
+</div>
+</header>
             <!-- 5-Phase Escalation Visualizer -->
             <section class="bg-surface-container border border-outline-variant p-panel-padding rounded-none">
                 <div class="flex items-center justify-between w-full relative">
-                    <!-- Connecting Line Base -->
-                    <div class="absolute left-8 right-8 top-1/2 -translate-y-1/2 h-px bg-outline-variant z-0"></div>
-                    <!-- Connecting Line Active -->
-                    <div id="phase-progress-line"
-                        class="absolute left-8 top-1/2 -translate-y-1/2 h-px bg-primary z-0 shadow-[0_0_8px_rgba(130,207,255,0.5)] transition-all duration-700"
-                        style="width: 40%"></div>
+                    <!-- Connecting Lines Container -->
+                    <div class="absolute left-8 right-8 top-1/2 -translate-y-1/2 h-px z-0">
+                        <!-- Connecting Line Base -->
+                        <div class="absolute inset-0 bg-outline-variant"></div>
+                        <!-- Connecting Line Active -->
+                        <div id="phase-progress-line"
+                            class="absolute inset-y-0 left-0 bg-primary shadow-[0_0_8px_rgba(130,207,255,0.5)] transition-all duration-700"
+                            style="width: 40%"></div>
+                    </div>
                     <!-- Phase 1 -->
-                    <div class="flex flex-col items-center gap-2 z-10 w-24">
+                    <div data-phase="1" class="flex flex-col items-center gap-2 z-10 w-24">
                         <div
-                            class="w-8 h-8 bg-surface-container border border-primary rounded-none flex items-center justify-center text-primary shadow-[0_0_8px_rgba(130,207,255,0.3)]">
-                            <span class="material-symbols-outlined text-[16px]"
-                                style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            class="phase-node w-8 h-8 bg-surface-container border border-primary rounded-none flex items-center justify-center text-primary shadow-[0_0_8px_rgba(130,207,255,0.3)]">
+                            <span class="material-symbols-outlined text-[16px]">check_circle</span>
                         </div>
                         <span class="font-label-caps text-label-caps text-primary text-center">DETECTION<br /><span
-                                class="text-outline text-[8px]">COMPLETE</span></span>
+                                class="status-text text-outline text-[8px]">COMPLETE</span></span>
                     </div>
                     <!-- Phase 2 -->
-                    <div class="flex flex-col items-center gap-2 z-10 w-24">
+                    <div data-phase="2" class="flex flex-col items-center gap-2 z-10 w-24">
                         <div
-                            class="w-8 h-8 bg-surface-container border border-primary rounded-none flex items-center justify-center text-primary shadow-[0_0_8px_rgba(130,207,255,0.3)]">
-                            <span class="material-symbols-outlined text-[16px]"
-                                style="font-variation-settings: 'FILL' 1;">flight_takeoff</span>
+                            class="phase-node w-8 h-8 bg-surface-container border border-primary rounded-none flex items-center justify-center text-primary shadow-[0_0_8px_rgba(130,207,255,0.3)]">
+                            <span class="material-symbols-outlined text-[16px]">flight_takeoff</span>
                         </div>
                         <span class="font-label-caps text-label-caps text-primary text-center">SCRAMBLE<br /><span
-                                class="text-outline text-[8px]">COMPLETE</span></span>
+                                class="status-text text-outline text-[8px]">COMPLETE</span></span>
                     </div>
                     <!-- Phase 3 (Active) -->
-                    <div class="flex flex-col items-center gap-2 z-10 w-24">
+                    <div data-phase="3" class="flex flex-col items-center gap-2 z-10 w-24">
                         <div
-                            class="w-10 h-10 bg-primary-container border-2 border-primary rounded-none flex items-center justify-center text-on-primary-container relative">
-                            <div class="absolute -inset-1 border border-primary opacity-50 animate-ping"></div>
+                            class="phase-node w-10 h-10 bg-primary-container border-2 border-primary rounded-none flex items-center justify-center text-on-primary-container relative">
+                            <div class="glow-ring absolute -inset-1 border border-primary opacity-50 animate-ping"></div>
                             <span class="material-symbols-outlined text-[20px]">visibility</span>
                         </div>
                         <span class="font-label-caps text-label-caps text-on-surface text-center font-bold">VISUAL
-                            ID<br /><span class="text-tertiary text-[8px] animate-pulse">ACTIVE FEED</span></span>
+                            ID<br /><span class="status-text text-tertiary text-[8px] animate-pulse">ACTIVE FEED</span></span>
                     </div>
                     <!-- Phase 4 (Pending) -->
-                    <div class="flex flex-col items-center gap-2 z-10 w-24 opacity-60">
+                    <div data-phase="4" class="flex flex-col items-center gap-2 z-10 w-24 opacity-60">
                         <div
-                            class="w-8 h-8 bg-surface border border-outline rounded-none flex items-center justify-center text-outline">
+                            class="phase-node w-8 h-8 bg-surface border border-outline rounded-none flex items-center justify-center text-outline">
                             <span class="material-symbols-outlined text-[16px]">campaign</span>
                         </div>
                         <span class="font-label-caps text-label-caps text-outline text-center">WARNING<br /><span
-                                class="text-outline-variant text-[8px]">PENDING</span></span>
+                                class="status-text text-outline-variant text-[8px]">PENDING</span></span>
                     </div>
                     <!-- Phase 5 (Pending) -->
-                    <div class="flex flex-col items-center gap-2 z-10 w-24 opacity-60">
+                    <div data-phase="5" class="flex flex-col items-center gap-2 z-10 w-24 opacity-60">
                         <div
-                            class="w-8 h-8 bg-surface border border-outline rounded-none flex items-center justify-center text-outline">
+                            class="phase-node w-8 h-8 bg-surface border border-outline rounded-none flex items-center justify-center text-outline">
                             <span class="material-symbols-outlined text-[16px]">my_location</span>
                         </div>
                         <span class="font-label-caps text-label-caps text-outline text-center">ESCORT<br /><span
-                                class="text-outline-variant text-[8px]">PENDING</span></span>
+                                class="status-text text-outline-variant text-[8px]">PENDING</span></span>
                     </div>
                 </div>
             </section>
@@ -155,8 +151,8 @@
                                     <div class="absolute left-[-10px] w-4 h-px bg-tertiary/60"></div>
                                     <div class="absolute right-[-10px] w-4 h-px bg-tertiary/60"></div>
                                     <!-- Target Box -->
-                                    <div
-                                        class="absolute w-16 h-16 border border-error/50 animate-pulse flex items-center justify-center">
+                                    <div id="hud-target-box"
+                                        class="absolute w-16 h-16 border border-error/50 animate-pulse flex items-center justify-center transition-all duration-500">
                                         <span
                                             class="absolute -top-4 -right-12 text-[10px] text-error font-data-mono">SU-27</span>
                                     </div>
@@ -164,13 +160,14 @@
                             </div>
                             <!-- Bottom HUD -->
                             <div class="flex justify-between items-end font-data-mono text-data-mono text-primary/80">
-                                <div>WPN: ARM<br />QTY: 4</div>
-                                <div class="flex gap-1">
-                                    <div class="w-8 h-2 bg-primary/40 border border-primary/60"></div>
-                                    <div class="w-8 h-2 bg-primary/40 border border-primary/60"></div>
-                                    <div class="w-8 h-2 border border-primary/60"></div>
+                                <div>WPN: <span id="hud-wpn-status">ARM</span><br />QTY: <span id="hud-wpn-qty">4</span></div>
+                                <div id="hud-wpn-bars" class="flex gap-1">
+                                    <div class="wpn-bar w-8 h-2 bg-primary/40 border border-primary/60"></div>
+                                    <div class="wpn-bar w-8 h-2 bg-primary/40 border border-primary/60"></div>
+                                    <div class="wpn-bar w-8 h-2 bg-primary/40 border border-primary/60"></div>
+                                    <div class="wpn-bar w-8 h-2 border border-primary/60"></div>
                                 </div>
-                                <div class="text-right">TIME: <span id="hud-time">14:32:05Z</span><br />SYS: NOMINAL
+                                <div class="text-right">TIME: <span id="hud-time">14:32:05Z</span><br />SYS: <span id="hud-sys">NOMINAL</span>
                                 </div>
                             </div>
                         </div>
@@ -178,6 +175,22 @@
                 </div>
                 <!-- Telemetry & Action Sidebar -->
                 <div class="flex flex-col gap-gutter">
+                    <!-- Threat Level Gauge (At-a-glance) -->
+                    <div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col gap-2 rounded-none">
+                        <div class="flex justify-between items-center">
+                            <span class="font-label-caps text-label-caps text-outline-variant uppercase">THREAT ASSESSMENT</span>
+                            <span id="threat-label" class="font-data-mono text-data-mono text-error">CRITICAL</span>
+                        </div>
+                        <div class="relative h-4 bg-surface-container-highest border border-outline-variant overflow-hidden">
+                            <div id="threat-gauge" class="h-full bg-gradient-to-r from-primary via-amber-500 to-error transition-all duration-1000 shadow-[0_0_10px_rgba(255,82,82,0.5)]" style="width: 85%"></div>
+                        </div>
+                        <div class="flex justify-between font-data-mono text-[8px] text-outline">
+                            <span>NOMINAL</span>
+                            <span>ELEVATED</span>
+                            <span>ALPHA</span>
+                        </div>
+                    </div>
+
                     <!-- Predictive Logistics Alert Container -->
                     <div id="predictive-alert-container" class="hidden bg-error-container/20 border-2 border-error/50 p-panel-padding flex-col gap-2 rounded-none relative animate-pulse">
                         <div class="flex justify-between items-center">
@@ -187,7 +200,6 @@
                         <span id="predictive-alert-msg" class="font-data-mono text-[10px] text-error/90 leading-tight"></span>
                         <button onclick="approveRelocation()" class="mt-2 w-full py-1.5 bg-error/20 hover:bg-error/40 border border-error text-error font-label-caps text-[10px] transition-colors">AUTHORIZE RELOCATION</button>
                     </div>
-                    
                     <!-- Target Telemetry Bento -->
                     <div
                         class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col gap-3 rounded-none relative">
@@ -228,18 +240,7 @@
                         <div id="comms-log"
                             class="flex flex-col gap-1 overflow-y-auto font-data-mono text-data-mono text-[10px]"
                             style="max-height: 160px;">
-                            <div class="flex gap-2 text-outline"><span
-                                    class="text-secondary w-16 shrink-0">14:28:10Z</span> <span>ATC: UNKNOWN TRAFFIC NO
-                                    RADIO CONTACT.</span></div>
-                            <div class="flex gap-2 text-outline"><span
-                                    class="text-secondary w-16 shrink-0">14:29:05Z</span> <span>GRIPEN-1: BOGEY IN
-                                    SIGHT. MANEUVERING TO INTERCEPT.</span></div>
-                            <div class="flex gap-2 text-tertiary"><span
-                                    class="text-secondary w-16 shrink-0">14:31:12Z</span> <span>GRIPEN-1: VISUAL
-                                    CONFIRMATION SU-27. NO EXTERNAL STORES VISIBLE.</span></div>
-                            <div class="flex gap-2 text-on-surface"><span
-                                    class="text-secondary w-16 shrink-0 animate-pulse">14:32:00Z</span> <span
-                                    class="bg-surface-container-high px-1">AWAITING C2 ORDERS...</span></div>
+                            <!-- Live messages will be prepended here -->
                         </div>
                     </div>
                     <!-- Action Command Block -->
@@ -261,10 +262,15 @@
                             <span class="material-symbols-outlined text-[16px]">campaign</span>
                             AUTHORIZE RADIO WARNING
                         </button>
-                        <button id="btn-flare" onclick="advancePhase(4)"
+                        <button id="btn-flare" onclick="triggerFlareAction()"
                             class="w-full py-3 bg-surface hover:bg-tertiary-container/20 border border-tertiary text-tertiary font-label-caps text-label-caps flex items-center justify-center gap-2 transition-colors rounded-none">
                             <span class="material-symbols-outlined text-[16px]">local_fire_department</span>
                             DEPLOY FLARE WARNING
+                        </button>
+                        <button id="btn-escort" onclick="advancePhase(5)"
+                            class="w-full py-3 bg-surface hover:bg-green-900/30 border border-green-600 text-green-400 font-label-caps text-label-caps flex items-center justify-center gap-2 transition-colors rounded-none">
+                            <span class="material-symbols-outlined text-[16px]">my_location</span>
+                            AUTHORIZE ESCORT
                         </button>
                         <button id="btn-finalize" onclick="finalizeReport()"
                             class="w-full py-3 mt-2 bg-primary hover:bg-primary-fixed border border-primary text-on-primary font-label-caps text-label-caps flex items-center justify-center gap-2 transition-colors rounded-none opacity-50 cursor-not-allowed"
@@ -275,235 +281,363 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ═══════════════════════════════════════════════════ -->
+            <!-- AI ANALYSIS PANEL (Enhancement Area 1)            -->
+            <!-- ═══════════════════════════════════════════════════ -->
+            <section id="ai-analysis-panel" class="bg-surface-container border border-outline-variant rounded-none">
+                <!-- Panel Header -->
+                <div class="flex justify-between items-center p-panel-padding border-b border-outline-variant bg-surface-container-high">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px] text-sky-400">psychology</span>
+                        <span class="font-label-caps text-label-caps text-on-surface tracking-wider">AI ANALYSIS ENGINE</span>
+                    </div>
+                    <div id="ai-engine-status" class="flex items-center gap-2">
+                        <div id="ai-engine-dot" class="w-2 h-2 bg-outline rounded-full"></div>
+                        <span id="ai-engine-label" class="font-data-mono text-data-mono text-outline">STANDBY</span>
+                    </div>
+                </div>
+
+                <!-- AI Pipeline Stepper -->
+                <div class="p-panel-padding border-b border-outline-variant/50">
+                    <div class="flex items-center justify-between w-full relative">
+                        <!-- Pipeline connecting line container -->
+                        <div class="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-px z-0">
+                            <!-- Base -->
+                            <div class="absolute inset-0 bg-outline-variant"></div>
+                            <!-- Active -->
+                            <div id="ai-pipeline-line" class="absolute inset-y-0 left-0 bg-sky-500 shadow-[0_0_6px_rgba(56,189,248,0.5)] transition-all duration-700" style="width: 0%"></div>
+                        </div>
+
+                        <div data-ai-step="SCAN" class="ai-step flex flex-col items-center gap-1 z-10 w-20">
+                            <div class="ai-step-node w-7 h-7 bg-surface border border-outline rounded-none flex items-center justify-center text-outline transition-all duration-300">
+                                <span class="material-symbols-outlined text-[14px]">radar</span>
+                            </div>
+                            <span class="font-label-caps text-[8px] text-outline text-center">SCAN</span>
+                        </div>
+                        <div data-ai-step="DETECT" class="ai-step flex flex-col items-center gap-1 z-10 w-20">
+                            <div class="ai-step-node w-7 h-7 bg-surface border border-outline rounded-none flex items-center justify-center text-outline transition-all duration-300">
+                                <span class="material-symbols-outlined text-[14px]">search</span>
+                            </div>
+                            <span class="font-label-caps text-[8px] text-outline text-center">DETECT</span>
+                        </div>
+                        <div data-ai-step="SUGGEST" class="ai-step flex flex-col items-center gap-1 z-10 w-20">
+                            <div class="ai-step-node w-7 h-7 bg-surface border border-outline rounded-none flex items-center justify-center text-outline transition-all duration-300">
+                                <span class="material-symbols-outlined text-[14px]">lightbulb</span>
+                            </div>
+                            <span class="font-label-caps text-[8px] text-outline text-center">SUGGEST</span>
+                        </div>
+                        <div data-ai-step="PROTECT" class="ai-step flex flex-col items-center gap-1 z-10 w-20">
+                            <div class="ai-step-node w-7 h-7 bg-surface border border-outline rounded-none flex items-center justify-center text-outline transition-all duration-300">
+                                <span class="material-symbols-outlined text-[14px]">verified_user</span>
+                            </div>
+                            <span class="font-label-caps text-[8px] text-outline text-center">PROTECT</span>
+                        </div>
+                        <div data-ai-step="REPORT" class="ai-step flex flex-col items-center gap-1 z-10 w-20">
+                            <div class="ai-step-node w-7 h-7 bg-surface border border-outline rounded-none flex items-center justify-center text-outline transition-all duration-300">
+                                <span class="material-symbols-outlined text-[14px]">summarize</span>
+                            </div>
+                            <span class="font-label-caps text-[8px] text-outline text-center">REPORT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Body: 3-column grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-0 divide-x divide-outline-variant/30">
+                    <!-- SIGINT Feed -->
+                    <div class="p-panel-padding flex flex-col gap-2">
+                        <div class="flex items-center justify-between border-b border-outline-variant/50 pb-2">
+                            <span class="font-label-caps text-label-caps text-outline-variant uppercase">SIGINT FEED</span>
+                            <button id="btn-sigint" onclick="runSignalAnalysis()"
+                                class="text-[9px] font-label-caps text-sky-400 border border-sky-500/30 px-2 py-0.5 hover:bg-sky-500/10 transition-colors">
+                                ANALYZE
+                            </button>
+                        </div>
+                        <div id="sigint-feed" class="flex flex-col gap-1.5 overflow-y-auto max-h-[140px] font-data-mono text-[10px]">
+                            <div class="text-outline-variant italic">Awaiting AI analysis...</div>
+                        </div>
+                    </div>
+
+                    <!-- AI Recommendation (HITL) -->
+                    <div class="p-panel-padding flex flex-col gap-2">
+                        <span class="font-label-caps text-label-caps text-outline-variant uppercase border-b border-outline-variant/50 pb-2">
+                            AI RECOMMENDATION
+                        </span>
+                        <div id="ai-recommendation" class="flex flex-col gap-2 flex-1">
+                            <div class="text-outline-variant font-data-mono text-[10px] italic">No active recommendation. Run AI Threat Scan to generate.</div>
+                        </div>
+                    </div>
+
+                    <!-- Sensor Confidence Breakdown -->
+                    <div class="p-panel-padding flex flex-col gap-2">
+                        <span class="font-label-caps text-label-caps text-outline-variant uppercase border-b border-outline-variant/50 pb-2">
+                            SENSOR CONFIDENCE
+                        </span>
+                        <div class="flex flex-col gap-2 font-data-mono text-[10px]">
+                            <div class="flex items-center gap-2">
+                                <span class="w-12 text-outline shrink-0">RADAR</span>
+                                <div class="flex-1 h-3 bg-surface-container-highest border border-outline-variant/30 overflow-hidden">
+                                    <div id="conf-radar" class="h-full bg-primary transition-all duration-500" style="width: 96%"></div>
+                                </div>
+                                <span id="conf-radar-val" class="w-8 text-right text-primary">96%</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-12 text-outline shrink-0">ESM</span>
+                                <div class="flex-1 h-3 bg-surface-container-highest border border-outline-variant/30 overflow-hidden">
+                                    <div id="conf-esm" class="h-full bg-tertiary transition-all duration-500" style="width: 88%"></div>
+                                </div>
+                                <span id="conf-esm-val" class="w-8 text-right text-tertiary">88%</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-12 text-outline shrink-0">SAT</span>
+                                <div class="flex-1 h-3 bg-surface-container-highest border border-outline-variant/30 overflow-hidden">
+                                    <div id="conf-sat" class="h-full bg-secondary transition-all duration-500" style="width: 72%"></div>
+                                </div>
+                                <span id="conf-sat-val" class="w-8 text-right text-secondary">72%</span>
+                            </div>
+                            <div class="flex items-center gap-2 mt-1 pt-1 border-t border-outline-variant/30">
+                                <span class="w-12 text-outline-variant shrink-0 font-bold">FUSED</span>
+                                <div class="flex-1 h-3 bg-surface-container-highest border border-outline-variant/30 overflow-hidden">
+                                    <div id="conf-fused" class="h-full bg-gradient-to-r from-primary via-tertiary to-secondary transition-all duration-500" style="width: 94%"></div>
+                                </div>
+                                <span id="conf-fused-val" class="w-8 text-right text-on-surface font-bold">94%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Mission Report Modal (Enhancement: Viewable Report) -->
+            <div id="report-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-6">
+                <div class="bg-surface-container border border-outline-variant w-full max-w-2xl shadow-2xl overflow-hidden">
+                    <!-- Modal Header -->
+                    <div class="p-4 border-b border-outline-variant bg-surface-container-high flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary">description</span>
+                            <span class="font-label-caps text-label-caps tracking-widest text-on-surface">MISSION AFTER-ACTION REPORT</span>
+                        </div>
+                        <button onclick="document.getElementById('report-modal').classList.add('hidden')" class="text-outline hover:text-on-surface transition-colors">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div id="report-content" class="p-6 overflow-y-auto max-h-[70vh] font-data-mono text-[12px] space-y-4">
+                        <!-- Content will be injected here -->
+                    </div>
+                    <!-- Modal Footer -->
+                    <div class="p-4 border-t border-outline-variant bg-surface-container-low flex justify-end gap-3">
+                        <button onclick="window.print()" class="px-4 py-2 border border-outline text-outline font-label-caps text-[10px] hover:bg-surface-bright transition-colors">PRINT REPORT</button>
+                        <button onclick="document.getElementById('report-modal').classList.add('hidden')" class="px-6 py-2 bg-primary text-on-primary font-label-caps text-[10px] hover:bg-primary-fixed transition-colors">CLOSE</button>
+                    </div>
+                </div>
+            </div>
         </main>
+
         <script src="./ai-system.js"></script>
         <script src="./sensor-data.js"></script>
         <script src="./shared-components.js"></script>
         <script>
-            // --- AI Scan trigger ---
+        <script>
+            // ═══════════════════════════════════════════════════
+            // UTILITY
+            // ═══════════════════════════════════════════════════
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            const COMM_COLORS = { ATC: 'text-primary', 'GRIPEN-1': 'text-green-400', 'C2 HQ': 'text-amber-400', ESM: 'text-purple-400', AWACS: 'text-sky-300', AI: 'text-sky-400' };
+            let threatCriticalTimer = 0;
+            let currentWeaponQty = 4;
+
+            function addCommEntry(src, msg) {
+                const log = document.getElementById('comms-log');
+                if (!log) return;
+                const now = new Date();
+                const pad = n => String(n).padStart(2, '0');
+                const time = `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}Z`;
+                const color = COMM_COLORS[src] || 'text-on-surface';
+                const entry = document.createElement('div');
+                entry.className = 'flex gap-2 text-on-surface animate-in fade-in slide-in-from-left duration-300';
+                entry.innerHTML = `<span class="text-secondary w-16 shrink-0 font-data-mono">${time}</span> <span class="${color} font-bold shrink-0">${src}:</span> <span>${msg}</span>`;
+                log.prepend(entry);
+                if (log.childNodes.length > 30) log.removeChild(log.lastChild);
+            }
+
+            // ═══════════════════════════════════════════════════
+            // ACTIONS & SIMULATION
+            // ═══════════════════════════════════════════════════
             function startAISimulation() {
-                if (typeof AISystem !== 'undefined') {
-                    AISystem.scan({
-                        speed: 1200,
-                        distance: typeof SensorDataEngine !== 'undefined' ? SensorDataEngine.state.target.range : 12.4,
-                        iff: false
-                    });
-                    // Delay signal analysis for dramatic effect
-                    setTimeout(() => {
-                        AISystem.analyzeSignal();
-                    }, 2000);
+                if (typeof AISystem === 'undefined' || typeof SensorDataEngine === 'undefined') return;
+                const btn = document.getElementById('btn-ai-scan');
+                if (btn) { btn.classList.add('animate-pulse', 'ring-1', 'ring-sky-400'); }
+                set('sys-status', 'AI ACTIVE'); set('hud-sys', 'AI SCAN');
+                document.getElementById('sys-status')?.classList.replace('text-secondary', 'text-sky-400');
+
+                const range = SensorDataEngine.state.target.range;
+                addCommEntry('AI', '▶ PHASE 1/5: SCANNING — Ingesting multi-domain sensor data...');
+                
+                AISystem.scan({ speed: 1200, distance: range, iff: false });
+                setTimeout(() => AISystem.analyzeSignal(), 1500);
+            }
+
+            function runSignalAnalysis() {
+                if (typeof AISystem === 'undefined') return;
+                AISystem.analyzeSignal();
+                addCommEntry('AI', 'SIGINT ANALYSIS INITIATED — SCANNING EMITTER BANDS');
+            }
+
+            function triggerFlareAction() {
+                const btn = document.getElementById('btn-flare');
+                if (btn) {
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-ping">local_fire_department</span> FLARES AWAY';
+                    btn.classList.add('bg-tertiary', 'text-on-tertiary');
+                    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('bg-tertiary', 'text-on-tertiary'); }, 3000);
+                }
+                addCommEntry('GRIPEN-1', 'DEPLOYING FLARE WARNING. TARGET NOT COMPLYING.');
+                if (currentWeaponQty > 0) {
+                    currentWeaponQty--;
+                    if (typeof SensorDataEngine !== 'undefined') SensorDataEngine.state.interceptor.weaponQty = currentWeaponQty;
+                    updateWeaponBars();
                 }
             }
 
-            // --- Phase progression ---
-            const phaseEls = document.querySelectorAll('#phase-progress-line');
-            const phaseWidths = { 1: '0%', 2: '20%', 3: '40%', 4: '70%', 5: '100%' };
+            function updateWeaponBars() {
+                set('hud-wpn-qty', currentWeaponQty);
+                const bars = document.querySelectorAll('#hud-wpn-bars .wpn-bar');
+                bars.forEach((bar, i) => {
+                    if (i < currentWeaponQty) { bar.className = 'wpn-bar w-8 h-2 bg-primary/40 border border-primary/60'; }
+                    else { bar.className = 'wpn-bar w-8 h-2 border border-primary/20 opacity-30'; }
+                });
+                if (currentWeaponQty <= 1) set('hud-wpn-status', 'LOW');
+                if (currentWeaponQty === 0) set('hud-wpn-status', 'EMPTY');
+            }
 
             function advancePhase(targetPhase) {
                 if (typeof SensorDataEngine === 'undefined') return;
-                const current = SensorDataEngine.state.phase;
-                if (targetPhase <= current) return;
+                if (targetPhase <= SensorDataEngine.state.phase) return;
                 SensorDataEngine.setPhase(targetPhase);
                 updatePhaseUI(targetPhase);
             }
+
+            const phaseWidths = { 1: '0%', 2: '20%', 3: '40%', 4: '70%', 5: '100%' };
+            const ROE_STATES = { 3: 'WEAPONS TIGHT', 4: 'HOLD FIRE', 5: 'WEAPONS FREE' };
 
             function updatePhaseUI(phase) {
                 const line = document.getElementById('phase-progress-line');
                 if (line) line.style.width = phaseWidths[phase] || '40%';
 
-                // Update phase node visuals
-                const phaseNodes = document.querySelectorAll('[data-phase]');
-                phaseNodes.forEach(node => {
+                document.querySelectorAll('[data-phase]').forEach(node => {
                     const p = parseInt(node.dataset.phase);
+                    const nodeBox = node.querySelector('.phase-node');
+                    const statusText = node.querySelector('.status-text');
                     const icon = node.querySelector('.material-symbols-outlined');
-                    const label = node.querySelector('.font-label-caps');
+                    const glow = node.querySelector('.glow-ring');
+
                     if (p < phase) {
-                        // Completed
-                        node.classList.remove('opacity-60');
-                        if (icon) icon.style.fontVariationSettings = "'FILL' 1";
+                        nodeBox.className = 'phase-node w-8 h-8 bg-surface-container border border-primary rounded-none flex items-center justify-center text-primary shadow-[0_0_8px_rgba(130,207,255,0.3)]';
+                        if (statusText) statusText.textContent = 'COMPLETE';
                     } else if (p === phase) {
-                        // Active
-                        node.classList.remove('opacity-60');
+                        nodeBox.className = 'phase-node w-10 h-10 bg-primary-container border-2 border-primary rounded-none flex items-center justify-center text-on-primary-container relative';
+                        if (statusText) statusText.textContent = 'ACTIVE';
                     } else {
-                        node.classList.add('opacity-60');
+                        nodeBox.className = 'phase-node w-8 h-8 bg-surface border border-outline rounded-none flex items-center justify-center text-outline';
+                        if (statusText) statusText.textContent = 'PENDING';
                     }
                 });
 
-                // Unlock finalize button at phase 5
+                const roe = document.getElementById('roe-state');
+                if (roe && ROE_STATES[phase]) {
+                    roe.textContent = ROE_STATES[phase];
+                }
+
                 const btnFinalize = document.getElementById('btn-finalize');
                 if (btnFinalize) {
-                    if (phase >= 5) {
-                        btnFinalize.classList.remove('opacity-50', 'cursor-not-allowed');
-                        btnFinalize.title = '';
-                    } else {
-                        btnFinalize.classList.add('opacity-50', 'cursor-not-allowed');
-                    }
+                    if (phase >= 5) btnFinalize.classList.remove('opacity-50', 'cursor-not-allowed');
+                    else btnFinalize.classList.add('opacity-50', 'cursor-not-allowed');
                 }
             }
 
             function finalizeReport() {
-                if (typeof SensorDataEngine === 'undefined') return;
-                if (SensorDataEngine.state.phase < 5) {
-                    advancePhase(5);
+                if (typeof SensorDataEngine === 'undefined' || SensorDataEngine.state.phase < 5) return;
+                let report = typeof AISystem !== 'undefined' ? AISystem.generateReport() : null;
+                const modal = document.getElementById('report-modal');
+                const content = document.getElementById('report-content');
+                if (modal && content && report) {
+                    content.innerHTML = `<div class="space-y-4">
+                        <div class="flex justify-between border-b border-outline-variant pb-2"><span>TIMESTAMP:</span> <span>${report.timestamp}</span></div>
+                        <div class="flex justify-between border-b border-outline-variant pb-2"><span>THREAT LEVEL:</span> <span class="text-error font-bold">${report.finalThreatLevel}</span></div>
+                        <div class="text-primary font-bold uppercase mt-4">Event Timeline</div>
+                        ${report.events.map(e => `<div class="flex gap-4 text-[10px] border-b border-outline-variant/10 py-1"><span class="text-outline w-16">${e.timestamp}</span><span class="flex-1">${e.message}</span></div>`).join('')}
+                    </div>`;
+                    modal.classList.remove('hidden');
                 }
-                if (typeof AISystem !== 'undefined') {
-                    const report = AISystem.generateReport();
-                    console.log('[REPORT]', report);
-                }
-                const btn = document.getElementById('btn-finalize');
-                if (btn) {
-                    btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">check_circle</span> REPORT FILED';
-                    btn.classList.add('bg-green-800', 'border-green-500', 'text-green-300');
-                    btn.classList.remove('bg-primary', 'border-primary', 'text-on-primary');
-                    btn.onclick = null;
-                }
+                addCommEntry('C2 HQ', 'FINAL INCIDENT REPORT FILED.');
             }
 
-            // --- AI Signal Analysis Listener ---
-            window.addEventListener('ai-signal-analysis', (e) => {
-                const logContainer = document.getElementById('comms-log');
-                if (logContainer) {
-                    const now = new Date().toISOString().split('T')[1].split('.')[0] + 'Z';
-                    const entry = document.createElement('div');
-                    entry.className = "flex gap-2 text-sky-400 border-l-2 border-sky-500 pl-2 bg-sky-500/5 py-1 animate-in fade-in slide-in-from-left duration-500";
-                    entry.innerHTML = `
-                        <span class="text-sky-600 w-16 shrink-0 font-bold">[AI:${e.detail.type}]</span>
-                        <span class="flex-1">${e.detail.msg}</span>
-                        <span class="text-[8px] text-sky-700 font-bold shrink-0">${(e.detail.prob * 100).toFixed(0)}% CONF</span>
-                    `;
-                    logContainer.appendChild(entry);
-                    logContainer.scrollTop = logContainer.scrollHeight;
-                }
-            });
+            // ═══════════════════════════════════════════════════
+            // AI EVENT LISTENERS
+            // ═══════════════════════════════════════════════════
+            const AI_PIPE_WIDTHS = { SCAN: '10%', DETECT: '30%', SUGGEST: '55%', PROTECT: '80%', REPORT: '100%' };
+            function updateAIPipeline(phase) {
+                const line = document.getElementById('ai-pipeline-line');
+                if (line) line.style.width = AI_PIPE_WIDTHS[phase] || '0%';
+                const label = document.getElementById('ai-engine-label');
+                if (label) label.textContent = phase ? `PROCESSING: ${phase}` : 'STANDBY';
 
-            // --- AI Effector Recommendation Listener ---
-            window.addEventListener('ai-effector-recommendation', (e) => {
-                const { type, label, icon, reason, color } = e.detail;
-                const logContainer = document.getElementById('comms-log');
-                if (!logContainer) return;
+                document.querySelectorAll('[data-ai-step]').forEach(step => {
+                    const s = step.dataset.aiStep;
+                    const node = step.querySelector('.ai-step-node');
+                    const steps = ['SCAN', 'DETECT', 'SUGGEST', 'PROTECT', 'REPORT'];
+                    const ci = steps.indexOf(phase), si = steps.indexOf(s);
+                    if (si < ci) node.className = 'ai-step-node w-7 h-7 bg-sky-500/20 border border-sky-500 text-sky-400 rounded-none flex items-center justify-center';
+                    else if (si === ci) node.className = 'ai-step-node w-8 h-8 bg-sky-500 border-2 border-sky-400 text-white rounded-none flex items-center justify-center shadow-[0_0_10px_rgba(56,189,248,0.5)]';
+                    else node.className = 'ai-step-node w-7 h-7 bg-surface border border-outline text-outline rounded-none flex items-center justify-center';
+                });
+            }
 
-                const colorMap = {
-                    amber: { bg: 'bg-amber-500/10', border: 'border-amber-500', text: 'text-amber-400', iconColor: 'text-amber-500' },
-                    error: { bg: 'bg-error/10', border: 'border-error', text: 'text-error', iconColor: 'text-error' },
-                    primary: { bg: 'bg-sky-500/10', border: 'border-sky-500', text: 'text-sky-400', iconColor: 'text-sky-500' }
-                };
-                const c = colorMap[color] || colorMap.primary;
-
-                const banner = document.createElement('div');
-                banner.className = `flex items-center gap-3 ${c.bg} border-l-2 ${c.border} px-3 py-2 my-1 animate-in fade-in slide-in-from-left duration-500`;
-                banner.innerHTML = `
-                    <span class="material-symbols-outlined ${c.iconColor} text-[18px]">${icon}</span>
-                    <div class="flex-1">
-                        <div class="font-data-mono text-[10px] ${c.text} font-bold uppercase tracking-wider">EFFECTOR: ${type}</div>
-                        <div class="font-data-mono text-[9px] text-outline">${label} — ${reason}</div>
-                    </div>
-                `;
-                logContainer.appendChild(banner);
-                logContainer.scrollTop = logContainer.scrollHeight;
-            });
-
-            // --- Predictive Logistics Alert Listener ---
-            window.addEventListener('ai-predictive-alert', (e) => {
-                const alert = e.detail;
-                const existing = document.getElementById('predictive-alert-card');
-                if (existing) existing.remove();
-
-                const isCritical = alert.severity === 'CRITICAL';
-                const borderColor = isCritical ? 'border-error' : 'border-amber-500';
-                const bgColor = isCritical ? 'bg-red-950/90' : 'bg-amber-950/90';
-                const textColor = isCritical ? 'text-error' : 'text-amber-400';
-                const pulseClass = isCritical ? 'animate-pulse' : '';
-
-                const card = document.createElement('div');
-                card.id = 'predictive-alert-card';
-                card.className = `fixed bottom-6 left-1/2 -translate-x-1/2 w-[600px] max-w-[90vw] ${bgColor} border-2 ${borderColor} shadow-[0_0_30px_rgba(255,100,80,0.3)] z-[100] backdrop-blur-sm`;
-                card.style.animation = 'slideInUp 0.5s ease-out';
-                card.innerHTML = `
-                    <style>
-                        @keyframes slideInUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-                    </style>
-                    <div class="flex items-center gap-2 px-4 py-2 border-b ${borderColor}/50 bg-black/30">
-                        <span class="material-symbols-outlined ${textColor} text-[18px] ${pulseClass}">warning</span>
-                        <span class="font-label-caps text-label-caps ${textColor} font-bold tracking-widest">STRATEGIC ALERT // PREDICTIVE LOGISTICS</span>
-                        <span class="ml-auto font-data-mono text-[9px] text-outline">${alert.severity}</span>
-                    </div>
-                    <div class="p-4 space-y-3">
-                        <p class="font-data-mono text-[12px] text-on-surface leading-relaxed">${alert.message}</p>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-black/30 border border-outline-variant/30 p-3">
-                                <div class="font-label-caps text-[8px] text-outline tracking-widest mb-1">DEPLETED BASE</div>
-                                <div class="font-data-mono text-[12px] ${textColor} font-bold">${alert.depletedBase}</div>
-                                <div class="font-data-mono text-[10px] text-outline">Readiness: ${alert.depletedReadiness}%</div>
+            window.addEventListener('ai-update', (e) => {
+                const { phase } = e.detail;
+                updateAIPipeline(phase);
+                if (phase === 'SUGGEST' && typeof AISystem !== 'undefined' && AISystem.state.suggestions.length) {
+                    const rec = document.getElementById('ai-recommendation');
+                    const sug = AISystem.state.suggestions[0];
+                    if (rec && sug) {
+                        const reasoningHtml = (sug.reasoning || []).map(r => `
+                            <div class="flex flex-col gap-0.5 border-l-2 border-sky-500/30 pl-2 py-1">
+                                <span class="font-label-caps text-[8px] text-sky-300 uppercase">${r.label}</span>
+                                <span class="font-data-mono text-[10px] text-on-surface-variant leading-snug">${r.detail}</span>
                             </div>
-                            <div class="bg-black/30 border border-outline-variant/30 p-3">
-                                <div class="font-label-caps text-[8px] text-outline tracking-widest mb-1">DONOR BASE</div>
-                                <div class="font-data-mono text-[12px] text-primary font-bold">${alert.donorBase}</div>
-                                <div class="font-data-mono text-[10px] text-outline">Readiness: ${alert.donorReadiness}%</div>
+                        `).join('');
+                        rec.innerHTML = `
+                            <div class="bg-sky-500/10 border border-sky-500/30 p-2">
+                                <div class="flex items-center gap-1 mb-1"><span class="material-symbols-outlined text-[12px] text-sky-400">auto_awesome</span>
+                                    <span class="font-label-caps text-[8px] text-sky-400">${sug.priority} PRIORITY</span></div>
+                                <p class="font-data-mono text-[10px] text-on-surface leading-relaxed">${sug.action}</p>
                             </div>
-                        </div>
-                        <div class="flex items-center gap-2 bg-black/20 border border-outline-variant/20 px-3 py-2">
-                            <span class="material-symbols-outlined text-primary text-[16px]">swap_horiz</span>
-                            <span class="font-data-mono text-[11px] text-on-surface">Transfer <span class="text-primary font-bold">${alert.suggestedTransfer}× JAS 39</span> from ${alert.donorBase} → ${alert.depletedBase}</span>
-                        </div>
-                    </div>
-                    <div class="flex gap-2 p-3 border-t ${borderColor}/30 bg-black/20">
-                        <button onclick="this.closest('#predictive-alert-card').remove(); if(typeof SharedComponents !== 'undefined') SharedComponents.showToast('TRANSFER APPROVED', 'Asset repositioning initiated', 'check_circle', 'success');"
-                            class="flex-1 py-2.5 bg-sky-950 border border-sky-500 text-sky-400 font-label-caps text-label-caps flex items-center justify-center gap-2 hover:bg-sky-900 active:scale-95 transition-all">
-                            <span class="material-symbols-outlined text-[14px]">check</span>
-                            APPROVE TRANSFER
-                        </button>
-                        <button onclick="this.closest('#predictive-alert-card').remove();"
-                            class="px-6 py-2.5 bg-surface border border-outline text-outline font-label-caps text-label-caps hover:bg-surface-bright transition-colors">
-                            DISMISS
-                        </button>
-                    </div>
-                `;
-                document.body.appendChild(card);
-            });
-
-            // --- Live telemetry listener ---
-            window.addEventListener('sensor-update', (e) => {
-                const d = e.detail;
-                const t = d.activeTarget;
-                const i = d.interceptor;
-
-                // HUD updates
-                const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-                set('hud-hdg', String(Math.round(i.heading)).padStart(3, '0'));
-                set('hud-mach', i.speed.toFixed(2));
-                set('hud-alt', i.altitude.toLocaleString());
-                set('hud-rng', t.range.toFixed(1));
-                set('hud-time', d.zuluTime);
-
-                // Target profiling
-                set('tp-confidence', d.fusedConfidence.toFixed(1) + '%');
-                set('tp-closure', t.closureRate + ' KTS');
-
-                // Closure rate color
-                const closureEl = document.getElementById('tp-closure');
-                if (closureEl) {
-                    if (t.closureRate < -500) closureEl.className = 'font-headline-md text-headline-md text-error animate-pulse';
-                    else if (t.closureRate < -300) closureEl.className = 'font-headline-md text-headline-md text-error';
-                    else closureEl.className = 'font-headline-md text-headline-md text-tertiary';
-                }
-
-                // Comms log
-                if (d.newComm) {
-                    const log = document.getElementById('comms-log');
-                    if (log) {
-                        const entry = document.createElement('div');
-                        entry.className = 'flex gap-2 text-on-surface';
-                        entry.innerHTML = `<span class="text-secondary w-16 shrink-0">${d.newComm.time}</span> <span>${d.newComm.src}: ${d.newComm.msg}</span>`;
-                        log.appendChild(entry);
-                        log.scrollTop = log.scrollHeight;
+                            <div class="bg-surface-container-highest border border-outline-variant/30 p-2 flex flex-col gap-1.5">${reasoningHtml}</div>
+                            <div class="flex gap-2 mt-1">
+                                <button onclick="AISystem.approveAction('${sug.id}'); this.parentElement.parentElement.innerHTML='<div class=\\'text-green-400 font-data-mono text-[10px]\\'>✓ APPROVED</div>';"
+                                    class="flex-1 py-1.5 bg-sky-500/20 border border-sky-500 text-sky-400 font-label-caps text-[9px] hover:bg-sky-500/30 transition-colors">APPROVE</button>
+                                <button onclick="AISystem.rejectAction('${sug.id}'); this.parentElement.parentElement.innerHTML='<div class=\\'text-error font-data-mono text-[10px]\\'>✗ REJECTED</div>';"
+                                    class="flex-1 py-1.5 bg-surface border border-outline text-outline font-label-caps text-[9px] hover:bg-surface-bright transition-colors">REJECT</button>
+                            </div>`;
                     }
                 }
-
-                // Phase UI sync
-                updatePhaseUI(d.phase);
             });
 
-            // --- Predictive Logistics Listener ---
+            window.addEventListener('ai-signal-analysis', (e) => {
+                const feed = document.getElementById('sigint-feed');
+                if (!feed) return;
+                if (feed.querySelector('.italic')) feed.innerHTML = '';
+                const entry = document.createElement('div');
+                entry.className = 'flex flex-col gap-0.5 border-l-2 border-sky-500/30 pl-2 py-1';
+                entry.innerHTML = `<div class="flex justify-between"><span class="text-sky-400 font-bold">${e.detail.type}</span><span class="text-outline">${(e.detail.prob * 100).toFixed(0)}%</span></div><p class="text-on-surface-variant leading-snug">${e.detail.msg}</p>`;
+                feed.prepend(entry);
+                if (feed.children.length > 6) feed.removeChild(feed.lastChild);
+            });
+
+            window.addEventListener('ai-effector-recommendation', (e) => {
+                addCommEntry('AI', `▶ EFFECTOR SELECTED: ${e.detail.type} — ${e.detail.reason}`);
+            });
+
             window.addEventListener('ai-predictive-alert', (e) => {
                 const alertContainer = document.getElementById('predictive-alert-container');
                 const alertMsg = document.getElementById('predictive-alert-msg');
@@ -514,21 +648,39 @@
                 }
             });
 
+            window.addEventListener('sensor-update', (e) => {
+                const d = e.detail, t = d.target, i = d.interceptor;
+                set('hud-hdg', String(Math.round(i.heading)).padStart(3, '0'));
+                set('hud-mach', i.speed.toFixed(2));
+                set('hud-alt', i.altitude.toLocaleString());
+                set('hud-rng', t.range.toFixed(1));
+                set('hud-time', d.zuluTime);
+                set('tp-confidence', d.fusedConfidence.toFixed(1) + '%');
+                set('tp-closure', t.closureRate + ' KTS');
+
+                const gauge = document.getElementById('threat-gauge');
+                const label = document.getElementById('threat-label');
+                if (gauge) gauge.style.width = d.threatScore + '%';
+                if (label) label.textContent = d.threatScore > 80 ? 'CRITICAL' : d.threatScore > 50 ? 'ELEVATED' : 'NOMINAL';
+
+                const s = d.sensors;
+                if (document.getElementById('conf-radar')) document.getElementById('conf-radar').style.width = s.radar.confidence + '%';
+                if (document.getElementById('conf-esm')) document.getElementById('conf-esm').style.width = s.esm.confidence + '%';
+                if (document.getElementById('conf-sat')) document.getElementById('conf-sat').style.width = s.satellite.confidence + '%';
+                if (document.getElementById('conf-fused')) document.getElementById('conf-fused').style.width = d.fusedConfidence + '%';
+                set('conf-radar-val', s.radar.confidence + '%');
+                set('conf-esm-val', s.esm.confidence + '%');
+                set('conf-sat-val', s.satellite.confidence + '%');
+                set('conf-fused-val', d.fusedConfidence.toFixed(1) + '%');
+
+                if (d.newComm) addCommEntry(d.newComm.src, d.newComm.msg);
+                updatePhaseUI(d.phase);
+            });
+
             function approveRelocation() {
                 const alertContainer = document.getElementById('predictive-alert-container');
-                if (alertContainer) {
-                    alertContainer.classList.remove('flex', 'animate-pulse');
-                    alertContainer.classList.add('hidden');
-                    // Add to log
-                    const logContainer = document.getElementById('comms-log');
-                    if (logContainer) {
-                        const entry = document.createElement('div');
-                        entry.className = "flex gap-2 text-error border-l-2 border-error pl-2 bg-error/5 py-1";
-                        entry.innerHTML = `<span class="text-error w-16 shrink-0 font-bold">[C2:CMD]</span><span class="flex-1">STRATEGIC RELOCATION AUTHORIZED. ASSETS MOVING.</span>`;
-                        logContainer.appendChild(entry);
-                        logContainer.scrollTop = logContainer.scrollHeight;
-                    }
-                }
+                if (alertContainer) alertContainer.classList.add('hidden');
+                addCommEntry('C2 HQ', 'STRATEGIC RELOCATION AUTHORIZED.');
             }
         </script>
 </body>

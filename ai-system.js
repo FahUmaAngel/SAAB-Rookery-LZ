@@ -259,6 +259,40 @@ const AISystem = {
         apiKey: globalThis.OPENROUTER_API_KEY || ""
     },
 
+    buildReasoning: (data) => {
+        const reasons = [];
+        const speed = Number(data.speed) || 0;
+        const distance = Number(data.distance) || 0;
+        const iff = Boolean(data.iff);
+
+        if (speed > 800) {
+            reasons.push({
+                label: 'High speed',
+                detail: `${Math.round(speed)} KTS exceeds normal civilian transit profile`,
+            });
+        }
+        if (distance < 50) {
+            reasons.push({
+                label: 'Close approach',
+                detail: `${distance.toFixed(1)} NM from the intercept zone requires rapid response`,
+            });
+        }
+        if (!iff) {
+            reasons.push({
+                label: 'No positive identification',
+                detail: 'IFF/transponder response is absent, so the track is treated as unknown',
+            });
+        }
+        if (!reasons.length) {
+            reasons.push({
+                label: 'Precautionary intercept',
+                detail: 'Available sensor data is inconclusive, so a visual intercept is recommended',
+            });
+        }
+
+        return reasons;
+    },
+
     /**
      * Call OpenRouter LLM for real tactical analysis
      */
@@ -355,6 +389,7 @@ const AISystem = {
     suggest: async (data) => {
         AISystem.state.currentPhase = "SUGGEST";
         AISystem.log("SUGGEST", "AI Generating tactical suggestions...");
+        const reasoning = AISystem.buildReasoning(data);
 
         const effector = AISystem.classifyEffector(data);
         AISystem.state.lastEffector = effector;
@@ -377,8 +412,8 @@ Provide a 2-sentence tactical recommendation for the C2 Commander. First sentenc
             const aiResponse = await AISystem.callOpenRouter(prompt);
             if (aiResponse) {
                 const recommendations = [
-                    { id: "ai-scramble", action: aiResponse, priority: "CRITICAL", effector },
-                    { id: "warn", action: "Issue Radio Warning (Standard)", priority: "MEDIUM" }
+                    { id: "ai-scramble", action: aiResponse, priority: "CRITICAL", effector, reasoning },
+                    { id: "warn", action: "Issue Radio Warning (Standard)", priority: "MEDIUM", reasoning }
                 ];
                 AISystem.state.suggestions = recommendations;
                 AISystem.log("SUGGEST", `AI Effector Selection: ${aiResponse}`);
@@ -387,8 +422,8 @@ Provide a 2-sentence tactical recommendation for the C2 Commander. First sentenc
         }
 
         const recommendations = [
-            { id: "scramble", action: fallbackAction, priority: "HIGH", effector },
-            { id: "warn", action: "Issue Radio Warning", priority: "MEDIUM" }
+            { id: "scramble", action: fallbackAction, priority: "HIGH", effector, reasoning },
+            { id: "warn", action: "Issue Radio Warning", priority: "MEDIUM", reasoning }
         ];
         AISystem.state.suggestions = recommendations;
         AISystem.log("SUGGEST", `AI suggested fallback effector: ${effector.label}`);
