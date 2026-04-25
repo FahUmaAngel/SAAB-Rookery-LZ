@@ -27,6 +27,12 @@ const SharedComponents = {
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: rgba(130, 207, 255, 0.2);
         }
+        main {
+            transition: opacity 0.15s ease;
+        }
+        main.spa-loading {
+            opacity: 0;
+        }
     `,
 
     header: `
@@ -144,7 +150,7 @@ const SharedComponents = {
         `;
     },
 
-    initHeader: (currentPage) => {
+    initHeader: (_currentPage) => {
         const headerPlaceholder = document.getElementById('header-placeholder');
         if (headerPlaceholder) {
             headerPlaceholder.innerHTML = SharedComponents.header;
@@ -188,7 +194,8 @@ const SharedComponents = {
             'map-view.html', 'tactical-map.html', 'logistics.html',
             'Asset-ready.html', 'Sensor-Fusion.html', 'sensor_map.html',
             'comms.html', 'mission_logs.html', 'asset-tracking.html',
-            'intel-brief.html'
+            'intel-brief.html', 'supply-chain.html', 'maintenance.html',
+            'personnel.html'
         ];
         const filename = url.split('/').pop().split('?')[0];
         if (!allowedPaths.includes(filename)) {
@@ -209,6 +216,10 @@ const SharedComponents = {
             const currentMain = document.querySelector('main');
 
             if (newMain && currentMain) {
+                // Fade out current content to prevent flicker
+                currentMain.classList.add('spa-loading');
+                await new Promise(r => setTimeout(r, 150));
+
                 // Use safe DOM adoption instead of innerHTML to prevent XSS
                 currentMain.className = newMain.className;
                 currentMain.replaceChildren(
@@ -261,6 +272,14 @@ const SharedComponents = {
                     }
                 }
 
+                // Fade in new content, then remove the loading overlay only after
+                // the transition has started — removing the overlay before the
+                // fade-in begins causes a brief transparent flash (flicker).
+                requestAnimationFrame(() => {
+                    currentMain.classList.remove('spa-loading');
+                    setTimeout(() => SharedComponents.showLoading(false), 150);
+                });
+
                 // Notify page modules that SPA navigation completed
                 dispatchEvent(new CustomEvent('spa-navigated', { detail: { url } }));
 
@@ -269,9 +288,8 @@ const SharedComponents = {
             }
         } catch (err) {
             console.error('Failed to load content:', err);
-            SharedComponents.showToast('LOAD ERROR', 'Failed to load page', 'error', 'error');
-        } finally {
             SharedComponents.showLoading(false);
+            SharedComponents.showToast('LOAD ERROR', 'Failed to load page', 'error', 'error');
         }
     },
 
@@ -360,7 +378,18 @@ const SharedComponents = {
                 }
             });
         }
-        
+
+        // SPA link delegation — intercept any internal <a href> click that hasn't
+        // already been handled by an inline onclick (those call preventDefault first).
+        document.addEventListener('click', (e) => {
+            if (e.defaultPrevented) return;
+            const link = e.target.closest('a[href]');
+            if (!link) return;
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto') || href.startsWith('//')) return;
+            SharedComponents.handleNav(e, href);
+        });
+
         // Save state on sidebar toggle
         const observer = new MutationObserver(() => {
             SharedComponents.saveState();
