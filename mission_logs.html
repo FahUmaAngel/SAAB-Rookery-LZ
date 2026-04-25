@@ -38,10 +38,6 @@
                 <span class="material-symbols-outlined text-lg" data-icon="navigation">navigation</span>
                 Asset Tracking
             </a>
-            <a id="mission-logs-telemetry-link" class="text-slate-400 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-800 hover:text-white transition-all" href="#detail-telemetry">
-                <span class="material-symbols-outlined text-lg" data-icon="query_stats">query_stats</span>
-                Telemetry
-            </a>
             <a id="mission-logs-intel-link" class="text-slate-400 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-800 hover:text-white transition-all" href="./intel-brief.html" onclick="SharedComponents.handleNav(event, './intel-brief.html')">
                 <span class="material-symbols-outlined text-lg" data-icon="description">description</span>
                 Intel Brief
@@ -579,7 +575,6 @@
         const exportPdfButton = document.getElementById("mission-log-export-pdf-button");
         const protestButton = document.getElementById("mission-log-generate-protest-button");
         const syncButton = document.getElementById("mission-log-sync-button");
-        const telemetryLink = document.getElementById("mission-logs-telemetry-link");
         const intelLink = document.getElementById("mission-logs-intel-link");
 
         if (filterButton) filterButton.onclick = cycleFilter;
@@ -587,14 +582,7 @@
         if (exportPdfButton) exportPdfButton.onclick = exportPrintableBrief;
         if (protestButton) protestButton.onclick = generateProtest;
         if (syncButton) syncButton.onclick = syncToNato;
-        if (telemetryLink) telemetryLink.onclick = (event) => {
-            event.preventDefault();
-            scrollToTarget("#detail-telemetry");
-        };
-        if (intelLink) intelLink.onclick = (event) => {
-            event.preventDefault();
-            scrollToTarget("#detail-summary-container");
-        };
+        if (intelLink) intelLink.onclick = (event) => SharedComponents.handleNav(event, "./intel-brief.html");
     }
 
     function initMissionLogs() {
