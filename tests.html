@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>C2 STRATOS — Test Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0e0e0e;
+            color: #e5e2e1;
+            font-family: 'Courier New', monospace;
+            padding: 24px;
+        }
+
+        h1 {
+            color: #82cfff;
+            margin-bottom: 16px;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+
+        .suite {
+            margin-bottom: 24px;
+            border: 1px solid #3e4850;
+            padding: 16px;
+        }
+
+        .suite-title {
+            color: #82cfff;
+            font-size: 14px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .test {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-left: 3px solid transparent;
+            margin-bottom: 4px;
+        }
+
+        .test.pass {
+            border-color: #34d399;
+            color: #34d399;
+        }
+
+        .test.fail {
+            border-color: #ff5252;
+            color: #ff5252;
+            background: rgba(255, 82, 82, 0.05);
+        }
+
+        .summary {
+            margin-top: 24px;
+            padding: 16px;
+            border: 2px solid #3e4850;
+            font-size: 14px;
+        }
+
+        .summary.all-pass {
+            border-color: #34d399;
+        }
+
+        .summary.has-fail {
+            border-color: #ff5252;
+        }
+
+        #results {
+            max-width: 900px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Hidden placeholders needed by shared-components -->
+    <div id="header-placeholder" style="display:none"></div>
+    <div id="sidebar-placeholder" style="display:none"></div>
+
+    <h1>// C2 STRATOS TEST SUITE</h1>
+    <div id="results"></div>
+
+    <!-- Load production code -->
+    <script src="./ai-system.js"></script>
+    <script src="./sensor-data.js"></script>
+    <script>
+        // ========================================================
+        // Minimal test framework
+        // ========================================================
+        const TestRunner = {
+            results: [],
+            currentSuite: '',
+
+            suite(name) { this.currentSuite = name; },
+
+            assert(description, fn) {
+                try {
+                    const result = fn();
+                    if (result === false) throw new Error('Assertion returned false');
+                    this.results.push({ suite: this.currentSuite, description, pass: true });
+                } catch (e) {
+                    this.results.push({ suite: this.currentSuite, description, pass: false, error: e.message });
+                }
+            },
+
+            assertEqual(description, actual, expected) {
+                this.assert(description, () => {
+                    if (actual !== expected) {
+                        throw new Error(`Expected "${expected}", got "${actual}"`);
+                    }
+                });
+            },
+
+            assertType(description, value, type) {
+                this.assert(description, () => {
+                    if (typeof value !== type) {
+                        throw new Error(`Expected type "${type}", got "${typeof value}"`);
+                    }
+                });
+            },
+
+            assertInRange(description, value, min, max) {
+                this.assert(description, () => {
+                    if (value < min || value > max) {
+                        throw new Error(`Expected ${value} to be in [${min}, ${max}]`);
+                    }
+                });
+            },
+
+            render() {
+                const container = document.getElementById('results');
+                const suites = {};
+                this.results.forEach(r => {
+                    if (!suites[r.suite]) suites[r.suite] = [];
+                    suites[r.suite].push(r);
+                });
+
+                let html = '';
+                let totalPass = 0, totalFail = 0;
+
+                Object.keys(suites).forEach(suite => {
+                    html += `<div class="suite"><div class="suite-title">${suite}</div>`;
+                    suites[suite].forEach(r => {
+                        if (r.pass) { totalPass++; } else { totalFail++; }
+                        const icon = r.pass ? '✓' : '✗';
+                        const cls = r.pass ? 'pass' : 'fail';
+                        const err = r.error ? ` — ${r.error}` : '';
+                        html += `<div class="test ${cls}">${icon} ${r.description}${err}</div>`;
+                    });
+                    html += '</div>';
+                });
+
+                const cls = totalFail === 0 ? 'all-pass' : 'has-fail';
+                html += `<div class="summary ${cls}" id="test-summary">
+                TOTAL: ${totalPass + totalFail} | PASS: ${totalPass} | FAIL: ${totalFail}
+            </div>`;
+
+                container.innerHTML = html;
+            }
+        };
+
+        // ========================================================
+        // TEST SUITES
+        // ========================================================
+
+        // ------ 1. SensorDataEngine: Initialization ------
+        TestRunner.suite('SensorDataEngine — Initialization');
+
+        TestRunner.assert('SensorDataEngine exists as global', () => typeof window.SensorDataEngine === 'object');
+        TestRunner.assertType('state is an object', SensorDataEngine.state, 'object');
+        TestRunner.assertType('start is a function', SensorDataEngine.start, 'function');
+        TestRunner.assertType('stop is a function', SensorDataEngine.stop, 'function');
+        TestRunner.assertType('setPhase is a function', SensorDataEngine.setPhase, 'function');
+        TestRunner.assertType('_tick is a function', SensorDataEngine._tick, 'function');
+
+        // ------ 2. SensorDataEngine: State Structure ------
+        TestRunner.suite('SensorDataEngine — State Structure');
+
+        const s = SensorDataEngine.state;
+        TestRunner.assertType('target is an object', s.target, 'object');
+        TestRunner.assertType('sensors is an object', s.sensors, 'object');
+        TestRunner.assertType('interceptor is an object', s.interceptor, 'object');
+        TestRunner.assertEqual('target.callsign', s.target.callsign, 'BOGEY_GOLF_42');
+        TestRunner.assertEqual('target.classId', s.target.classId, 'SU-27 FLANKER');
+        TestRunner.assertType('target.lat is number', s.target.lat, 'number');
+        TestRunner.assertType('target.lon is number', s.target.lon, 'number');
+        TestRunner.assertType('target.heading is number', s.target.heading, 'number');
+        TestRunner.assertType('target.speed is number', s.target.speed, 'number');
+        TestRunner.assertType('target.altitude is number', s.target.altitude, 'number');
+        TestRunner.assertType('target.closureRate is number', s.target.closureRate, 'number');
+        TestRunner.assertType('target.range is number', s.target.range, 'number');
+        TestRunner.assertEqual('target.transponder is false', s.target.transponder, false);
+        TestRunner.assertType('sensors.radar is object', s.sensors.radar, 'object');
+        TestRunner.assertType('sensors.esm is object', s.sensors.esm, 'object');
+        TestRunner.assertType('sensors.satellite is object', s.sensors.satellite, 'object');
+        TestRunner.assertType('fusedConfidence is number', s.fusedConfidence, 'number');
+        TestRunner.assertType('phase is number', s.phase, 'number');
+        TestRunner.assertInRange('phase starts at 3', s.phase, 1, 5);
+
+        // ------ 3. SensorDataEngine: Tick Simulation ------
+        TestRunner.suite('SensorDataEngine — Tick Simulation');
+
+        // Stop any auto-started engine, save state, run ticks manually
+        SensorDataEngine.stop();
+        const beforeTick = {
+            lat: s.target.lat,
+            lon: s.target.lon,
+            tickCount: s.tickCount,
+        };
+
+        SensorDataEngine._tick();
+
+        TestRunner.assert('tickCount incremented', () => s.tickCount === beforeTick.tickCount + 1);
+        TestRunner.assert('target lat changed after tick', () => s.target.lat !== beforeTick.lat);
+        TestRunner.assert('target lon changed after tick', () => s.target.lon !== beforeTick.lon);
+        TestRunner.assertInRange('target speed in valid range', s.target.speed, 0.70, 1.10);
+        TestRunner.assertInRange('target altitude in valid range', s.target.altitude, 15000, 38000);
+        TestRunner.assertInRange('target closureRate in range', s.target.closureRate, -700, -100);
+        TestRunner.assertInRange('target range in valid range', s.target.range, 1.0, 50.0);
+        TestRunner.assertInRange('radar confidence in range', s.sensors.radar.confidence, 75, 99);
+        TestRunner.assertInRange('esm confidence in range', s.sensors.esm.confidence, 60, 95);
+        TestRunner.assertInRange('satellite confidence in range', s.sensors.satellite.confidence, 40, 90);
+        TestRunner.assertInRange('fusedConfidence in range', s.fusedConfidence, 70, 99);
+        TestRunner.assert('altitudeTrend is valid string', () =>
+            ['DESCENDING', 'CLIMBING', 'LEVEL'].includes(s.target.altitudeTrend)
+        );
+
+        // ------ 4. SensorDataEngine: Event Dispatch ------
+        TestRunner.suite('SensorDataEngine — Event Dispatch');
+
+        let eventReceived = false;
+        let eventDetail = null;
+        const handler = (e) => { eventReceived = true; eventDetail = e.detail; };
+        window.addEventListener('sensor-update', handler);
+        SensorDataEngine._tick();
+        window.removeEventListener('sensor-update', handler);
+
+        TestRunner.assert('sensor-update event dispatched', () => eventReceived === true);
+        TestRunner.assert('event detail has target', () => eventDetail && typeof eventDetail.target === 'object');
+        TestRunner.assert('event detail has interceptor', () => typeof eventDetail.interceptor === 'object');
+        TestRunner.assert('event detail has sensors', () => typeof eventDetail.sensors === 'object');
+        TestRunner.assert('event detail has zuluTime', () => typeof eventDetail.zuluTime === 'string');
+        TestRunner.assert('zuluTime matches format HH:MM:SSZ', () => /^\d{2}:\d{2}:\d{2}Z$/.test(eventDetail.zuluTime));
+        TestRunner.assert('event detail has tick count', () => typeof eventDetail.tick === 'number');
+        TestRunner.assert('event detail has fusedConfidence', () => typeof eventDetail.fusedConfidence === 'number');
+        TestRunner.assert('event detail has phase', () => typeof eventDetail.phase === 'number');
+
+        // ------ 5. SensorDataEngine: Comms Generation ------
+        TestRunner.suite('SensorDataEngine — Comms Messages');
+
+        // Run ticks until we get a comms message (every 4th tick)
+        let commFound = null;
+        const commHandler = (e) => { if (e.detail.newComm) commFound = e.detail.newComm; };
+        window.addEventListener('sensor-update', commHandler);
+        for (let i = 0; i < 5; i++) SensorDataEngine._tick();
+        window.removeEventListener('sensor-update', commHandler);
+
+        TestRunner.assert('comms message generated within 5 ticks', () => commFound !== null);
+        if (commFound) {
+            TestRunner.assert('comm has time field', () => typeof commFound.time === 'string');
+            TestRunner.assert('comm has src field', () => typeof commFound.src === 'string');
+            TestRunner.assert('comm has msg field', () => typeof commFound.msg === 'string');
+            TestRunner.assert('comm src is valid', () =>
+                ['ATC', 'GRIPEN-1', 'C2 HQ', 'ESM', 'AWACS'].includes(commFound.src)
+            );
+        }
+
+        // ------ 6. SensorDataEngine: Phase Management ------
+        TestRunner.suite('SensorDataEngine — Phase Management');
+
+        SensorDataEngine.setPhase(1);
+        TestRunner.assertEqual('setPhase(1) sets phase to 1', SensorDataEngine.state.phase, 1);
+
+        SensorDataEngine.setPhase(5);
+        TestRunner.assertEqual('setPhase(5) sets phase to 5', SensorDataEngine.state.phase, 5);
+
+        SensorDataEngine.setPhase(0); // Should clamp to 1
+        TestRunner.assertEqual('setPhase(0) clamps to 1', SensorDataEngine.state.phase, 1);
+
+        SensorDataEngine.setPhase(99); // Should clamp to 5
+        TestRunner.assertEqual('setPhase(99) clamps to 5', SensorDataEngine.state.phase, 5);
+
+        SensorDataEngine.setPhase(3); // Reset for other tests
+
+        // ------ 7. SensorDataEngine: Utility Functions ------
+        TestRunner.suite('SensorDataEngine — Utilities');
+
+        TestRunner.assertEqual('_clamp(5, 0, 10) = 5', SensorDataEngine._clamp(5, 0, 10), 5);
+        TestRunner.assertEqual('_clamp(-5, 0, 10) = 0', SensorDataEngine._clamp(-5, 0, 10), 0);
+        TestRunner.assertEqual('_clamp(15, 0, 10) = 10', SensorDataEngine._clamp(15, 0, 10), 10);
+        TestRunner.assertEqual('_clampDeg(370) = 10', SensorDataEngine._clampDeg(370), 10);
+        TestRunner.assertEqual('_clampDeg(-10) = 350', SensorDataEngine._clampDeg(-10), 350);
+        TestRunner.assertEqual('_clampDeg(0) = 0', SensorDataEngine._clampDeg(0), 0);
+        TestRunner.assertType('_jitter returns number', SensorDataEngine._jitter(0, 1), 'number');
+
+        // ------ 8. SensorDataEngine: SessionStorage Persistence ------
+        TestRunner.suite('SensorDataEngine — Persistence');
+
+        SensorDataEngine.state.target.lat = 58.123;
+        SensorDataEngine._saveState();
+        const saved = sessionStorage.getItem('sensorDataState');
+        TestRunner.assert('state saved to sessionStorage', () => saved !== null);
+        TestRunner.assert('saved state contains target lat', () => {
+            const parsed = JSON.parse(saved);
+            return parsed.target.lat === 58.123;
+        });
+
+        // ------ 9. SensorDataEngine: Multi-tick Stability ------
+        TestRunner.suite('SensorDataEngine — Stability (50 ticks)');
+
+        let tickError = null;
+        try {
+            for (let i = 0; i < 50; i++) SensorDataEngine._tick();
+        } catch (e) {
+            tickError = e.message;
+        }
+        TestRunner.assert('50 consecutive ticks without error', () => tickError === null);
+        TestRunner.assertInRange('speed stable after 50 ticks', s.target.speed, 0.70, 1.10);
+        TestRunner.assertInRange('altitude stable after 50 ticks', s.target.altitude, 15000, 38000);
+        TestRunner.assertInRange('closureRate stable after 50 ticks', s.target.closureRate, -700, -100);
+        TestRunner.assertInRange('radar confidence stable', s.sensors.radar.confidence, 75, 99);
+        TestRunner.assertInRange('fusedConfidence stable', s.fusedConfidence, 70, 99);
+
+        // ------ 10. AISystem: Initialization ------
+        TestRunner.suite('AISystem — Initialization');
+
+        TestRunner.assert('AISystem exists as global', () => typeof window.AISystem === 'object');
+        TestRunner.assertType('scan is a function', AISystem.scan, 'function');
+        TestRunner.assertType('detect is a function', AISystem.detect, 'function');
+        TestRunner.assertType('suggest is a function', AISystem.suggest, 'function');
+        TestRunner.assertType('approveAction is a function', AISystem.approveAction, 'function');
+        TestRunner.assertType('rejectAction is a function', AISystem.rejectAction, 'function');
+        TestRunner.assertType('generateReport is a function', AISystem.generateReport, 'function');
+        TestRunner.assertType('log is a function', AISystem.log, 'function');
+
+        // ------ 11. AISystem: State Structure ------
+        TestRunner.suite('AISystem — State');
+
+        TestRunner.assertType('state is object', AISystem.state, 'object');
+        TestRunner.assert('state has currentPhase', () => typeof AISystem.state.currentPhase === 'string');
+        TestRunner.assertType('threatScore is number', AISystem.state.threatScore, 'number');
+        TestRunner.assert('logs is array', () => Array.isArray(AISystem.state.logs));
+        TestRunner.assert('suggestions is array', () => Array.isArray(AISystem.state.suggestions));
+        TestRunner.assertType('hitlPending is boolean', AISystem.state.hitlPending, 'boolean');
+
+        // ------ 12. AISystem: Scan → Detect → Suggest Pipeline ------
+        TestRunner.suite('AISystem — Pipeline (High Threat)');
+
+        // Reset state
+        AISystem.state.logs = [];
+        AISystem.state.suggestions = [];
+        AISystem.state.hitlPending = false;
+        AISystem.state.threatScore = 0;
+
+        const scanResult = AISystem.scan({ speed: 1200, distance: 10, iff: false });
+
+        TestRunner.assertEqual('high-threat score = 100', AISystem.state.threatScore, 100);
+        TestRunner.assert('hitlPending is true for high threat', () => AISystem.state.hitlPending === true);
+        TestRunner.assert('suggestions generated', () => AISystem.state.suggestions.length > 0);
+        TestRunner.assert('first suggestion has id', () => typeof AISystem.state.suggestions[0].id === 'string');
+        TestRunner.assert('first suggestion has action', () => typeof AISystem.state.suggestions[0].action === 'string');
+        TestRunner.assert('scan result is array of suggestions', () => Array.isArray(scanResult));
+        TestRunner.assert('log entries created for pipeline', () => AISystem.state.logs.length >= 3);
+
+        // ------ 13. AISystem: Low Threat Path ------
+        TestRunner.suite('AISystem — Pipeline (Low Threat)');
+
+        AISystem.state.logs = [];
+        AISystem.state.suggestions = [];
+        AISystem.state.hitlPending = false;
+        AISystem.state.threatScore = 0;
+
+        const lowResult = AISystem.scan({ speed: 400, distance: 200, iff: true });
+
+        TestRunner.assertEqual('low-threat score = 0', AISystem.state.threatScore, 0);
+        TestRunner.assert('hitlPending is false for low threat', () => AISystem.state.hitlPending === false);
+        TestRunner.assertEqual('no suggestions for low threat', AISystem.state.suggestions.length, 0);
+        TestRunner.assertType('scan returns number (score) for low threat', lowResult, 'number');
+
+        // ------ 14. AISystem: Approve/Reject Actions ------
+        TestRunner.suite('AISystem — HITL Approve/Reject');
+
+        // Set up a high-threat scenario
+        AISystem.state.logs = [];
+        AISystem.scan({ speed: 1200, distance: 10, iff: false });
+
+        AISystem.approveAction('scramble');
+        TestRunner.assert('hitlPending false after approve', () => AISystem.state.hitlPending === false);
+        TestRunner.assert('approve logged', () =>
+            AISystem.state.logs.some(l => l.message.includes('HUMAN APPROVED'))
+        );
+
+        // Reset and reject
+        AISystem.scan({ speed: 1200, distance: 10, iff: false });
+        AISystem.rejectAction('warn');
+        TestRunner.assert('hitlPending false after reject', () => AISystem.state.hitlPending === false);
+        TestRunner.assert('reject logged', () =>
+            AISystem.state.logs.some(l => l.message.includes('HUMAN REJECTED'))
+        );
+
+        // ------ 15. AISystem: Generate Report ------
+        TestRunner.suite('AISystem — Report Generation');
+
+        const report = AISystem.generateReport();
+        TestRunner.assertType('report is object', report, 'object');
+        TestRunner.assert('report has timestamp', () => typeof report.timestamp === 'string');
+        TestRunner.assert('report has events array', () => Array.isArray(report.events));
+        TestRunner.assert('report has finalThreatLevel', () =>
+            ['CRITICAL', 'STABLE'].includes(report.finalThreatLevel)
+        );
+        TestRunner.assert('report logged', () =>
+            AISystem.state.logs.some(l => l.message.includes('Mission report generated'))
+        );
+
+        // ------ 16. AISystem: Logging & Events ------
+        TestRunner.suite('AISystem — Logging & Events');
+
+        let aiEventFired = false;
+        const aiHandler = (e) => { aiEventFired = true; };
+        window.addEventListener('ai-update', aiHandler);
+        AISystem.log('TEST', 'Unit test message');
+        window.removeEventListener('ai-update', aiHandler);
+
+        TestRunner.assert('ai-update event dispatched on log', () => aiEventFired === true);
+        TestRunner.assert('log entry added', () => {
+            const last = AISystem.state.logs[AISystem.state.logs.length - 1];
+            return last.phase === 'TEST' && last.message === 'Unit test message';
+        });
+
+        // ------ 17. AISystem: Detect Scoring Logic ------
+        TestRunner.suite('AISystem — Detect Scoring');
+
+        // High speed only
+        AISystem.state.threatScore = 0;
+        AISystem.detect({ speed: 900, distance: 200, iff: true });
+        TestRunner.assertEqual('high speed only = 30', AISystem.state.threatScore, 30);
+
+        // Close distance only
+        AISystem.state.threatScore = 0;
+        AISystem.detect({ speed: 400, distance: 30, iff: true });
+        TestRunner.assertEqual('close distance only = 40', AISystem.state.threatScore, 40);
+
+        // No IFF only
+        AISystem.state.threatScore = 0;
+        AISystem.detect({ speed: 400, distance: 200, iff: false });
+        TestRunner.assertEqual('no IFF only = 30', AISystem.state.threatScore, 30);
+
+        // All factors
+        AISystem.state.threatScore = 0;
+        AISystem.detect({ speed: 900, distance: 30, iff: false });
+        TestRunner.assertEqual('all factors = 100', AISystem.state.threatScore, 100);
+
+        // ========================================================
+        // RENDER RESULTS
+        // ========================================================
+        TestRunner.render();
+
+        // Output for automated checking
+        const pass = TestRunner.results.filter(r => r.pass).length;
+        const fail = TestRunner.results.filter(r => !r.pass).length;
+        console.log(`[TEST RESULTS] TOTAL: ${pass + fail} | PASS: ${pass} | FAIL: ${fail}`);
+        if (fail > 0) {
+            TestRunner.results.filter(r => !r.pass).forEach(r => {
+                console.error(`[FAIL] ${r.suite} > ${r.description}: ${r.error}`);
+            });
+        }
+    </script>
+</body>
+
+</html>

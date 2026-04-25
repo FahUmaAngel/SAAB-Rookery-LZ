@@ -6,37 +6,26 @@
 const SharedComponents = {
     style: `
         :root {
-            --sidebar-width: 80px;
+            --sidebar-width: 64px;
             --header-height: 48px;
             --ai-accent: #82cfff;
             --hitl-danger: #ff5252;
         }
-        body.sidebar-expanded {
-            --sidebar-width: 260px;
-        }
         #main-wrapper {
             padding-left: var(--sidebar-width);
-            transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             width: 100%;
+            display: flex;
+        }
+        #subsidebar-placeholder {
+            flex-shrink: 0;
+            height: 100%;
+        }
+        #main-wrapper > main {
+            flex: 1 1 0%;
+            min-width: 0;
         }
         aside {
             width: var(--sidebar-width);
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .submenu-item {
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: all 0.2s ease-out;
-            pointer-events: none;
-        }
-        .sidebar-expanded .submenu-item {
-            opacity: 1;
-            transform: translateX(0);
-            pointer-events: auto;
-        }
-        .sidebar-expanded .menu-label {
-            opacity: 1;
-            width: auto;
         }
         .custom-scrollbar::-webkit-scrollbar {
             width: 2px;
@@ -47,12 +36,27 @@ const SharedComponents = {
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: rgba(130, 207, 255, 0.2);
         }
+        main {
+            transition: opacity 0.15s ease;
+        }
+        main.spa-loading {
+            opacity: 0;
+        }
     `,
 
     header: `
         <header class="fixed top-0 w-full h-12 flex justify-between items-center px-4 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
             <div class="flex items-center gap-4">
-                <span class="text-lg font-black tracking-widest text-sky-500 dark:text-sky-400 font-['Space_Grotesk'] uppercase tracking-tighter text-xs">C2 // TACTICAL OVERWATCH</span>
+                <span class="text-lg font-black tracking-widest text-sky-500 dark:text-sky-400 font-['Space_Grotesk'] uppercase tracking-tighter text-xs mr-4">C2 // TACTICAL OVERWATCH</span>
+                <!-- Top Nav Links -->
+                <nav class="hidden md:flex items-center gap-6 font-['Space_Grotesk'] font-bold text-[10px] tracking-widest uppercase">
+                    <a href="./map-view.html" onclick="SharedComponents.handleNav(event, './map-view.html')" class="text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">map</span> MAP VIEW
+                    </a>
+                    <a href="./tactical-map.html" onclick="SharedComponents.handleNav(event, './tactical-map.html')" class="text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">explore</span> TACTICAL MAP
+                    </a>
+                </nav>
             </div>
             <div class="flex flex-1 justify-end items-center gap-6">
                 <!-- Search Bar -->
@@ -93,81 +97,43 @@ const SharedComponents = {
     `,
 
     sidebar: (currentPage) => {
+        const logsIntelPages = [
+            'mission_logs.html',
+            'asset-tracking.html',
+            'intel-brief.html'
+        ];
         const menuItems = [
-            { 
-                id: 'map', 
-                label: 'Map View', 
-                icon: 'map', 
-                href: './map-view.html',
-                subItems: [
-                    { label: 'Map View', icon: 'map', href: './map-view.html' },
-                    { label: 'Tactical Map', icon: 'explore', href: './tactical-map.html' },
-                    { label: 'Threat Intel', icon: 'warning', href: '#' },
-                    { label: 'Battery Status', icon: 'battery_charging_full', href: '#' },
-                    { label: 'Logistics', icon: 'local_shipping', href: './logistics.html' }
-                ]
-            },
+            { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', href: './logistics.html' },
             { id: 'assets', label: 'Asset Ready', icon: 'flight_takeoff', href: './Asset-ready.html' },
             { id: 'fusion', label: 'Sensor Fusion', icon: 'sensors', href: './Sensor-Fusion.html' },
             { id: 'sensor-map', label: 'Sensor_map', icon: 'map_search', href: './sensor_map.html' },
             { id: 'comms', label: 'Comms', icon: 'satellite', href: './comms.html' },
-            { 
-                id: 'logs', 
-                label: 'Logs & Intel', 
-                icon: 'history_edu', 
-                href: './mission_logs.html',
-                subItems: [
-                    { label: 'Mission Logs', icon: 'history_edu', href: './mission_logs.html' },
-                    { label: 'Asset Tracking', icon: 'navigation', href: '#' },
-                    { label: 'Telemetry', icon: 'query_stats', href: '#' },
-                    { label: 'Intel Brief', icon: 'description', href: '#' }
-                ]
-            },
+            { id: 'logs', label: 'Logs & Intel', icon: 'history_edu', href: './mission_logs.html' },
         ];
 
-        const isExpanded = typeof document !== 'undefined' && document.body.classList.contains('sidebar-expanded');
-
         const linksHtml = menuItems.map(item => {
-            const isParentActive = currentPage.includes(item.href.replace('./', '')) && item.href !== '#';
-            const isChildActive = item.subItems ? item.subItems.some(sub => currentPage.includes(sub.href.replace('./', '')) && sub.href !== '#') : false;
-            const isActive = isParentActive || isChildActive;
-            const hasSubmenu = item.subItems && item.subItems.length > 0;
+            const itemPage = item.href.replace('./', '');
+            const isLogsIntelItem = item.id === 'logs';
+            const isActive = item.href !== '#' && (
+                currentPage.includes(itemPage) ||
+                (isLogsIntelItem && logsIntelPages.some(page => currentPage.includes(page)))
+            );
             const baseClass = "flex flex-col items-center justify-center py-3 w-full active:scale-95 transition-all group";
             const activeClass = "bg-sky-950/30 text-sky-400 border-l-2 border-sky-500";
-            const inactiveClass = "text-slate-600 hover:bg-slate-900 hover:text-sky-200";
-            
-            let subHtml = '';
-            if (hasSubmenu) {
-                const isSubmenuVisible = isExpanded && isActive;
-                subHtml = `
-                    <div class="submenu-container ${isSubmenuVisible ? '' : 'hidden'} flex flex-col w-full bg-slate-900/50 mt-1 border-y border-slate-800/50">
-                        ${item.subItems.map(sub => {
-                            const isSubActive = currentPage.includes(sub.href.replace('./', '')) && sub.href !== '#';
-                            return `
-                            <a href="${sub.href}" class="submenu-item flex items-center gap-3 px-6 py-2 text-[10px] ${isSubActive ? 'text-sky-400 bg-sky-500/10' : 'text-slate-500'} hover:text-sky-400 hover:bg-sky-500/5 transition-colors" ${sub.href !== '#' ? `onclick="SharedComponents.handleNav(event, '${sub.href}')"` : ''}>
-                                <span class="material-symbols-outlined text-[14px]">${sub.icon}</span>
-                                <span class="menu-label whitespace-nowrap">${sub.label}</span>
-                            </a>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
-            }
+            const inactiveClass = "text-slate-400 hover:bg-slate-800 hover:text-sky-300";
 
             return `
                 <div class="w-full flex flex-col items-center">
                     <a class="${baseClass} ${isActive ? activeClass : inactiveClass}" 
                        href="${item.href}" 
-                       onclick="${hasSubmenu ? `SharedComponents.toggleSubmenu(event, this)` : `SharedComponents.handleNav(event, '${item.href}')`}">
+                       onclick="SharedComponents.handleNav(event, '${item.href}')">
                         <div class="flex items-center justify-center w-full relative">
                             <span class="material-symbols-outlined mb-1 ${isActive ? 'group-hover:animate-pulse' : ''}" style="${isActive ? "font-variation-settings: 'FILL' 1;" : ""}">
                                 ${item.icon}
                             </span>
-                            ${hasSubmenu ? `<span class="material-symbols-outlined text-[12px] absolute right-1 top-1 text-slate-700 group-hover:text-sky-500 transition-transform duration-200" style="transform: ${isExpanded && isActive ? 'rotate(90deg)' : 'rotate(0deg)'}">chevron_right</span>` : ''}
                         </div>
-                        <span class="font-['Space_Grotesk'] font-medium uppercase text-[10px] text-center px-1 menu-label">${item.label}</span>
+                        <span class="font-['Space_Grotesk'] font-medium uppercase text-[9px] text-center px-1 menu-label leading-[1.1]">${item.label}</span>
                     </a>
-                    ${subHtml}
                 </div>
             `;
         }).join('');
@@ -176,9 +142,9 @@ const SharedComponents = {
             <aside class="fixed left-0 top-12 h-[calc(100vh-48px)] flex flex-col items-center py-4 z-40 bg-slate-950 border-r border-slate-800 overflow-x-hidden">
                 <div class="mb-6 flex flex-col items-center text-center border-b border-slate-800 pb-4 w-full px-2">
                     <div class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-full flex items-center justify-center mb-2 overflow-hidden shadow-inner shrink-0">
-                        <span class="material-symbols-outlined text-slate-600 text-[20px]">person</span>
+                        <span class="material-symbols-outlined text-slate-400 text-[20px]">person</span>
                     </div>
-                    <span class="text-[8px] font-['Space_Grotesk'] text-slate-500 font-bold uppercase tracking-widest text-center px-1 whitespace-nowrap">SECTOR 7<br/><span class="text-[7px] text-slate-600">BALTIC REGION</span></span>
+                    <span class="text-[8px] font-['Space_Grotesk'] text-slate-400 font-bold uppercase tracking-widest text-center px-1 whitespace-nowrap">SECTOR 7<br/><span class="text-[7px] text-slate-500">BALTIC REGION</span></span>
                 </div>
                 <nav class="flex flex-col w-full gap-1 flex-1 overflow-y-auto custom-scrollbar">
                     ${linksHtml}
@@ -193,29 +159,41 @@ const SharedComponents = {
         `;
     },
 
-    toggleSubmenu: (event, el) => {
-        event.preventDefault();
-        const submenu = el.nextElementSibling;
-        if (!submenu) return;
-        const icon = el.querySelector('.absolute.right-1');
-        const isExpanded = document.body.classList.contains('sidebar-expanded');
-
-        if (isExpanded && !submenu.classList.contains('hidden')) {
-            document.body.classList.remove('sidebar-expanded');
-            submenu.classList.add('hidden');
-            if (icon) icon.style.transform = 'rotate(0deg)';
-        } else {
-            // Close other submenus first if needed (optional)
-            document.querySelectorAll('.submenu-container').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.absolute.right-1').forEach(i => i.style.transform = 'rotate(0deg)');
-            
-            document.body.classList.add('sidebar-expanded');
-            submenu.classList.remove('hidden');
-            if (icon) icon.style.transform = 'rotate(90deg)';
-        }
+    subSidebars: {
+        strategicOps: {
+            pages: ['logistics.html', 'supply-chain.html', 'maintenance.html', 'personnel.html'],
+            title: 'STRATEGIC OPS',
+            subtitle: 'V-22 OSPREY WING',
+            width: '220px',
+            items: [
+                { label: 'Dashboard',    icon: 'dashboard', href: './logistics.html' },
+                { label: 'Supply Chain', icon: 'package_2', href: './supply-chain.html' },
+                { label: 'Maintenance',  icon: 'build',     href: './maintenance.html' },
+                { label: 'Personnel',    icon: 'groups',    href: './personnel.html' },
+            ],
+            bottomButton: (filename) => {
+                if (filename === 'personnel.html')   return 'DEPLOY PERSONNEL';
+                if (filename === 'maintenance.html') return 'NEW WORK ORDER';
+                return 'INITIATE RESUPPLY';
+            },
+            footerLinks: true,
+        },
+        logsIntel: {
+            pages: ['mission_logs.html', 'asset-tracking.html', 'intel-brief.html'],
+            title: 'LOGS & INTEL',
+            subtitle: 'HISTORICAL ANALYSIS',
+            width: '180px',
+            items: [
+                { label: 'Mission Logs',   icon: 'history_edu',  href: './mission_logs.html' },
+                { label: 'Asset Tracking', icon: 'navigation',   href: './asset-tracking.html' },
+                { label: 'Intel Brief',    icon: 'description',  href: './intel-brief.html' },
+            ],
+            bottomButton: null,
+            footerLinks: false,
+        },
     },
 
-    initHeader: (currentPage) => {
+    initHeader: (_currentPage) => {
         const headerPlaceholder = document.getElementById('header-placeholder');
         if (headerPlaceholder) {
             headerPlaceholder.innerHTML = SharedComponents.header;
@@ -227,6 +205,76 @@ const SharedComponents = {
         if (sidebarPlaceholder) {
             sidebarPlaceholder.innerHTML = SharedComponents.sidebar(currentPage);
         }
+    },
+
+    initSubSidebar: (currentPage) => {
+        // Auto-create placeholder if the page doesn't have one in its HTML
+        let placeholder = document.getElementById('subsidebar-placeholder');
+        if (!placeholder) {
+            placeholder = document.createElement('div');
+            placeholder.id = 'subsidebar-placeholder';
+            const mainWrapper = document.getElementById('main-wrapper');
+            const mainEl = mainWrapper?.querySelector(':scope > main');
+            if (mainEl) {
+                mainWrapper.insertBefore(placeholder, mainEl);
+            } else if (mainWrapper) {
+                mainWrapper.appendChild(placeholder);
+            } else {
+                return;
+            }
+        }
+
+        const filename = currentPage.split('/').pop().split('?')[0] || currentPage;
+        const group = Object.values(SharedComponents.subSidebars).find(g =>
+            g.pages.some(p => filename === p)
+        );
+
+        if (!group) {
+            placeholder.innerHTML = '';
+            return;
+        }
+
+        const itemsHtml = group.items.map(item => {
+            const isActive = filename === item.href.replace('./', '');
+            const cls = isActive
+                ? 'bg-slate-900 text-sky-400 border-l-4 border-sky-500'
+                : 'text-slate-500 border-l-4 border-transparent hover:bg-slate-900 hover:text-slate-200 transition-all';
+            const fill = isActive ? " style=\"font-variation-settings:'FILL' 1;\"" : '';
+            return `<a class="px-4 py-3 flex items-center gap-3 ${cls}" href="${item.href}">
+                <span class="material-symbols-outlined text-lg"${fill}>${item.icon}</span>
+                ${item.label}
+            </a>`;
+        }).join('');
+
+        const bottomHtml = group.bottomButton ? `
+            <div class="px-4 mt-auto mb-4 shrink-0">
+                <button class="w-full bg-sky-900/20 text-sky-400 border border-sky-800/50 py-2 text-[10px] uppercase font-bold tracking-widest hover:bg-sky-800/40 transition-colors font-['Space_Grotesk']">
+                    ${group.bottomButton(filename)}
+                </button>
+            </div>` : '';
+
+        const footerHtml = group.footerLinks ? `
+            <div class="flex flex-col gap-1 font-['Space_Grotesk'] uppercase text-[11px] font-semibold tracking-wider mt-4 border-t border-slate-800 pt-4 shrink-0">
+                <a class="text-slate-500 px-4 py-2 flex items-center gap-3 border-l-4 border-transparent hover:text-slate-300 transition-all" href="#">
+                    <span class="material-symbols-outlined text-base">terminal</span>Diagnostics
+                </a>
+                <a class="text-slate-500 px-4 py-2 flex items-center gap-3 border-l-4 border-transparent hover:text-slate-300 transition-all" href="#">
+                    <span class="material-symbols-outlined text-base">help_center</span>Help
+                </a>
+            </div>` : '';
+
+        placeholder.innerHTML = `
+            <aside class="bg-slate-950/80 border-r border-slate-800 flex flex-col py-4 h-full backdrop-blur-md overflow-y-auto custom-scrollbar hidden md:flex" style="width:${group.width};flex-shrink:0">
+                <div class="px-4 mb-6 shrink-0">
+                    <h2 class="text-sky-500 font-bold font-['Space_Grotesk'] uppercase text-xs tracking-widest">${group.title}</h2>
+                    <div class="text-slate-400 text-[10px] uppercase font-semibold tracking-wider mt-1">${group.subtitle}</div>
+                </div>
+                <div class="flex-1 flex flex-col gap-1 font-['Space_Grotesk'] uppercase text-[11px] font-semibold tracking-wider">
+                    ${itemsHtml}
+                </div>
+                ${bottomHtml}
+                ${footerHtml}
+            </aside>`;
     },
 
     initZuluClock: () => {
@@ -258,7 +306,9 @@ const SharedComponents = {
         const allowedPaths = [
             'map-view.html', 'tactical-map.html', 'logistics.html',
             'Asset-ready.html', 'Sensor-Fusion.html', 'sensor_map.html',
-            'comms.html', 'mission_logs.html'
+            'comms.html', 'mission_logs.html', 'asset-tracking.html',
+            'intel-brief.html', 'supply-chain.html', 'maintenance.html',
+            'personnel.html'
         ];
         const filename = url.split('/').pop().split('?')[0];
         if (!allowedPaths.includes(filename)) {
@@ -279,6 +329,10 @@ const SharedComponents = {
             const currentMain = document.querySelector('main');
 
             if (newMain && currentMain) {
+                // Fade out current content to prevent flicker
+                currentMain.classList.add('spa-loading');
+                await new Promise(r => setTimeout(r, 150));
+
                 // Use safe DOM adoption instead of innerHTML to prevent XSS
                 currentMain.className = newMain.className;
                 currentMain.replaceChildren(
@@ -331,17 +385,25 @@ const SharedComponents = {
                     }
                 }
 
+                // Fade in new content, then remove the loading overlay only after
+                // the transition has started — removing the overlay before the
+                // fade-in begins causes a brief transparent flash (flicker).
+                requestAnimationFrame(() => {
+                    currentMain.classList.remove('spa-loading');
+                    setTimeout(() => SharedComponents.showLoading(false), 150);
+                });
+
                 // Notify page modules that SPA navigation completed
                 dispatchEvent(new CustomEvent('spa-navigated', { detail: { url } }));
 
-                // Update active state in sidebar
+                // Update active states in sidebar and sub-sidebar
                 SharedComponents.initSidebar(url);
+                SharedComponents.initSubSidebar(url);
             }
         } catch (err) {
             console.error('Failed to load content:', err);
-            SharedComponents.showToast('LOAD ERROR', 'Failed to load page', 'error', 'error');
-        } finally {
             SharedComponents.showLoading(false);
+            SharedComponents.showToast('LOAD ERROR', 'Failed to load page', 'error', 'error');
         }
     },
 
@@ -409,6 +471,7 @@ const SharedComponents = {
 
         SharedComponents.initHeader(currentPage);
         SharedComponents.initSidebar(currentPage);
+        SharedComponents.initSubSidebar(currentPage);
         SharedComponents.initZuluClock();
         SharedComponents.initAIUpdates();
     },
@@ -430,7 +493,18 @@ const SharedComponents = {
                 }
             });
         }
-        
+
+        // SPA link delegation — intercept any internal <a href> click that hasn't
+        // already been handled by an inline onclick (those call preventDefault first).
+        document.addEventListener('click', (e) => {
+            if (e.defaultPrevented) return;
+            const link = e.target.closest('a[href]');
+            if (!link) return;
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto') || href.startsWith('//')) return;
+            SharedComponents.handleNav(e, href);
+        });
+
         // Save state on sidebar toggle
         const observer = new MutationObserver(() => {
             SharedComponents.saveState();
@@ -483,6 +557,26 @@ const SharedComponents = {
 
         const suggestion = globalThis.AISystem?.state.suggestions[0];
         if (!suggestion) return;
+
+        // Get effector classification if available
+        const effector = suggestion.effector || globalThis.AISystem?.state.lastEffector;
+        const effectorColorMap = {
+            amber:   { bg: 'bg-amber-950/50', border: 'border-amber-500', text: 'text-amber-400', iconColor: 'text-amber-500' },
+            error:   { bg: 'bg-red-950/50', border: 'border-error', text: 'text-error', iconColor: 'text-error' },
+            primary: { bg: 'bg-sky-950/50', border: 'border-sky-500', text: 'text-sky-400', iconColor: 'text-sky-500' }
+        };
+        const ec = effector ? (effectorColorMap[effector.color] || effectorColorMap.primary) : null;
+
+        const effectorBadgeHtml = effector ? `
+            <div class="flex items-center gap-2 ${ec.bg} border ${ec.border} px-2 py-1.5 mb-3">
+                <span class="material-symbols-outlined ${ec.iconColor} text-[16px]">${effector.icon}</span>
+                <div>
+                    <div class="font-['Space_Grotesk'] text-[9px] font-bold ${ec.text} uppercase tracking-widest">EFFECTOR: ${effector.type}</div>
+                    <div class="text-[8px] text-slate-500">${effector.label}</div>
+                </div>
+            </div>
+        ` : '';
+
         const card = document.createElement('div');
         card.id = 'ai-hitl-card';
         card.className = "fixed top-20 right-6 w-80 bg-slate-950 border-2 border-sky-500 shadow-[0_0_20px_rgba(130,207,255,0.2)] z-[100] p-4 animate-in slide-in-from-right fade-in";
@@ -491,6 +585,7 @@ const SharedComponents = {
                 <span class="material-symbols-outlined text-sky-500">psychology</span>
                 <span class="font-['Space_Grotesk'] text-xs font-bold text-sky-400 uppercase tracking-widest">AI Suggestion</span>
             </div>
+            ${effectorBadgeHtml}
             <p class="text-slate-300 text-sm mb-4 font-medium">${suggestion.action}</p>
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="AISystem.approveAction('${suggestion.id}'); document.getElementById('ai-hitl-card').remove();" 
