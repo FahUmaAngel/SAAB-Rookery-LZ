@@ -82,6 +82,11 @@ const SharedComponents = {
     `,
 
     sidebar: (currentPage) => {
+        const logsIntelPages = [
+            'mission_logs.html',
+            'asset-tracking.html',
+            'intel-brief.html'
+        ];
         const menuItems = [
             { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', href: './logistics.html' },
             { id: 'assets', label: 'Asset Ready', icon: 'flight_takeoff', href: './Asset-ready.html' },
@@ -92,7 +97,12 @@ const SharedComponents = {
         ];
 
         const linksHtml = menuItems.map(item => {
-            const isActive = currentPage.includes(item.href.replace('./', '')) && item.href !== '#';
+            const itemPage = item.href.replace('./', '');
+            const isLogsIntelItem = item.id === 'logs';
+            const isActive = item.href !== '#' && (
+                currentPage.includes(itemPage) ||
+                (isLogsIntelItem && logsIntelPages.some(page => currentPage.includes(page)))
+            );
             const baseClass = "flex flex-col items-center justify-center py-3 w-full active:scale-95 transition-all group";
             const activeClass = "bg-sky-950/30 text-sky-400 border-l-2 border-sky-500";
             const inactiveClass = "text-slate-400 hover:bg-slate-800 hover:text-sky-300";
@@ -177,7 +187,8 @@ const SharedComponents = {
         const allowedPaths = [
             'map-view.html', 'tactical-map.html', 'logistics.html',
             'Asset-ready.html', 'Sensor-Fusion.html', 'sensor_map.html',
-            'comms.html', 'mission_logs.html', 'asset-tracking.html'
+            'comms.html', 'mission_logs.html', 'asset-tracking.html',
+            'intel-brief.html'
         ];
         const filename = url.split('/').pop().split('?')[0];
         if (!allowedPaths.includes(filename)) {
