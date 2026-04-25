@@ -105,7 +105,7 @@ const SensorDataEngine = {
     /** Comms log messages to cycle through */
     _commsPool: [
         { src: 'ATC', msg: 'NEGATIVE RADIO CONTACT WITH UNKNOWN TRAFFIC.' },
-        { src: 'GRIPEN-1', msg: 'MAINTAINING VISUAL. TARGET STABLE HEADING 285.' },
+        { src: 'GRIPEN-1', msg: 'MAINTAINING VISUAL. TARGET STABLE HEADING 274.' },
         { src: 'C2 HQ', msg: 'COPY GRIPEN-1. HOLD POSITION. RULES WEAPONS TIGHT.' },
         { src: 'GRIPEN-1', msg: 'TARGET ALTITUDE CHANGE DETECTED. NOW FL310.' },
         { src: 'ESM', msg: 'EMITTER SCAN: N001VE PULSE DOPPLER DETECTED.' },
@@ -279,9 +279,9 @@ const SensorDataEngine = {
         );
 
         // --- Threat Score (dynamic) ---
-        const rangeScore = this._clamp(100 - (t.range * 2), 0, 100);
-        const closureScore = this._clamp(Math.abs(t.closureRate) / 7, 0, 100);
-        const speedScore = this._clamp((t.speed - 0.5) * 100, 0, 100);
+        const rangeScore = this._clamp(100 - (activeTarget.range * 2), 0, 100);
+        const closureScore = this._clamp(Math.abs(activeTarget.closureRate) / 7, 0, 100);
+        const speedScore = this._clamp((activeTarget.speed - 0.5) * 100, 0, 100);
         this.state.threatScore = Math.round(rangeScore * 0.5 + closureScore * 0.3 + speedScore * 0.2);
 
         // --- Timestamp ---
