@@ -1,203 +1,456 @@
 <!DOCTYPE html>
+<html class="dark" lang="en">
 
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Multi-Domain Sensor Map</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<style>
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Multi-Domain Sensor Map</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="tailwind.config.js"></script>
+    <style>
+        /* Leaflet overrides */
+        .leaflet-container { background: #0a0e14 !important; font-family: 'Inter', sans-serif; }
+        .leaflet-control-zoom a { background: #1a1f2e !important; color: #82cfff !important; border: 1px solid #3e4850 !important; }
+        .leaflet-control-zoom a:hover { background: #252b3b !important; }
+        .leaflet-control-attribution { display: none !important; }
+        .leaflet-popup-content-wrapper { background: rgba(10,14,20,0.95) !important; border: 1px solid #3e4850 !important; border-radius: 4px !important; color: #e5e2e1 !important; font-family: 'Inter', sans-serif !important; }
+        .leaflet-popup-tip { background: rgba(10,14,20,0.95) !important; border: 1px solid #3e4850 !important; }
+        .leaflet-popup-content { margin: 8px 12px !important; font-size: 11px !important; }
+
+        /* Animations */
+        @keyframes hostilePulse {
+            0%, 100% { box-shadow: 0 0 6px rgba(255,85,85,0.8); }
+            50% { box-shadow: 0 0 14px rgba(255,85,85,1); }
+        }
+        .hostile-marker { animation: hostilePulse 1.5s ease-in-out infinite; }
+
+        @keyframes friendlyPulse {
+            0%, 100% { box-shadow: 0 0 4px rgba(130,207,255,0.8); }
+            50% { box-shadow: 0 0 12px rgba(130,207,255,1); }
+        }
+        .friendly-marker { animation: friendlyPulse 2s ease-in-out infinite; }
+
+        @keyframes unknownPulse {
+            0%, 100% { box-shadow: 0 0 4px rgba(245,158,11,0.8); }
+            50% { box-shadow: 0 0 10px rgba(245,158,11,1); }
+        }
+        .unknown-marker { animation: unknownPulse 2s ease-in-out infinite; }
+
         .bg-hex-grid {
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='103.923' viewBox='0 0 60 103.923' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 17.32v34.64L30 69.28 0 51.96V17.32zM30 103.923L0 86.603V51.96l30 17.32 30-17.32v34.643z' fill='none' stroke='rgba(135, 146, 155, 0.05)' stroke-width='1'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='103.923' viewBox='0 0 60 103.923' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 17.32v34.64L30 69.28 0 51.96V17.32zM30 103.923L0 86.603V51.96l30 17.32 30-17.32v34.643z' fill='none' stroke='rgba(56, 189, 248, 0.1)' stroke-width='1'/%3E%3C/svg%3E");
             background-size: 60px 103.923px;
         }
     </style>
-<script src="tailwind.config.js"></script>
 </head>
+
 <body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
-<!-- TopNavBar -->
-<div id="header-placeholder"></div>
-<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
-<!-- SideNavBar -->
-<div id="sidebar-placeholder"></div>
-<!-- Main Content Canvas -->
-<main class="flex h-full relative bg-surface-lowest">
-<!-- Tactical Map Area (Fluid) -->
-<div class="flex-1 relative overflow-hidden bg-surface-dim border-r border-outline-variant/30">
-<!-- Base Map Image -->
-<div class="absolute inset-0 z-0 opacity-40 mix-blend-screen" data-alt="Satellite imagery view of dark ocean waters with landmass edges representing the Baltic Sea region in a high contrast tactical style" data-location="Baltic Sea" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAtY3EOyN-2ZK7CYOBzTJ4xQKYV__5E2ehu_hy5ahEUFszNcvNl0Pz1-Pqgg6xQyaT3V6-7WZO0vgJq9STQaf3JmCMa3QeI7FRabXDjj1ZIeDrQEuhmykTElB2sw3ho-V44ZY7z7ct83x81851Lg7xb-mY2KVVUowRV81tdWOa4FRQxrX6Gx70CI1klfD507P4BgmyJynQxq7ijdhfcfY7UiwPferM4-j2gl6gv13D2S0CXSOeXhXCu78A9-fRwymLXFl1uK5yzbj7i'); background-size: cover; background-position: center;">
-</div>
-<!-- Hex Grid -->
-<div class="absolute inset-0 z-10 bg-hex-grid pointer-events-none"></div>
-<!-- Overlays Layer -->
-<div class="absolute inset-0 z-20 pointer-events-none">
-<!-- Sovereign Airspace (Gotland area roughly) -->
-<div class="absolute top-1/4 left-1/3 w-64 h-64 border border-primary/40 rounded-full bg-primary/5 flex items-center justify-center">
-<span class="font-data-mono text-data-mono text-primary/60 absolute top-4 uppercase">Gotland 12nm</span>
-</div>
-<!-- Radar Fan (Amber) -->
-<div class="absolute bottom-1/4 right-1/4 w-96 h-96 radar-sweep flex items-center justify-center" style="clip-path: polygon(50% 50%, 100% 0, 100% 100%); transform: rotate(-45deg);">
-<div class="absolute inset-0 border border-tertiary/30 rounded-full"></div>
-</div>
-<span class="absolute bottom-1/4 right-1/4 font-data-mono text-data-mono text-tertiary/80 ml-48 mb-12">KALININGRAD RADAR</span>
-<!-- Satellite Pass (ICEYE) -->
-<div class="absolute inset-0 overflow-hidden">
-<svg class="opacity-50" height="100%" width="100%">
-<line stroke="#82cfff" stroke-dasharray="4 4" stroke-width="1" x1="20%" x2="80%" y1="0" y2="100%"></line>
-<!-- Scanning beam simulation -->
-<polygon fill="url(#satGradient)" opacity="0.1" points="40%,33% 60%,66% 70%,60% 50%,27%"></polygon>
-<defs>
-<lineargradient id="satGradient" x1="0%" x2="100%" y1="0%" y2="100%">
-<stop offset="0%" stop-color="#82cfff"></stop>
-<stop offset="100%" stop-color="transparent"></stop>
-</lineargradient>
-</defs>
-</svg>
-<div class="absolute top-1/3 left-[45%] bg-surface-container border border-primary px-2 py-1 flex items-center gap-2">
-<span class="material-symbols-outlined text-[14px] text-primary">satellite_alt</span>
-<span class="font-data-mono text-data-mono text-primary">ICEYE-X1 SCAN</span>
-</div>
-</div>
-<!-- Active Track (Bogey) -->
-<div class="absolute top-1/2 right-[30%] flex flex-col items-center">
-<div class="relative w-4 h-4">
-<div class="absolute inset-0 bg-error rounded-full opacity-75 animate-ping"></div>
-<div class="absolute inset-1 bg-error rounded-full"></div>
-</div>
-<div class="mt-2 bg-surface-container-highest border border-error/50 px-2 py-1 backdrop-blur-sm relative">
-<!-- Track line indicating direction -->
-<div class="absolute w-24 h-px bg-error/50 right-full top-1/2 -mt-px mr-2" style="transform-origin: right center; transform: rotate(15deg);"></div>
-<span class="font-data-mono text-data-mono text-error uppercase font-bold tracking-wider">BOGEY_GOLF_42</span>
-</div>
-</div>
-</div>
-<!-- Map Controls (Bottom Left) -->
-<div class="absolute bottom-4 left-4 z-30 flex gap-2">
-<div class="bg-surface-container border border-outline-variant p-panel-padding flex gap-4 backdrop-blur-sm">
-<div class="flex flex-col">
-<span class="font-label-caps text-label-caps text-on-surface-variant mb-1">LAT / LON</span>
-<span class="font-data-mono text-data-mono text-on-surface">57°18'N 19°05'E</span>
-</div>
-<div class="w-px bg-outline-variant"></div>
-<div class="flex flex-col">
-<span class="font-label-caps text-label-caps text-on-surface-variant mb-1">ELEVATION</span>
-<span class="font-data-mono text-data-mono text-on-surface">SEA LEVEL</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Sidebar Detail (Fixed Right) -->
-<aside class="w-[320px] bg-surface border-l border-outline-variant flex flex-col z-30">
-<!-- Target Header -->
-<div class="p-gutter border-b border-outline-variant bg-surface-container-low">
-<div class="flex justify-between items-start mb-2">
-<h2 class="font-headline-md text-headline-md text-error flex items-center gap-2">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
-                            ACTIVE TRACK
-                        </h2>
-<span class="px-1.5 py-0.5 bg-error-container text-on-error-container font-label-caps text-label-caps border border-error/30">HOSTILE</span>
-</div>
-<div class="font-data-mono text-[16px] text-on-surface font-bold tracking-wider uppercase mb-1">
-                        BOGEY_GOLF_42
+    <!-- TopNavBar -->
+    <div id="header-placeholder"></div>
+    <div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)] flex">
+        <!-- SideNavBar -->
+        <div id="sidebar-placeholder"></div>
+        
+        <!-- Main Content -->
+        <main class="flex-1 flex h-full relative">
+            <!-- Tactical Map Area -->
+            <div class="flex-1 relative overflow-hidden bg-surface-dim border-r border-outline-variant/30">
+                <div class="absolute inset-0 z-10 bg-hex-grid pointer-events-none opacity-20"></div>
+                <div id="map-container" class="absolute inset-0 z-0"></div>
+            </div>
+
+            <!-- Sidebar Detail -->
+            <aside class="w-[380px] bg-surface border-l border-outline-variant flex flex-col z-30 overflow-y-auto">
+                <!-- Target Selector -->
+                <div class="p-gutter border-b border-outline-variant bg-surface-container-low">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="font-label-caps text-label-caps text-on-surface-variant">ACTIVE TRACK</h2>
+                        <button id="btn-audio" class="flex items-center gap-1 px-2 py-1 border border-outline-variant rounded text-on-surface-variant hover:bg-surface-container transition-colors">
+                            <span class="material-symbols-outlined text-[16px]">volume_up</span>
+                            <span class="font-data-mono text-[10px]">AUDIO</span>
+                        </button>
                     </div>
-<div class="flex items-center gap-2 text-on-surface-variant">
-<div class="w-1.5 h-1.5 bg-error rounded-full"></div>
-<span class="font-data-mono text-data-mono">TRACKING IN PROGRESS</span>
-</div>
-</div>
-<!-- Telemetry Bento Grid -->
-<div class="p-gutter flex flex-col gap-unit overflow-y-auto flex-1">
-<!-- Row 1: Kinematics -->
-<div class="grid grid-cols-2 gap-unit">
-<div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden">
-<div class="absolute top-0 right-0 w-8 h-8 bg-surface-container-highest flex items-center justify-center border-l border-b border-outline-variant/50">
-<span class="material-symbols-outlined text-[14px] text-outline">speed</span>
-</div>
-<span class="font-label-caps text-label-caps text-on-surface-variant mb-2">TARGET SPEED</span>
-<div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
-                                0.85 <span class="font-data-mono text-data-mono text-primary/70">MACH</span>
-</div>
-</div>
-<div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col relative overflow-hidden">
-<div class="absolute top-0 right-0 w-8 h-8 bg-surface-container-highest flex items-center justify-center border-l border-b border-outline-variant/50">
-<span class="material-symbols-outlined text-[14px] text-outline">flight</span>
-</div>
-<span class="font-label-caps text-label-caps text-on-surface-variant mb-2">ALTITUDE</span>
-<div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
-                                32K <span class="font-data-mono text-data-mono text-primary/70">FT</span>
-</div>
-<div class="mt-1 font-data-mono text-label-caps text-error flex items-center gap-1">
-<span class="material-symbols-outlined text-[10px]">arrow_downward</span> DESCENDING
+                    <div id="target-list" class="flex flex-col gap-1 max-h-[100px] overflow-y-auto"></div>
+                </div>
+
+                <!-- Active Target Header -->
+                <div class="p-gutter border-b border-outline-variant bg-surface-container-low">
+                    <div class="flex justify-between items-start mb-2">
+                        <h2 class="font-headline-md text-headline-md text-error flex items-center gap-2">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
+                            TRACK DETAIL
+                        </h2>
+                        <span id="target-status-badge" class="px-1.5 py-0.5 bg-error-container text-on-error-container font-label-caps text-label-caps border border-error/30">HOSTILE</span>
+                    </div>
+                    <div id="target-callsign" class="font-data-mono text-[18px] text-on-surface font-bold tracking-wider uppercase mb-1">BOGEY_GOLF_42</div>
+                    <div id="target-class" class="font-data-mono text-[12px] text-on-surface-variant mb-2">SU-27 FLANKER</div>
+                    <div class="flex items-center gap-2">
+                        <div id="status-dot" class="w-1.5 h-1.5 bg-error rounded-full"></div>
+                        <span id="status-text" class="font-data-mono text-data-mono text-on-surface-variant">TRACKING IN PROGRESS</span>
+                    </div>
+                </div>
+
+                <!-- Telemetry -->
+                <div class="p-gutter flex flex-col gap-unit overflow-y-auto flex-1">
+                    <div class="grid grid-cols-2 gap-unit">
+                        <div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col">
+                            <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">TARGET SPEED</span>
+                            <div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
+                                <span id="sm-speed">0.85</span> <span class="font-data-mono text-data-mono text-primary/70">MACH</span>
                             </div>
-</div>
-</div>
-<!-- Row 2: Signatures -->
-<div class="bg-surface-container border border-outline-variant p-panel-padding mt-2 flex flex-col">
-<div class="flex justify-between items-center mb-4 border-b border-outline-variant/50 pb-2">
-<span class="font-label-caps text-label-caps text-on-surface-variant">SENSOR FUSION DATA</span>
-<span class="material-symbols-outlined text-[16px] text-tertiary">memory</span>
-</div>
-<div class="grid grid-cols-2 gap-x-4 gap-y-3">
-<div class="flex flex-col">
-<span class="font-label-caps text-[8px] text-outline mb-1">ESM SIGNATURE</span>
-<span class="font-data-mono text-data-mono text-on-surface uppercase bg-surface-container-highest px-1 border border-outline-variant/30 inline-block w-max">FLANKER-H</span>
-</div>
-<div class="flex flex-col">
-<span class="font-label-caps text-[8px] text-outline mb-1">TRANSPONDER</span>
-<span class="font-data-mono text-data-mono text-error uppercase flex items-center gap-1">
-<div class="w-1 h-1 bg-error"></div> OFF
-                                </span>
-</div>
-<div class="flex flex-col col-span-2">
-<span class="font-label-caps text-[8px] text-outline mb-1">HEADING</span>
-<div class="flex items-center gap-2">
-<span class="font-data-mono text-data-mono text-on-surface">285° (WNW) TO GOTLAND</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Row 3: Action Context -->
-<div class="bg-surface-container-highest border border-error-container p-panel-padding mt-2">
-<span class="font-label-caps text-label-caps text-error mb-2 block">INTEL SUMMARY</span>
-<p class="font-data-mono text-[10px] leading-relaxed text-on-surface-variant">
-                             Target acquired departing Kaliningrad airspace. High speed, descending profile consistent with tactical maneuvers. Lack of transponder signal mandates Alpha threat categorization until visual ID.
-                         </p>
-</div>
-</div>
-<!-- Layer Toggles -->
-<div class="p-gutter border-t border-outline-variant bg-surface-container-low">
-<span class="font-label-caps text-label-caps text-on-surface-variant mb-3 block">OVERLAY CONTROLS</span>
-<div class="flex flex-col gap-2">
-<label class="flex items-center justify-between p-2 border border-outline-variant bg-surface cursor-pointer hover:bg-surface-container transition-colors">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-[16px] text-tertiary">radar</span>
-<span class="font-data-mono text-data-mono text-on-surface">RADAR FANS</span>
-</div>
-<div class="w-8 h-4 border border-tertiary flex items-center bg-tertiary/20 px-0.5">
-<div class="w-3 h-3 bg-tertiary translate-x-3.5 transition-transform"></div>
-</div>
-</label>
-<label class="flex items-center justify-between p-2 border border-outline-variant bg-surface cursor-pointer hover:bg-surface-container transition-colors">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-[16px] text-primary">satellite_alt</span>
-<span class="font-data-mono text-data-mono text-on-surface">SAT PASSES</span>
-</div>
-<div class="w-8 h-4 border border-primary flex items-center bg-primary/20 px-0.5">
-<div class="w-3 h-3 bg-primary translate-x-3.5 transition-transform"></div>
-</div>
-</label>
-<label class="flex items-center justify-between p-2 border border-outline-variant/50 bg-surface/50 cursor-pointer hover:bg-surface-container transition-colors opacity-70">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-[16px] text-outline">cloud</span>
-<span class="font-data-mono text-data-mono text-outline">WEATHER</span>
-</div>
-<div class="w-8 h-4 border border-outline-variant flex items-center px-0.5">
-<div class="w-3 h-3 bg-outline-variant transition-transform"></div>
-</div>
-</label>
-</div>
-</div>
-</aside>
-</main>
-</div>
-<script src="./shared-components.js"></script>
-</body></html>
+                        </div>
+                        <div class="bg-surface-container border border-outline-variant p-panel-padding flex flex-col">
+                            <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">ALTITUDE</span>
+                            <div class="font-headline-lg text-headline-lg text-primary flex items-baseline gap-1">
+                                <span id="sm-altitude">32K</span> <span class="font-data-mono text-data-mono text-primary/70">FT</span>
+                            </div>
+                            <div id="sm-alt-trend" class="mt-1 font-data-mono text-label-caps text-error flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[10px]">arrow_downward</span>
+                                <span id="sm-alt-trend-text">DESCENDING</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Position -->
+                    <div class="bg-surface-container border border-outline-variant p-panel-padding mt-2 flex flex-col">
+                        <span class="font-label-caps text-label-caps text-on-surface-variant mb-2">POSITION</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex flex-col">
+                                <span class="font-label-caps text-[8px] text-outline mb-1">LAT/LON</span>
+                                <span id="sm-position" class="font-data-mono text-data-mono text-on-surface">57.30°N 19.05°E</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-label-caps text-[8px] text-outline mb-1">RANGE</span>
+                                <span id="sm-range" class="font-data-mono text-data-mono text-on-surface">12.4 NM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sensor Fusion -->
+                    <div class="bg-surface-container border border-outline-variant p-panel-padding mt-2 flex flex-col">
+                        <div class="flex justify-between items-center mb-3 border-b border-outline-variant/50 pb-2">
+                            <span class="font-label-caps text-label-caps text-on-surface-variant">SENSOR FUSION</span>
+                            <span id="sm-fused-pct" class="font-data-mono text-data-mono text-primary">94.2%</span>
+                        </div>
+                        <div class="flex h-2 w-full bg-surface-container-highest border border-outline-variant/30 overflow-hidden">
+                            <div id="bar-radar" class="h-full bg-primary transition-all duration-700" style="width: 48%"></div>
+                            <div id="bar-esm" class="h-full bg-tertiary transition-all duration-700" style="width: 26%"></div>
+                            <div id="bar-sat" class="h-full bg-sky-400 transition-all duration-700" style="width: 14%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Export Buttons -->
+                    <div class="mt-2 flex gap-2">
+                        <button id="btn-export-json" class="px-3 py-2 bg-surface-container border border-outline-variant hover:bg-surface-container-high text-on-surface text-sm">EXPORT JSON</button>
+                        <button id="btn-export-csv" class="px-3 py-2 bg-surface-container border border-outline-variant hover:bg-surface-container-high text-on-surface text-sm">EXPORT CSV</button>
+                    </div>
+                </div>
+
+                <!-- Sensor Filters -->
+                <div class="p-gutter border-t border-outline-variant bg-surface-container-low">
+                    <span class="font-label-caps text-label-caps text-on-surface-variant mb-3 block">SENSOR FILTERS</span>
+                    <div class="flex flex-col gap-2">
+                        <label data-filter="hostile" class="flex items-center justify-between p-2 border border-error/30 bg-error-container/20 cursor-pointer hover:bg-error-container/30">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px] text-error">warning</span>
+                                <span class="font-data-mono text-data-mono text-on-surface">HOSTILE</span>
+                            </div>
+                            <input type="checkbox" checked class="w-4 h-4 accent-error">
+                        </label>
+                        <label data-filter="unknown" class="flex items-center justify-between p-2 border border-warning/30 bg-warning-container/20 cursor-pointer hover:bg-warning-container/30">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px] text-warning">help</span>
+                                <span class="font-data-mono text-data-mono text-on-surface">UNKNOWN</span>
+                            </div>
+                            <input type="checkbox" checked class="w-4 h-4 accent-warning">
+                        </label>
+                        <label data-filter="friendly" class="flex items-center justify-between p-2 border border-primary/30 bg-primary-container/20 cursor-pointer hover:bg-primary-container/30">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px] text-primary">verified</span>
+                                <span class="font-data-mono text-data-mono text-on-surface">FRIENDLY</span>
+                            </div>
+                            <input type="checkbox" checked class="w-4 h-4 accent-primary">
+                        </label>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="./sensor-data.js"></script>
+    <script src="./shared-components.js"></script>
+    <script>
+        // === Global State ===
+        let mapInitialized = false;
+        let audioEnabled = false;
+        const trackMarkers = {};
+        const trackLabels = {};
+        let map = null;
+        let markersLayer = null;
+        let labelsLayer = null;
+
+        // === Leaflet Map ===
+        function initMap() {
+            if (document.getElementById('map-container') && !mapInitialized) {
+                // Load Leaflet CSS
+                if (!document.getElementById('leaflet-css')) {
+                    const link = document.createElement('link');
+                    link.id = 'leaflet-css';
+                    link.rel = 'stylesheet';
+                    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                    document.head.appendChild(link);
+                }
+
+                // Load Leaflet JS
+                if (typeof L === 'undefined') {
+                    const script = document.createElement('script');
+                    script.id = 'leaflet-js';
+                    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                    script.onload = createMap;
+                    document.head.appendChild(script);
+                } else {
+                    createMap();
+                }
+            }
+        }
+
+        function createMap() {
+            map = L.map('map-container', {
+                center: [57.5, 18.5],
+                zoom: 6,
+                zoomControl: false,
+                attributionControl: false,
+                minZoom: 4,
+                maxZoom: 10
+            });
+
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            markersLayer = L.layerGroup().addTo(map);
+            labelsLayer = L.layerGroup().addTo(map);
+
+            mapInitialized = true;
+            updateTargets();
+        }
+
+        // === Icons ===
+        function createIcon(status) {
+            const color = status === 'HOSTILE' ? '#ff5555' : status === 'FRIENDLY' ? '#82cfff' : '#f59e0b';
+            const animClass = status === 'HOSTILE' ? 'hostile-marker' : status === 'FRIENDLY' ? 'friendly-marker' : 'unknown-marker';
+            
+            return L.divIcon({
+                className: '',
+                html: `<div class="${animClass}" style="width:12px;height:12px;background:${color};border:2px solid ${color};border-radius:50%;"></div>`,
+                iconSize: [12, 12],
+                iconAnchor: [6, 6]
+            });
+        }
+
+        // === Update Targets ===
+        function updateTargets() {
+            if (!mapInitialized || typeof SensorDataEngine === 'undefined') return;
+
+            const state = SensorDataEngine.state;
+            if (!state || !state.targets) return;
+
+            const targets = state.targets;
+            const activeIdx = state.activeTargetIndex || 0;
+            const activeTarget = targets[activeIdx];
+
+            // Update markers
+            targets.forEach((t, idx) => {
+                if (trackMarkers[t.id]) {
+                    trackMarkers[t.id].setLatLng([t.lat, t.lon]);
+                } else {
+                    const marker = L.marker([t.lat, t.lon], { icon: createIcon(t.status) });
+                    marker.bindPopup(`<b>${t.callsign}</b><br>${t.classId}<br>HDG: ${Math.round(t.heading)}° | ALT: ${t.altitude}ft`);
+                    marker.addTo(markersLayer);
+                    trackMarkers[t.id] = marker;
+                }
+
+                // Label
+                if (trackLabels[t.id]) {
+                    trackLabels[t.id].setLatLng([t.lat, t.lon]);
+                } else {
+                    const label = L.divIcon({
+                        className: '',
+                        html: `<span style="font-family:'Inter',monospace;font-size:9px;font-weight:700;color:${t.status === 'HOSTILE' ? '#ff5555' : t.status === 'FRIENDLY' ? '#82cfff' : '#f59e0b'};text-shadow:0 0 4px #000;">${t.callsign}</span>`,
+                        iconSize: [80, 12],
+                        iconAnchor: [40, -6]
+                    });
+                    const labelMarker = L.marker([t.lat, t.lon], { icon: label, interactive: false });
+                    labelMarker.addTo(labelsLayer);
+                    trackLabels[t.id] = labelMarker;
+                }
+            });
+
+            // Update sidebar with active target
+            if (activeTarget) {
+                const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+                set('target-callsign', activeTarget.callsign);
+                set('target-class', activeTarget.classId);
+                set('sm-speed', activeTarget.speed.toFixed(2));
+                set('sm-altitude', Math.round(activeTarget.altitude / 1000) + 'K');
+                set('sm-position', `${activeTarget.lat.toFixed(2)}°N ${activeTarget.lon.toFixed(2)}°E`);
+                set('sm-range', activeTarget.range.toFixed(1) + ' NM');
+
+                // Status badge
+                const badge = document.getElementById('target-status-badge');
+                if (badge) {
+                    badge.textContent = activeTarget.status;
+                    badge.className = `px-1.5 py-0.5 font-label-caps text-label-caps border ${
+                        activeTarget.status === 'HOSTILE' ? 'bg-error-container text-on-error-container border-error/30' :
+                        activeTarget.status === 'FRIENDLY' ? 'bg-primary-container text-on-primary-container border-primary/30' :
+                        'bg-warning-container text-on-warning-container border-warning/30'
+                    }`;
+                }
+
+                // Status dot
+                const dot = document.getElementById('status-dot');
+                const text = document.getElementById('status-text');
+                if (dot) {
+                    dot.className = `w-1.5 h-1.5 rounded-full ${
+                        activeTarget.status === 'HOSTILE' ? 'bg-error' :
+                        activeTarget.status === 'FRIENDLY' ? 'bg-primary' : 'bg-warning'
+                    }`;
+                }
+                if (text) {
+                    text.textContent = activeTarget.status === 'HOSTILE' ? 'TRACKING IN PROGRESS' : 
+                                   activeTarget.status === 'FRIENDLY' ? 'FRIENDLY AIR' : 'UNKNOWN - EVALUATING';
+                }
+
+                // Altitude trend
+                const trendEl = document.getElementById('sm-alt-trend');
+                const trendText = document.getElementById('sm-alt-trend-text');
+                if (trendEl && trendText) {
+                    trendText.textContent = activeTarget.altitudeTrend;
+                    const icon = trendEl.querySelector('.material-symbols-outlined');
+                    if (activeTarget.altitudeTrend === 'DESCENDING') {
+                        trendEl.className = 'mt-1 font-data-mono text-label-caps text-error flex items-center gap-1';
+                        if (icon) icon.textContent = 'arrow_downward';
+                    } else if (activeTarget.altitudeTrend === 'CLIMBING') {
+                        trendEl.className = 'mt-1 font-data-mono text-label-caps text-primary flex items-center gap-1';
+                        if (icon) icon.textContent = 'arrow_upward';
+                    } else {
+                        trendEl.className = 'mt-1 font-data-mono text-label-caps text-outline flex items-center gap-1';
+                        if (icon) icon.textContent = 'remove';
+                    }
+                }
+            }
+
+            // Update target list
+            renderTargetList();
+        }
+
+        function renderTargetList() {
+            if (typeof SensorDataEngine === 'undefined') return;
+            
+            const container = document.getElementById('target-list');
+            if (!container) return;
+
+            const targets = SensorDataEngine.state?.targets || [];
+            const activeIdx = SensorDataEngine.state?.activeTargetIndex || 0;
+
+            container.innerHTML = '';
+            targets.forEach((t, idx) => {
+                const div = document.createElement('div');
+                div.className = `p-2 border cursor-pointer flex justify-between items-center ${
+                    idx === activeIdx ? 'bg-primary-container border-primary' : 'border-outline-variant hover:bg-surface-container'
+                }`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full ${t.status === 'HOSTILE' ? 'bg-error' : t.status === 'FRIENDLY' ? 'bg-primary' : 'bg-warning'}"></div>
+                        <span class="font-data-mono text-[12px] text-on-surface">${t.callsign}</span>
+                    </div>
+                    <span class="font-data-mono text-[10px] text-on-surface-variant">${t.range}NM</span>
+                `;
+                div.onclick = () => {
+                    SensorDataEngine.setActiveTarget(idx);
+                };
+                container.appendChild(div);
+            });
+        }
+
+        // === Sensor Fusion Bars ===
+        function updateFusionBars(data) {
+            if (!data || !data.sensors) return;
+            
+            const s = data.sensors;
+            const total = s.radar.confidence + s.esm.confidence + s.satellite.confidence;
+            
+            const br = document.getElementById('bar-radar');
+            const be = document.getElementById('bar-esm');
+            const bs = document.getElementById('bar-sat');
+            const fp = document.getElementById('sm-fused-pct');
+            
+            if (br) br.style.width = (s.radar.confidence / total * 100) + '%';
+            if (be) be.style.width = (s.esm.confidence / total * 100) + '%';
+            if (bs) bs.style.width = (s.satellite.confidence / total * 100) + '%';
+            if (fp) fp.textContent = data.fusedConfidence.toFixed(1) + '%';
+        }
+
+        // === Event Listeners ===
+        window.addEventListener('sensor-update', (e) => {
+            updateTargets();
+            updateFusionBars(e.detail);
+        });
+
+        // Export buttons
+        document.getElementById('btn-export-json')?.addEventListener('click', () => {
+            SensorDataEngine?.exportData();
+        });
+
+        document.getElementById('btn-export-csv')?.addEventListener('click', () => {
+            SensorDataEngine?.exportCSV();
+        });
+
+        // Audio toggle
+        document.getElementById('btn-audio')?.addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            SensorDataEngine?.setAudio(audioEnabled);
+            const btn = document.getElementById('btn-audio');
+            if (btn) {
+                btn.classList.toggle('bg-primary-container', audioEnabled);
+                btn.classList.toggle('border-primary', audioEnabled);
+            }
+        });
+
+        // Sensor filters
+        const filterState = { hostile: true, unknown: true, friendly: true };
+        document.querySelectorAll('[data-filter]').forEach(label => {
+            const key = label.dataset.filter;
+            const checkbox = label.querySelector('input');
+            if (checkbox) {
+                checkbox.checked = filterState[key];
+                checkbox.addEventListener('change', () => {
+                    filterState[key] = checkbox.checked;
+                    // Show/hide markers based on filter
+                    Object.keys(trackMarkers).forEach(id => {
+                        const target = SensorDataEngine?.state?.targets?.find(t => t.id === id);
+                        if (target) {
+                            const show = filterState[target.status.toLowerCase()];
+                            if (trackMarkers[id]) {
+                                show ? markersLayer.addLayer(trackMarkers[id]) : markersLayer.removeLayer(trackMarkers[id]);
+                            }
+                            if (trackLabels[id]) {
+                                show ? labelsLayer.addLayer(trackLabels[id]) : labelsLayer.removeLayer(trackLabels[id]);
+                            }
+                        }
+                    });
+                });
+            }
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initMap);
+        window.addEventListener('load', () => {
+            if (document.getElementById('map-container') && !mapInitialized) initMap();
+        });
+    </script>
+</body>
+</html>

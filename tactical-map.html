@@ -7,163 +7,227 @@
     <title>C2 // TACTICAL MAP</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="tailwind.config.js"></script>
-    </head>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+</head>
 
-<body
-    class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
 
     <div id="header-placeholder"></div>
     <div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
         <div id="sidebar-placeholder"></div>
 
         <main class="h-full p-gutter flex gap-gutter overflow-hidden relative hex-bg">
-            <!-- Center Tactical Map (Fluid) -->
-            <section
-                class="flex-grow flex flex-col relative bg-surface-container border border-outline-variant rounded-DEFAULT overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
-                <!-- Faux Map Background -->
-                <img alt="Dark stylized map of the Baltic Sea region with tactical overlays"
-                    class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity pointer-events-none"
-                    data-alt="Dark highly stylized satellite map of the Baltic Sea region, deep navy and black tones, minimal geography details, cyber aesthetic"
-                    data-location="Baltic Sea"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYFLeQKytJUcTtb4dshwMmP0beiiJeSwYO2G1MImQq5cvTfTBC3gZz7D_LMZXsPsirC3Z3ypByAQCiY2uNJMEoGfPZo3odiDy4nnrrL7IoJfqOIJXYeWugFMwiOOqBShnl-GZIKPVVROOC97BgbWlEALf6xH0I7Ueyl4MogEDRkBGsvUbI3cBdBeRObdZSRPFyEkN2oEcO4_gzJbzKLrmkPevYegjSxMjSo4tqUcMICz4fWd1N71NskLjTU11fCNC1sMnIZUD0Zd_e" />
-                <!-- Map Overlays & Artifacts -->
-                <div class="absolute inset-0 pointer-events-none p-panel-padding">
+            <style>
+                /* Leaflet overrides for tactical dark theme */
+                .leaflet-container { background: #0a0e14 !important; font-family: 'Inter', sans-serif; }
+                .leaflet-control-zoom a { background: #1a1f2e !important; color: #82cfff !important; border: 1px solid #3e4850 !important; }
+                .leaflet-control-zoom a:hover { background: #252b3b !important; }
+                .leaflet-control-attribution { display: none !important; }
+
+                /* Radar sweep on the real map (CSS-animated canvas overlay) */
+                .radar-ring-glow { box-shadow: 0 0 20px rgba(130, 207, 255, 0.15), inset 0 0 20px rgba(130, 207, 255, 0.05); }
+
+                /* Radar sweep conic gradient overlay */
+                .radar-sweep-overlay {
+                    background: conic-gradient(
+                        from 0deg at 50% 50%,
+                        transparent 0deg,
+                        transparent 270deg,
+                        rgba(130, 207, 255, 0.12) 330deg,
+                        rgba(130, 207, 255, 0.25) 360deg
+                    );
+                    border-radius: 50%;
+                    animation: radarSweep 4s linear infinite;
+                }
+
+                @keyframes radarSweep {
+                    0%   { transform: translate(-50%, -50%) rotate(0deg); }
+                    100% { transform: translate(-50%, -50%) rotate(360deg); }
+                }
+
+                /* Node pulse animation */
+                @keyframes nodePulse {
+                    0%, 100% { box-shadow: 0 0 4px rgba(130, 207, 255, 0.8), 0 0 8px rgba(130, 207, 255, 0.4); }
+                    50%      { box-shadow: 0 0 8px rgba(130, 207, 255, 1), 0 0 20px rgba(130, 207, 255, 0.6); }
+                }
+                .node-dot { animation: nodePulse 2s ease-in-out infinite; }
+
+                /* Hostile diamond pulse */
+                @keyframes hostilePulse {
+                    0%, 100% { box-shadow: 0 0 6px rgba(255, 180, 171, 0.8); transform: rotate(45deg) scale(1); }
+                    50%      { box-shadow: 0 0 14px rgba(255, 85, 85, 1); transform: rotate(45deg) scale(1.15); }
+                }
+                .hostile-diamond { animation: hostilePulse 1.5s ease-in-out infinite; }
+
+                /* Friendly interceptor chevron pulse */
+                @keyframes friendlyPulse {
+                    0%, 100% { filter: drop-shadow(0 0 4px rgba(130,207,255,0.6)); }
+                    50%      { filter: drop-shadow(0 0 10px rgba(130,207,255,1)); }
+                }
+                .friendly-chevron { animation: friendlyPulse 2s ease-in-out infinite; }
+
+                /* Airbase triangle pulse */
+                @keyframes basePulse {
+                    0%, 100% { filter: drop-shadow(0 0 3px rgba(0,174,239,0.5)); }
+                    50%      { filter: drop-shadow(0 0 8px rgba(0,174,239,0.9)); }
+                }
+                .airbase-triangle { animation: basePulse 3s ease-in-out infinite; }
+
+                /* Toggle button active state */
+                .toggle-btn.active { background: rgba(0, 174, 239, 0.15); border-color: #00AEEF; color: #82cfff; }
+
+                /* Leaflet popup override */
+                .leaflet-popup-content-wrapper { background: rgba(10, 14, 20, 0.95) !important; border: 1px solid #3e4850 !important; border-radius: 4px !important; color: #e5e2e1 !important; font-family: 'Inter', sans-serif !important; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important; }
+                .leaflet-popup-tip { background: rgba(10, 14, 20, 0.95) !important; border: 1px solid #3e4850 !important; }
+                .leaflet-popup-content { margin: 8px 12px !important; font-size: 11px !important; line-height: 1.6 !important; }
+
+                /* GBAD shield pulse */
+                @keyframes gbadPulse {
+                    0%, 100% { filter: drop-shadow(0 0 4px rgba(255,100,90,0.5)); }
+                    50%      { filter: drop-shadow(0 0 10px rgba(255,100,90,0.9)); }
+                }
+                .gbad-shield { animation: gbadPulse 2.5s ease-in-out infinite; }
+
+                /* Drone hexagon pulse */
+                @keyframes dronePulse {
+                    0%, 100% { filter: drop-shadow(0 0 4px rgba(245,158,11,0.5)); }
+                    50%      { filter: drop-shadow(0 0 10px rgba(245,158,11,0.9)); }
+                }
+                .drone-hex { animation: dronePulse 2.5s ease-in-out infinite; }
+
+                /* Transfer arrow dash animation */
+                @keyframes dashFlow {
+                    from { stroke-dashoffset: 24; }
+                    to   { stroke-dashoffset: 0; }
+                }
+            </style>
+            
+            <!-- ══════════════════════════════════════════════
+                 CENTER: Interactive Leaflet Tactical Map
+                 ══════════════════════════════════════════════ -->
+            <section class="flex-grow flex flex-col relative bg-surface-container border border-outline-variant rounded-DEFAULT overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
+
+                <!-- Leaflet Map Container -->
+                <div id="tactical-map" class="absolute inset-0 w-full h-full z-0"></div>
+
+                <!-- ── HUD Overlay (top) ── -->
+                <div class="absolute inset-0 pointer-events-none z-[500] p-panel-padding flex flex-col justify-between">
                     <div class="flex justify-between items-start">
-                        <div
-                            class="font-label-caps text-label-caps text-outline bg-surface/80 px-2 py-1 border border-outline-variant backdrop-blur-sm">
+                        <div class="font-label-caps text-label-caps text-outline bg-surface/80 px-2 py-1 border border-outline-variant backdrop-blur-sm">
                             TACTICAL MAP // OP AREA: BALTIC REGION // GRID: 34T CM
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 items-center">
                             <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                            <span
-                                class="font-data-mono text-data-mono text-primary bg-surface/80 px-2 py-1 border border-primary/30 backdrop-blur-sm">DATALINK
-                                SYNCED</span>
+                            <span class="font-data-mono text-data-mono text-primary bg-surface/80 px-2 py-1 border border-primary/30 backdrop-blur-sm">DATALINK SYNCED</span>
                         </div>
                     </div>
-                    <!-- Grid Lines -->
-                    <div class="absolute top-1/4 left-0 w-full h-[1px] bg-outline-variant opacity-30"></div>
-                    <div class="absolute top-2/4 left-0 w-full h-[1px] bg-outline-variant opacity-30"></div>
-                    <div class="absolute top-3/4 left-0 w-full h-[1px] bg-outline-variant opacity-30"></div>
-                    <div class="absolute left-1/4 top-0 w-[1px] h-full bg-outline-variant opacity-30"></div>
-                    <div class="absolute left-2/4 top-0 w-[1px] h-full bg-outline-variant opacity-30"></div>
-                    <div class="absolute left-3/4 top-0 w-[1px] h-full bg-outline-variant opacity-30"></div>
-                    <!-- Radar Fan -->
-                    <div
-                        class="absolute top-1/2 left-1/2 w-96 h-96 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/20 flex items-center justify-center">
-                        <div class="w-full h-full radar-sweep opacity-40"></div>
-                    </div>
-                    <div
-                        class="absolute top-1/2 left-1/2 w-[500px] h-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary opacity-10">
-                    </div>
-                    <!-- Active Track (Bogey) -->
-                    <div
-                        class="absolute top-[40%] left-[60%] flex flex-col items-center pointer-events-auto cursor-pointer group">
-                        <div
-                            class="w-3 h-3 bg-error rotate-45 border border-surface shadow-[0_0_8px_rgba(255,180,171,0.6)] group-hover:scale-125 transition-transform">
+
+                    <!-- ── Bottom HUD: Toggle Controls ── -->
+                    <div class="flex justify-between items-end">
+                        <!-- Layer Toggle Buttons -->
+                        <div class="flex gap-2 pointer-events-auto">
+                            <button id="btn-radar" onclick="toggleLayer('radar')"
+                                class="toggle-btn active bg-surface-container border border-outline-variant text-on-surface px-3 py-1.5 font-label-caps text-label-caps uppercase hover:bg-surface-bright transition-all duration-200 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[14px]">radar</span>
+                                RADAR
+                            </button>
+                            <button id="btn-sat" onclick="toggleLayer('sat')"
+                                class="toggle-btn bg-surface-container border border-outline-variant text-on-surface px-3 py-1.5 font-label-caps text-label-caps uppercase hover:bg-surface-bright transition-all duration-200 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[14px]">satellite_alt</span>
+                                SAT
+                            </button>
+                            <button id="btn-bndry" onclick="toggleLayer('bndry')"
+                                class="toggle-btn bg-surface-container border border-outline-variant text-on-surface px-3 py-1.5 font-label-caps text-label-caps uppercase hover:bg-surface-bright transition-all duration-200 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[14px]">border_style</span>
+                                BNDRY
+                            </button>
+                            <button id="btn-qra" onclick="toggleLayer('qra')"
+                                class="toggle-btn bg-surface-container border border-outline-variant text-on-surface px-3 py-1.5 font-label-caps text-label-caps uppercase hover:bg-surface-bright transition-all duration-200 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[14px]">flight_takeoff</span>
+                                QRA
+                            </button>
                         </div>
-                        <span class="mt-1 font-data-mono text-data-mono text-error uppercase">TRK-842</span>
-                        <!-- Trajectory Line -->
-                        <svg class="absolute top-1.5 left-1.5 w-32 h-32 pointer-events-none"
-                            style="transform: rotate(45deg); transform-origin: top left;">
-                            <line stroke="#ffb4ab" stroke-dasharray="2 4" stroke-width="1" x1="0" x2="100" y1="0"
-                                y2="0"></line>
-                        </svg>
-                    </div>
-                    <!-- AI Intercept Vector (Hidden by default) -->
-                    <div id="ai-intercept-vector" class="absolute top-[50%] left-[30%] hidden pointer-events-none">
-                        <div class="flex flex-col items-center">
-                            <span class="text-[9px] font-data-mono text-sky-400 mb-1 uppercase tracking-tighter">AI Reco Intercept Vec</span>
-                            <svg class="w-64 h-64" style="transform: rotate(-30deg); transform-origin: top left;">
-                                <line stroke="#82cfff" stroke-dasharray="4 4" stroke-width="2" x1="0" x2="200" y1="0" y2="0"></line>
-                                <circle cx="200" cy="0" r="4" fill="#82cfff" class="animate-ping"></circle>
-                            </svg>
+                        <!-- Legend -->
+                        <div class="bg-surface/90 border border-outline-variant backdrop-blur-sm px-3 py-2 flex flex-col gap-1.5">
+                            <span class="font-label-caps text-[8px] text-outline tracking-widest mb-0.5">LEGEND</span>
+                            <div class="flex items-center gap-2">
+                                <div class="w-2.5 h-2.5 rounded-full bg-primary node-dot" style="animation: none;"></div>
+                                <span class="font-data-mono text-[10px] text-on-surface-variant">RADAR NODE</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:9px solid #00AEEF;margin:0 0.5px;"></div>
+                                <span class="font-data-mono text-[10px] text-on-surface-variant">FIGHTER BASE</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-2.5 h-2.5 bg-error rotate-45" style="margin: 0 1px;"></div>
+                                <span class="font-data-mono text-[10px] text-on-surface-variant">HOSTILE TRACK</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg width="12" height="10" viewBox="0 0 12 10" style="margin:0 0.5px;"><polygon points="6,0 12,10 0,10" fill="#82cfff" opacity="0.8"/></svg>
+                                <span class="font-data-mono text-[10px] text-on-surface-variant">INTERCEPTOR</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-2.5 h-2.5 rounded-full border border-primary/40 bg-primary/10"></div>
+                                <span class="font-data-mono text-[10px] text-on-surface-variant">RADAR COVERAGE</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[12px] text-error" style="margin:0 1px;">shield</span>
+                                <span class="font-data-mono text-[10px] text-on-surface-variant">GBAD / LUFTVÄRN</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[12px] text-amber-400" style="margin:0 1px;">flight_class</span>
+                                <span class="font-data-mono text-[10px] text-on-surface-variant">UAV / DRÖNARE</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- AI Geofencing Alert Zone (Hidden by default, activates on PROTECT phase) -->
-                <div id="ai-geofence-zone" class="absolute top-[35%] left-[55%] hidden pointer-events-none -translate-x-1/2 -translate-y-1/2">
-                    <div class="relative flex items-center justify-center w-48 h-48">
-                        <div class="absolute inset-0 rounded-full border-2 border-error/60 animate-ping" style="animation-duration: 1.5s;"></div>
-                        <div class="absolute inset-4 rounded-full border border-error/30"></div>
-                        <div class="bg-slate-950/80 border border-error/50 px-2 py-1 text-center">
-                            <span class="text-[8px] font-data-mono text-error uppercase tracking-widest block">⚠ GEOFENCE</span>
-                            <span class="text-[7px] font-data-mono text-error/70 uppercase block">PROTECT ZONE BREACH</span>
-                        </div>
+
+                <!-- Threat Event Toast Overlay -->
+                <div id="threat-event-toast" class="absolute top-[15%] left-[50%] hidden pointer-events-none -translate-x-1/2 z-[550] flex flex-col items-center gap-2">
+                    <div id="threat-toast-content" class="bg-surface/90 border border-outline px-4 py-2 text-center backdrop-blur shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                        <!-- Message goes here -->
                     </div>
                 </div>
-                <!-- Map Controls -->
-                <div class="absolute bottom-6 left-6 flex gap-2">
-                    <button
-                        class="bg-surface-container border border-outline-variant text-on-surface px-3 py-1 font-label-caps text-label-caps uppercase hover:bg-surface-bright transition-colors">RADAR</button>
-                    <button
-                        class="bg-surface-container border border-outline-variant text-on-surface px-3 py-1 font-label-caps text-label-caps uppercase hover:bg-surface-bright transition-colors">SAT</button>
-                    <button
-                        class="bg-primary-container text-on-primary-container border border-primary px-3 py-1 font-label-caps text-label-caps uppercase">BNDRY</button>
-                </div>
-                <div class="absolute bottom-6 right-6 flex pointer-events-auto">
-                    <div
-                        class="bg-surface-container border border-outline-variant p-2 flex flex-col gap-2 backdrop-blur-md">
-                        <button
-                            class="w-8 h-8 flex items-center justify-center bg-surface-variant hover:bg-primary/20 border border-outline-variant hover:border-primary transition-colors"><span
-                                class="material-symbols-outlined text-[16px]">add</span></button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center bg-surface-variant hover:bg-primary/20 border border-outline-variant hover:border-primary transition-colors"><span
-                                class="material-symbols-outlined text-[16px]">remove</span></button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center bg-surface-variant hover:bg-primary/20 border border-outline-variant hover:border-primary transition-colors"><span
-                                class="material-symbols-outlined text-[16px]">my_location</span></button>
-                    </div>
-                </div>
+
             </section>
 
-            <!-- Telemetry Right Sidebar -->
+            <!-- ══════════════════════════════════════════════
+                 RIGHT SIDEBAR: Target Telemetry Panel
+                 ══════════════════════════════════════════════ -->
             <aside class="w-[360px] flex flex-col gap-gutter overflow-y-auto pr-1 pb-1 scrollbar-hide shrink-0">
                 <!-- Target Details Block -->
                 <div class="bg-surface-container border border-outline-variant rounded-DEFAULT flex flex-col">
                     <!-- Header -->
-                    <div
-                        class="p-panel-padding border-b border-outline-variant bg-surface-variant/30 flex justify-between items-center">
-                        <h3 class="font-headline-md text-headline-md text-on-surface uppercase tracking-wider">Target
-                            Details</h3>
-                        <span
-                            class="font-label-caps text-label-caps bg-error/20 text-error px-2 py-0.5 rounded border border-error/50">HOSTILE</span>
+                    <div class="p-panel-padding border-b border-outline-variant bg-surface-variant/30 flex justify-between items-center">
+                        <h3 class="font-headline-md text-headline-md text-on-surface uppercase tracking-wider">Target Details</h3>
+                        <span class="font-label-caps text-label-caps bg-error/20 text-error px-2 py-0.5 rounded border border-error/50">HOSTILE</span>
                     </div>
                     <div class="p-gutter space-y-gutter">
                         <!-- Identification Block -->
                         <div class="border border-outline-variant bg-surface p-panel-padding relative">
-                            <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">
-                                Identification</h4>
-                            <div
-                                class="font-data-mono text-data-mono text-on-surface text-lg mb-1 text-error shadow-sm">
-                                SU-27 Flanker</div>
-                            <div class="font-data-mono text-data-mono text-on-surface-variant text-xs">Profile Match:
-                                <span class="text-primary">94%</span>
-                            </div>
-                            <div class="absolute top-panel-padding right-panel-padding w-2 h-2 bg-error animate-pulse">
-                            </div>
+                            <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Identification</h4>
+                            <div class="font-data-mono text-data-mono text-on-surface text-lg mb-1 text-error shadow-sm">SU-27 Flanker</div>
+                            <div class="font-data-mono text-data-mono text-on-surface-variant text-xs">Profile Match: <span class="text-primary">94%</span></div>
+                            <div class="absolute top-panel-padding right-panel-padding w-2 h-2 bg-error animate-pulse"></div>
                         </div>
                         <!-- Telemetry Grid -->
                         <div class="grid grid-cols-2 gap-unit">
                             <div class="border border-outline-variant bg-surface p-panel-padding">
-                                <div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">
-                                    Speed</div>
+                                <div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Speed</div>
                                 <div class="font-data-mono text-data-mono text-on-surface text-lg">M 1.2</div>
                             </div>
                             <div class="border border-outline-variant bg-surface p-panel-padding">
-                                <div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">
-                                    Altitude</div>
+                                <div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Altitude</div>
                                 <div class="font-data-mono text-data-mono text-on-surface text-lg">32k ft</div>
                             </div>
                             <div class="border border-outline-variant bg-surface p-panel-padding col-span-2">
-                                <div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">
-                                    Bearing</div>
+                                <div class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Bearing</div>
                                 <div class="font-data-mono text-data-mono text-on-surface text-lg">274° TRUE</div>
                             </div>
                         </div>
                         <!-- Status Block -->
                         <div class="border border-outline-variant bg-surface p-panel-padding">
-                            <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">
-                                Transponder</h4>
+                            <h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Transponder</h4>
                             <div class="flex items-center gap-2">
                                 <span class="material-symbols-outlined text-error text-sm">warning</span>
                                 <span class="font-data-mono text-data-mono text-error font-bold">OFF / NO SQUAWK</span>
@@ -171,52 +235,962 @@
                         </div>
                         <!-- Action Buttons -->
                         <div class="pt-2 flex flex-col gap-2">
-                                                        <button onclick="triggerAIScan()"
+                            <button onclick="triggerAIScan()"
                                 class="w-full bg-sky-950/50 hover:bg-sky-900 border border-sky-500 text-sky-400 font-label-caps text-label-caps uppercase py-3 transition-all active:scale-95 flex items-center justify-center gap-2">
                                 <span class="material-symbols-outlined text-sm animate-spin-slow">psychology</span>
                                 AI Tactical Scan
                             </button>
                             <button
-                                class="w-full bg-[#00AEEF] hover:bg-sky-400 text-slate-950 font-label-caps text-label-caps uppercase py-3 border border-[#00AEEF] transition-colors">Designate
-                                Target</button>
+                                class="w-full bg-[#00AEEF] hover:bg-sky-400 text-slate-950 font-label-caps text-label-caps uppercase py-3 border border-[#00AEEF] transition-colors">Designate Target</button>
                             <button
-                                class="w-full bg-transparent text-on-surface border border-outline hover:border-on-surface font-label-caps text-label-caps uppercase py-3 transition-colors">Scramble
-                                Intercept</button>
+                                class="w-full bg-transparent text-on-surface border border-outline hover:border-on-surface font-label-caps text-label-caps uppercase py-3 transition-colors">Scramble Intercept</button>
                         </div>
                     </div>
                 </div>
             </aside>
+            <script>
+            (function initTacticalMap() {
+                // Ensure Leaflet CSS is loaded
+                if (!document.getElementById('leaflet-css')) {
+                    const link = document.createElement('link');
+                    link.id = 'leaflet-css';
+                    link.rel = 'stylesheet';
+                    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                    document.head.appendChild(link);
+                }
+
+                // Cleanup previous map instance if it exists to prevent "Map container is already initialized" error
+                if (window.tacticalMapInstance) {
+                    window.tacticalMapInstance.remove();
+                    window.tacticalMapInstance = null;
+                }
+
+                function loadLeafletJS(callback) {
+                    if (typeof L !== 'undefined') {
+                        callback();
+                        return;
+                    }
+                    if (document.getElementById('leaflet-js')) {
+                        const checkL = setInterval(() => {
+                            if (typeof L !== 'undefined') {
+                                clearInterval(checkL);
+                                callback();
+                            }
+                        }, 50);
+                        return;
+                    }
+                    const script = document.createElement('script');
+                    script.id = 'leaflet-js';
+                    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                    script.onload = callback;
+                    document.head.appendChild(script);
+                }
+
+                loadLeafletJS(() => {
+                    const layerState = { radar: true, sat: false, bndry: false, qra: false };
+                    
+                    const map = L.map('tactical-map', {
+                        center: [60.5, 18.5],
+                        zoom: 5,
+                        zoomControl: false,
+                        attributionControl: false,
+                        minZoom: 4,
+                        maxZoom: 10
+                    });
+                    
+                    window.tacticalMapInstance = map;
+
+                    L.control.zoom({ position: 'topright' }).addTo(map);
+
+                    const darkTiles = L.tileLayer(
+                        'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+                            subdomains: 'abcd',
+                            maxZoom: 19
+                        }
+                    ).addTo(map);
+
+                    const satTiles = L.tileLayer(
+                        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                            maxZoom: 18,
+                            opacity: 0.4
+                        }
+                    );
+
+                    const radarNodes = [
+                        { name: 'VISBY',    code: 'GV-01', lat: 57.6348, lng: 18.2948, radius: 180000, wing: 'GOTLAND AIR BASE' },
+                        { name: 'UPPSALA',  code: 'UP-02', lat: 59.8586, lng: 17.6389, radius: 130000, wing: 'F16 WING' },
+                        { name: 'RONNEBY',  code: 'RB-03', lat: 56.2600, lng: 15.2636, radius: 130000, wing: 'F17 KALLINGE' },
+                        { name: 'LULEÅ',    code: 'LU-04', lat: 65.5848, lng: 22.1567, radius: 130000, wing: 'F21 WING' },
+                        { name: 'SÅTENÄS',  code: 'SA-05', lat: 58.4300, lng: 12.7100, radius: 130000, wing: 'F7 WING' },
+                    ];
+
+                    const nodeMarkersGroup = L.layerGroup().addTo(map);
+                    const radarCoverageGroup = L.layerGroup().addTo(map);
+                    const radarSweepGroup = L.layerGroup().addTo(map);
+                    const boundaryGroup = L.layerGroup();
+                    const qraGroup = L.layerGroup(); // QRA bases, combat radius, interceptor
+                    const tracksGroup = L.layerGroup().addTo(map); // High z-index tracks layer
+
+                    radarNodes.forEach(node => {
+                        const dotIcon = L.divIcon({
+                            className: '',
+                            html: `
+                                <div style="position:relative; width:20px; height:20px;">
+                                    <div style="
+                                        position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                                        width:10px; height:10px; border-radius:50%;
+                                        background: #82cfff;
+                                        box-shadow: 0 0 6px rgba(130,207,255,0.9), 0 0 14px rgba(130,207,255,0.5), 0 0 30px rgba(130,207,255,0.2);
+                                        animation: nodePulse 2s ease-in-out infinite;
+                                    "></div>
+                                    <div style="
+                                        position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                                        width:20px; height:20px; border-radius:50%;
+                                        border: 1px solid rgba(130,207,255,0.3);
+                                    "></div>
+                                </div>
+                            `,
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]
+                        });
+
+                        const marker = L.marker([node.lat, node.lng], { icon: dotIcon }).addTo(nodeMarkersGroup);
+                        marker.bindPopup(`
+                            <div style="font-family: 'Inter', monospace;">
+                                <div style="color:#82cfff; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">${node.name}</div>
+                                <div style="color:#87929b; font-size:9px; letter-spacing:0.08em;">${node.wing}</div>
+                                <div style="color:#87929b; font-size:9px; margin-top:2px;">CODE: ${node.code}</div>
+                                <div style="color:#87929b; font-size:9px;">RANGE: ${(node.radius / 1000).toFixed(0)} KM</div>
+                                <div style="color:#34d399; font-size:9px; margin-top:4px; font-weight:600;">● STATUS: ACTIVE</div>
+                            </div>
+                        `, { className: 'tactical-popup' });
+
+                        const labelIcon = L.divIcon({
+                            className: '',
+                            html: `<div style="
+                                font-family: 'Inter', monospace;
+                                font-size: 9px;
+                                font-weight: 700;
+                                letter-spacing: 0.1em;
+                                color: #82cfff;
+                                text-shadow: 0 0 6px rgba(130,207,255,0.5);
+                                white-space: nowrap;
+                                text-align: center;
+                                pointer-events: none;
+                            ">${node.name}</div>`,
+                            iconSize: [80, 14],
+                            iconAnchor: [40, -6]
+                        });
+                        L.marker([node.lat, node.lng], { icon: labelIcon, interactive: false }).addTo(nodeMarkersGroup);
+
+                        L.circle([node.lat, node.lng], {
+                            radius: node.radius,
+                            color: 'rgba(130, 207, 255, 0.25)',
+                            weight: 1,
+                            fillColor: 'rgba(130, 207, 255, 0.04)',
+                            fillOpacity: 1,
+                            dashArray: '6 4',
+                            interactive: false
+                        }).addTo(radarCoverageGroup);
+
+                        L.circle([node.lat, node.lng], {
+                            radius: node.radius * 0.5,
+                            color: 'rgba(130, 207, 255, 0.12)',
+                            weight: 1,
+                            fill: false,
+                            dashArray: '3 6',
+                            interactive: false
+                        }).addTo(radarCoverageGroup);
+
+                        const sweepIcon = L.divIcon({
+                            className: '',
+                            html: `<div class="radar-sweep-overlay" style="
+                                position:absolute; top:50%; left:50%;
+                                width: 260px; height: 260px;
+                                pointer-events: none;
+                                opacity: 0.5;
+                            "></div>`,
+                            iconSize: [0, 0],
+                            iconAnchor: [0, 0]
+                        });
+                        L.marker([node.lat, node.lng], { icon: sweepIcon, interactive: false }).addTo(radarSweepGroup);
+                    });
+
+                    // ══════════════════════════════════════════
+                    //  FIGHTER AIRBASES (QRA Layer)
+                    // ══════════════════════════════════════════
+
+                    const fighterBases = [
+                        { name: 'F 21', code: 'F21-QRA', lat: 65.5848, lng: 22.1567, wing: 'NORRBOTTEN WING', region: 'NORTH' },
+                        { name: 'F 16', code: 'F16-QRA', lat: 59.8586, lng: 17.6389, wing: 'UPPSALA WING', region: 'CENTER' },
+                        { name: 'F 17', code: 'F17-QRA', lat: 56.2600, lng: 15.2636, wing: 'BLEKINGE WING', region: 'SOUTH' },
+                    ];
+
+                    const combatRadius = 300000; // 300km — 15-min intercept reach
+
+                    fighterBases.forEach(base => {
+                        // Upward-pointing triangle icon for airbases
+                        const triangleIcon = L.divIcon({
+                            className: '',
+                            html: `
+                                <div style="position:relative; width:24px; height:30px;" class="airbase-triangle">
+                                    <svg width="24" height="20" viewBox="0 0 24 20" style="position:absolute;top:0;left:0;">
+                                        <polygon points="12,0 24,20 0,20" fill="#00AEEF" stroke="#82cfff" stroke-width="1" opacity="0.9"/>
+                                    </svg>
+                                    <div style="
+                                        position:absolute; bottom:0; left:50%; transform: translateX(-50%);
+                                        font-family: 'Inter', monospace;
+                                        font-size: 8px;
+                                        font-weight: 700;
+                                        letter-spacing: 0.08em;
+                                        color: #00AEEF;
+                                        text-shadow: 0 0 6px rgba(0,174,239,0.5);
+                                        white-space: nowrap;
+                                    ">${base.name}</div>
+                                </div>
+                            `,
+                            iconSize: [24, 30],
+                            iconAnchor: [12, 15]
+                        });
+
+                        const baseMarker = L.marker([base.lat, base.lng], { icon: triangleIcon, zIndexOffset: 500 }).addTo(qraGroup);
+                        baseMarker.bindPopup(`
+                            <div style="font-family: 'Inter', monospace;">
+                                <div style="color:#00AEEF; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">${base.name} BASE</div>
+                                <div style="color:#87929b; font-size:9px; letter-spacing:0.08em;">${base.wing}</div>
+                                <div style="color:#87929b; font-size:9px; margin-top:2px;">SECTOR: ${base.region}</div>
+                                <div style="color:#87929b; font-size:9px;">CODE: ${base.code}</div>
+                                <div style="color:#87929b; font-size:9px;">COMBAT RADIUS: ${combatRadius / 1000} KM</div>
+                                <div style="color:#82cfff; font-size:9px; margin-top:4px; font-weight:600;">● QRA: STANDBY</div>
+                            </div>
+                        `);
+
+                        // Combat radius ring (15-min intercept reach)
+                        L.circle([base.lat, base.lng], {
+                            radius: combatRadius,
+                            color: 'rgba(130, 207, 255, 0.3)',
+                            weight: 1,
+                            fill: false,
+                            dashArray: '8 6',
+                            interactive: false
+                        }).addTo(qraGroup);
+                    });
+
+                    // ══════════════════════════════════════════
+                    //  FRIENDLY INTERCEPTOR — INT-01
+                    // ══════════════════════════════════════════
+
+                    const hostilePos = [58.8, 22.5];
+                    const trajectoryEnd = [58.3, 16.0];
+
+                    // Calculate which base is closest to the hostile
+                    function haversineDistance(lat1, lng1, lat2, lng2) {
+                        const R = 6371;
+                        const dLat = (lat2 - lat1) * Math.PI / 180;
+                        const dLng = (lng2 - lng1) * Math.PI / 180;
+                        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                                  Math.sin(dLng/2) * Math.sin(dLng/2);
+                        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                    }
+
+                    let closestBase = fighterBases[0];
+                    let minDist = Infinity;
+                    fighterBases.forEach(base => {
+                        const d = haversineDistance(base.lat, base.lng, hostilePos[0], hostilePos[1]);
+                        if (d < minDist) { minDist = d; closestBase = base; }
+                    });
+
+                    // Interceptor spawns offset from closest base, flying toward the hostile trajectory
+                    // Place INT-01 partway between the closest base and the hostile's predicted intercept point
+                    const interceptMidLat = (hostilePos[0] + trajectoryEnd[0]) / 2;
+                    const interceptMidLng = (hostilePos[1] + trajectoryEnd[1]) / 2;
+                    const intPos = [
+                        closestBase.lat + (interceptMidLat - closestBase.lat) * 0.45,
+                        closestBase.lng + (interceptMidLng - closestBase.lng) * 0.45
+                    ];
+
+                    // Calculate where the intercept vector meets the hostile trajectory
+                    // Project a point on the hostile's trajectory closest to INT-01's heading
+                    const interceptPoint = [
+                        interceptMidLat,
+                        interceptMidLng
+                    ];
+
+                    // Friendly chevron/triangle icon
+                    const friendlyIcon = L.divIcon({
+                        className: '',
+                        html: `
+                            <div style="position:relative; width:30px; height:40px;" class="friendly-chevron">
+                                <svg width="20" height="18" viewBox="0 0 20 18" style="position:absolute;top:2px;left:5px;">
+                                    <polygon points="10,0 20,18 0,18" fill="rgba(130,207,255,0.3)" stroke="#82cfff" stroke-width="1.5"/>
+                                </svg>
+                                <div style="
+                                    position:absolute; bottom:0; left:50%; transform: translateX(-50%);
+                                    font-family: 'Inter', monospace;
+                                    font-size: 9px;
+                                    font-weight: 700;
+                                    letter-spacing: 0.08em;
+                                    color: #82cfff;
+                                    text-shadow: 0 0 6px rgba(130,207,255,0.5);
+                                    white-space: nowrap;
+                                ">INT-01</div>
+                            </div>
+                        `,
+                        iconSize: [30, 40],
+                        iconAnchor: [15, 20]
+                    });
+
+                    const friendlyMarker = L.marker(intPos, { icon: friendlyIcon, zIndexOffset: 1000 }).addTo(qraGroup);
+                    friendlyMarker.bindPopup(`
+                        <div style="font-family: 'Inter', monospace;">
+                            <div style="color:#82cfff; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">INT-01 — FRIENDLY</div>
+                            <div style="color:#87929b; font-size:9px;">TYPE: JAS 39 GRIPEN</div>
+                            <div style="color:#87929b; font-size:9px;">ORIGIN: ${closestBase.name} (${closestBase.wing})</div>
+                            <div style="color:#87929b; font-size:9px;">SPEED: MACH 1.6</div>
+                            <div style="color:#87929b; font-size:9px;">ALT: 35,000 FT</div>
+                            <div style="color:#87929b; font-size:9px;">MISSION: INTERCEPT TRK-842</div>
+                            <div style="color:#82cfff; font-size:9px; margin-top:4px; font-weight:600;">● TRANSPONDER: ON — SQUAWK 7401</div>
+                        </div>
+                    `);
+
+                    // Departure line from base to INT-01
+                    L.polyline([[closestBase.lat, closestBase.lng], intPos], {
+                        color: '#82cfff',
+                        weight: 1,
+                        dashArray: '3 6',
+                        opacity: 0.3,
+                        interactive: false
+                    }).addTo(qraGroup);
+
+                    // Intercept vector line from INT-01 to intercept point on hostile trajectory
+                    L.polyline([intPos, interceptPoint], {
+                        color: '#82cfff',
+                        weight: 1.5,
+                        dashArray: '6 4',
+                        opacity: 0.6,
+                        interactive: false
+                    }).addTo(qraGroup);
+
+                    // Intercept point marker (blinking target)
+                    const interceptDotIcon = L.divIcon({
+                        className: '',
+                        html: `
+                            <div style="position:relative; width:16px; height:16px;">
+                                <div style="
+                                    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                                    width:8px; height:8px; border-radius:50%;
+                                    border: 1.5px solid #82cfff;
+                                    background: rgba(130,207,255,0.15);
+                                    animation: nodePulse 1.5s ease-in-out infinite;
+                                "></div>
+                                <div style="
+                                    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                                    width:16px; height:16px; border-radius:50%;
+                                    border: 1px solid rgba(130,207,255,0.2);
+                                "></div>
+                            </div>
+                        `,
+                        iconSize: [16, 16],
+                        iconAnchor: [8, 8]
+                    });
+                    const interceptDot = L.marker(interceptPoint, { icon: interceptDotIcon, zIndexOffset: 900, interactive: false }).addTo(qraGroup);
+
+                    // Intercept point label
+                    const interceptLabel = L.divIcon({
+                        className: '',
+                        html: `<div style="
+                            font-family: 'Inter', monospace;
+                            font-size: 8px;
+                            font-weight: 600;
+                            letter-spacing: 0.08em;
+                            color: rgba(130,207,255,0.7);
+                            white-space: nowrap;
+                            pointer-events: none;
+                        ">INTERCEPT PT</div>`,
+                        iconSize: [80, 12],
+                        iconAnchor: [40, -6]
+                    });
+                    L.marker(interceptPoint, { icon: interceptLabel, interactive: false }).addTo(qraGroup);
+
+                    const hostileIcon = L.divIcon({
+                        className: '',
+                        html: `
+                            <div style="position:relative; width:30px; height:40px;">
+                                <div class="hostile-diamond" style="
+                                    position:absolute; top:4px; left:50%; transform: translateX(-50%) rotate(45deg);
+                                    width:12px; height:12px;
+                                    background: rgba(255, 100, 90, 0.3);
+                                    border: 2px solid #ffb4ab;
+                                    box-shadow: 0 0 8px rgba(255,180,171,0.6);
+                                "></div>
+                                <div style="
+                                    position:absolute; bottom:0; left:50%; transform: translateX(-50%);
+                                    font-family: 'Inter', monospace;
+                                    font-size: 9px;
+                                    font-weight: 700;
+                                    letter-spacing: 0.08em;
+                                    color: #ffb4ab;
+                                    text-shadow: 0 0 6px rgba(255,180,171,0.5);
+                                    white-space: nowrap;
+                                ">TRK-842</div>
+                            </div>
+                        `,
+                        iconSize: [30, 40],
+                        iconAnchor: [15, 20]
+                    });
+
+                    const hostileMarker = L.marker(hostilePos, { icon: hostileIcon, zIndexOffset: 1000 }).addTo(tracksGroup);
+                    hostileMarker.bindPopup(`
+                        <div style="font-family: 'Inter', monospace;">
+                            <div style="color:#ffb4ab; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">TRK-842 — HOSTILE</div>
+                            <div style="color:#87929b; font-size:9px;">ID: SU-27 FLANKER</div>
+                            <div style="color:#87929b; font-size:9px;">SPEED: MACH 0.85</div>
+                            <div style="color:#87929b; font-size:9px;">ALT: 32,000 FT</div>
+                            <div style="color:#87929b; font-size:9px;">BRG: 274° TRUE</div>
+                            <div style="color:#ffb4ab; font-size:9px; margin-top:4px; font-weight:600;">⚠ TRANSPONDER: OFF</div>
+                        </div>
+                    `);
+
+                    const trajectoryLine = L.polyline([hostilePos, trajectoryEnd], {
+                        color: '#ffb4ab',
+                        weight: 1.5,
+                        dashArray: '4 8',
+                        opacity: 0.5,
+                        interactive: false
+                    }).addTo(tracksGroup);
+
+                    const arrowIcon = L.divIcon({
+                        className: '',
+                        html: `<div style="
+                            width:0; height:0;
+                            border-left: 5px solid transparent;
+                            border-right: 5px solid transparent;
+                            border-top: 8px solid #ffb4ab;
+                            opacity: 0.5;
+                            transform: rotate(-110deg);
+                        "></div>`,
+                        iconSize: [10, 8],
+                        iconAnchor: [5, 4]
+                    });
+                    L.marker(trajectoryEnd, { icon: arrowIcon, interactive: false }).addTo(tracksGroup);
+
+                    // Threat Tracking Logic & Animation
+                    let trackProgress = 0;
+                    let crossedFir = false;
+                    let crossedSov = false;
+                    
+                    function updateThreatState(msg, type) {
+                        const toast = document.getElementById('threat-event-toast');
+                        const content = document.getElementById('threat-toast-content');
+                        toast.classList.remove('hidden');
+                        
+                        if (type === 'CRITICAL') {
+                            content.className = "bg-error/20 border-2 border-error px-6 py-3 text-center backdrop-blur shadow-[0_0_20px_rgba(255,85,85,0.6)]";
+                            content.innerHTML = `<span class="material-symbols-outlined text-error text-[24px] align-middle mr-2">warning</span><span class="text-[12px] font-data-mono text-error font-bold uppercase tracking-widest align-middle">${msg}</span>`;
+                            const mainSection = document.querySelector('section.flex-grow');
+                            mainSection.classList.add('border-error');
+                            mainSection.style.boxShadow = 'inset 0 0 60px rgba(255,85,85,0.6)';
+                            document.querySelector('.hostile-diamond').style.animationDuration = '0.5s'; // faster pulse
+                        } else {
+                            content.className = "bg-surface/90 border border-[#82cfff] px-4 py-2 text-center backdrop-blur shadow-[0_0_15px_rgba(130,207,255,0.3)]";
+                            content.innerHTML = `<span class="text-[10px] font-data-mono text-[#82cfff] uppercase tracking-widest block">${msg}</span>`;
+                            setTimeout(() => { toast.classList.add('hidden'); }, 6000);
+                        }
+                    }
+
+                    // Threat check logic (variables already declared above)
+                    
+                    window.updateHostilePosition = function(lat, lng) {
+                        if (hostileMarker) hostileMarker.setLatLng([lat, lng]);
+                        
+                        if (window.turf && window.esaaFirGeoJson && !crossedFir) {
+                            if (turf.booleanPointInPolygon([lng, lat], window.esaaFirGeoJson)) {
+                                crossedFir = true;
+                                updateThreatState("INFO: TRACK ENTERED ESAA FIR", "INFO");
+                            }
+                        }
+                        
+                        if (window.turf && window.sovereignBufferPolygon && !crossedSov) {
+                            if (turf.booleanPointInPolygon([lng, lat], window.sovereignBufferPolygon)) {
+                                crossedSov = true;
+                                updateThreatState("CRITICAL: SOVEREIGN AIRSPACE VIOLATION", "CRITICAL");
+                            }
+                        }
+                    };
+
+                    // Sweden Land Border (GeoJSON)
+                    const sweGeoJSON = {"type": "FeatureCollection","features": [{"type": "Feature","id": "SWE","properties": {"name": "Sweden"},"geometry": {"type": "MultiPolygon","coordinates": [[[[22.183173, 65.723741],[21.213517, 65.026005],[21.369631, 64.413588],[19.778876, 63.609554],[17.847779, 62.7494],[17.119555, 61.341166],[17.831346, 60.636583],[18.787722, 60.081914],[17.869225, 58.953766],[16.829185, 58.719827],[16.44771, 57.041118],[15.879786, 56.104302],[14.666681, 56.200885],[14.100721, 55.407781],[12.942911, 55.361737],[12.625101, 56.30708],[11.787942, 57.441817],[11.027369, 58.856149],[11.468272, 59.432393],[12.300366, 60.117933],[12.631147, 61.293572],[11.992064, 61.800362],[11.930569, 63.128318],[12.579935, 64.066219],[13.571916, 64.049114],[13.919905, 64.445421],[13.55569, 64.787028],[15.108411, 66.193867],[16.108712, 67.302456],[16.768879, 68.013937],[17.729182, 68.010552],[17.993868, 68.567391],[19.87856, 68.407194],[20.025269, 69.065139],[20.645593, 69.106247],[21.978535, 68.616846],[23.539473, 67.936009],[23.56588, 66.396051],[23.903379, 66.006927],[22.183173, 65.723741]]],[[[17.061767, 57.385783],[17.210083, 57.326521],[16.430053, 56.179196],[16.364135, 56.556455],[17.061767, 57.385783]]],[[[19.357910, 57.958588],[18.803100, 57.651279],[18.825073, 57.444949],[18.995361, 57.441993],[18.951416, 57.370976],[18.693237, 57.305756],[18.709716, 57.204734],[18.462524, 57.127295],[18.319702, 56.926992],[18.105468, 56.891003],[18.187866, 57.109402],[18.072509, 57.267163],[18.154907, 57.394664],[18.094482, 57.545312],[18.660278, 57.929434],[19.039306, 57.941098],[19.105224, 57.993543],[19.374389, 57.996454],[19.357910, 57.958588]]],[[[20.846557, 63.823710],[21.066284, 63.829768],[20.972900, 63.715670],[20.824584, 63.579121],[20.695495, 63.591340],[20.819091, 63.714454],[20.799865, 63.780059],[20.846557, 63.823710]]]]}}]};
+
+                    L.geoJSON(sweGeoJSON, {
+                        style: {
+                            color: '#00AEEF',
+                            weight: 2,
+                            fillColor: 'rgba(0, 174, 239, 0.03)',
+                            fillOpacity: 1,
+                            dashArray: '8 4'
+                        },
+                        interactive: false
+                    }).addTo(boundaryGroup);
+
+                    if (window.turf) {
+                        try {
+                            const bufferedSovereign = turf.buffer(sweGeoJSON, 22.2, { units: 'kilometers' });
+                            L.geoJSON(bufferedSovereign, {
+                                style: {
+                                    color: '#ff4444',
+                                    weight: 2,
+                                    fill: false
+                                },
+                                interactive: false
+                            }).addTo(boundaryGroup);
+                            window.sovereignBufferPolygon = bufferedSovereign;
+                            
+                            // 12 NM Label inside the buffer curve
+                            const sovLabel = L.divIcon({
+                                className: '',
+                                html: `<div style="
+                                    font-family:'Inter',monospace; font-size:7px; font-weight:600;
+                                    letter-spacing:0.12em; color:rgba(255,68,68,0.8);
+                                    white-space:nowrap; pointer-events:none;
+                                    transform: rotate(-20deg) translateY(-8px); transform-origin: left center;
+                                ">SOV AIRSPACE // 12NM LIMIT</div>`,
+                                iconSize: [120, 12],
+                                iconAnchor: [0, 6]
+                            });
+                            // roughly eastern boundary near Stockhokm archipelago
+                            L.marker([59.5, 19.3], { icon: sovLabel, interactive: false }).addTo(boundaryGroup);
+                            
+                        } catch (e) { console.warn("Turf bug:", e); window.sovereignBufferPolygon = null; }
+                    }
+
+                    // ESAA FIR Polygon (Sweden Flight Information Region)
+                    if (window.turf) {
+                        const esaaPolyCoords = [
+                            // [lng, lat]
+                            [12.8, 55.3], [19.0, 55.3], [20.5, 59.0], [24.1, 65.8],
+                            [20.5, 69.0], [15.0, 69.0], [10.5, 58.9], [12.8, 55.3]
+                        ];
+                        const esaaFirGeoJson = turf.polygon([esaaPolyCoords]);
+                        L.geoJSON(esaaFirGeoJson, {
+                            style: {
+                                color: '#00AEEF',
+                                weight: 2,
+                                dashArray: '4 6',
+                                fill: false
+                            },
+                            interactive: false
+                        }).addTo(boundaryGroup);
+                        window.esaaFirGeoJson = esaaFirGeoJson;
+                        
+                        const firLabel = L.divIcon({
+                            className: '',
+                            html: `<div style="
+                                font-family:'Inter',monospace; font-size:8px; font-weight:600;
+                                letter-spacing:0.1em; color:rgba(0,174,239,0.5);
+                                white-space:nowrap; pointer-events:none;
+                            ">ESAA FIR LIMIT</div>`,
+                            iconSize: [80, 12],
+                            iconAnchor: [40, 6]
+                        });
+                        L.marker([58.0, 20.2], { icon: firLabel, interactive: false }).addTo(boundaryGroup);
+                    }
+
+                    window.toggleLayer = function(layerName) {
+                        layerState[layerName] = !layerState[layerName];
+                        const btn = document.getElementById(`btn-${layerName}`);
+
+                        if (btn) {
+                            if (layerState[layerName]) {
+                                btn.classList.add('active');
+                            } else {
+                                btn.classList.remove('active');
+                            }
+                        }
+
+                        if (layerState.radar) {
+                            if (!map.hasLayer(radarCoverageGroup)) map.addLayer(radarCoverageGroup);
+                            if (!map.hasLayer(radarSweepGroup)) map.addLayer(radarSweepGroup);
+                        } else {
+                            if (map.hasLayer(radarCoverageGroup)) map.removeLayer(radarCoverageGroup);
+                            if (map.hasLayer(radarSweepGroup)) map.removeLayer(radarSweepGroup);
+                        }
+
+                        if (layerState.sat) {
+                            if (!map.hasLayer(satTiles)) map.addLayer(satTiles);
+                        } else {
+                            if (map.hasLayer(satTiles)) map.removeLayer(satTiles);
+                        }
+
+                        if (layerState.bndry) {
+                            if (!map.hasLayer(boundaryGroup)) map.addLayer(boundaryGroup);
+                        } else {
+                            if (map.hasLayer(boundaryGroup)) map.removeLayer(boundaryGroup);
+                        }
+
+                        // QRA
+                        if (layerState.qra) {
+                            if (!map.hasLayer(qraGroup)) map.addLayer(qraGroup);
+                        } else {
+                            if (map.hasLayer(qraGroup)) map.removeLayer(qraGroup);
+                        }
+                    };
+
+                    window.triggerAIScan = function() {
+                        if (window.AISystem) {
+                            window.AISystem.scan({
+                                speed: 1150,
+                                distance: 42,
+                                iff: false
+                            });
+                        }
+                    };
+
+                    // AI Geofencing Alert Zone Marker (Geographically anchored)
+                    const geofenceIcon = L.divIcon({
+                        className: '',
+                        html: `
+                            <div id="ai-geofence-zone-inner" class="hidden relative flex items-center justify-center w-48 h-48 pointer-events-none">
+                                <div class="absolute inset-0 rounded-full border-2 border-error/60 animate-ping" style="animation-duration: 1.5s;"></div>
+                                <div class="absolute inset-4 rounded-full border border-error/30"></div>
+                                <div class="bg-slate-950/80 border border-error/50 px-2 py-1 text-center shadow-[0_0_15px_rgba(255,85,85,0.4)]">
+                                    <span class="text-[8px] font-data-mono text-error uppercase tracking-widest block">⚠ GEOFENCE</span>
+                                    <span class="text-[7px] font-data-mono text-error/70 uppercase block">PROTECT ZONE BREACH</span>
+                                </div>
+                            </div>
+                        `,
+                        iconSize: [192, 192],
+                        iconAnchor: [96, 96]
+                    });
+                    
+                    // Placing it around the area corresponding to the original visual intent (Gulf of Bothnia Region)
+                    const geofenceMarker = L.marker([63.1, 21.1], { icon: geofenceIcon, zIndexOffset: 450, interactive: false }).addTo(map);
+
+                    window.tacticalMapAIListener = (e) => {
+                        if (e.detail.phase === 'SUGGEST') {
+                            const el = hostileMarker.getElement();
+                            if (el) {
+                                el.style.filter = 'brightness(1.5) drop-shadow(0 0 10px rgba(255,85,85,0.8))';
+                                setTimeout(() => { el.style.filter = ''; }, 3000);
+                            }
+                        }
+                        if (e.detail.phase === 'PROTECT') {
+                            const innerDiv = document.getElementById('ai-geofence-zone-inner');
+                            if (innerDiv) {
+                                innerDiv.classList.remove('hidden');
+                            }
+                        }
+                    };
+                    window.addEventListener('ai-update', window.tacticalMapAIListener);
+
+                    // ══════════════════════════════════════════
+                    //  GBAD BATTERIES (Ground-Based Air Defense)
+                    // ══════════════════════════════════════════
+                    const gbadSites = [
+                        { name: 'GBAD GOTLAND',  code: 'GB-01', lat: 57.63, lng: 18.30, range: 60000, system: 'RBS 70 NG' },
+                        { name: 'GBAD BLEKINGE', code: 'GB-02', lat: 56.16, lng: 15.60, range: 50000, system: 'RBS 98' },
+                    ];
+
+                    const gbadGroup = L.layerGroup();
+
+                    gbadSites.forEach(site => {
+                        const gbadIcon = L.divIcon({
+                            className: '',
+                            html: `
+                                <div style="position:relative; width:28px; height:28px;" class="gbad-shield">
+                                    <div style="
+                                        position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                                        width:22px; height:22px; border-radius:3px;
+                                        background: rgba(255,100,90,0.15);
+                                        border: 2px solid #ffb4ab;
+                                        display: flex; align-items: center; justify-content: center;
+                                    ">
+                                        <svg width="12" height="14" viewBox="0 0 12 14" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);">
+                                            <path d="M6,1 L11,5 L11,10 C11,12 6,13 6,13 C6,13 1,12 1,10 L1,5 Z" fill="rgba(255,100,90,0.4)" stroke="#ffb4ab" stroke-width="1"/>
+                                        </svg>
+                                    </div>
+                                    <div style="
+                                        position:absolute; bottom:-16px; left:50%; transform: translateX(-50%);
+                                        font-family: 'Inter', monospace;
+                                        font-size: 7px;
+                                        font-weight: 700;
+                                        letter-spacing: 0.08em;
+                                        color: #ffb4ab;
+                                        text-shadow: 0 0 6px rgba(255,180,171,0.5);
+                                        white-space: nowrap;
+                                    ">${site.name}</div>
+                                </div>
+                            `,
+                            iconSize: [28, 28],
+                            iconAnchor: [14, 14]
+                        });
+
+                        const marker = L.marker([site.lat, site.lng], { icon: gbadIcon, zIndexOffset: 600 }).addTo(gbadGroup);
+                        marker.bindPopup(`
+                            <div style="font-family: 'Inter', monospace;">
+                                <div style="color:#ffb4ab; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">${site.name}</div>
+                                <div style="color:#87929b; font-size:9px;">SYSTEM: ${site.system}</div>
+                                <div style="color:#87929b; font-size:9px;">CODE: ${site.code}</div>
+                                <div style="color:#87929b; font-size:9px;">RANGE: ${(site.range / 1000).toFixed(0)} KM</div>
+                                <div style="color:#ffb4ab; font-size:9px; margin-top:4px; font-weight:600;">● LUFTVÄRN: ARMED</div>
+                            </div>
+                        `);
+
+                        // Engagement envelope
+                        L.circle([site.lat, site.lng], {
+                            radius: site.range,
+                            color: 'rgba(255, 180, 171, 0.25)',
+                            weight: 1,
+                            fillColor: 'rgba(255, 100, 90, 0.05)',
+                            fillOpacity: 1,
+                            dashArray: '4 6',
+                            interactive: false
+                        }).addTo(gbadGroup);
+                    });
+
+                    // ══════════════════════════════════════════
+                    //  DRONE STATIONS (UAV)
+                    // ══════════════════════════════════════════
+                    const droneSites = [
+                        { name: 'UAV VISBY',    code: 'UV-01', lat: 57.60, lng: 18.25, range: 80000, type: 'Skeldar V-200' },
+                        { name: 'UAV HALMSTAD', code: 'UV-02', lat: 56.68, lng: 12.86, range: 70000, type: 'GlobalEye UAV' },
+                    ];
+
+                    const droneGroup = L.layerGroup();
+
+                    droneSites.forEach(site => {
+                        const droneIcon = L.divIcon({
+                            className: '',
+                            html: `
+                                <div style="position:relative; width:28px; height:34px;" class="drone-hex">
+                                    <svg width="22" height="20" viewBox="0 0 22 20" style="position:absolute;top:2px;left:3px;">
+                                        <polygon points="11,0 22,6 22,14 11,20 0,14 0,6" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="1.5"/>
+                                    </svg>
+                                    <div style="
+                                        position:absolute; bottom:-2px; left:50%; transform: translateX(-50%);
+                                        font-family: 'Inter', monospace;
+                                        font-size: 7px;
+                                        font-weight: 700;
+                                        letter-spacing: 0.08em;
+                                        color: #f59e0b;
+                                        text-shadow: 0 0 6px rgba(245,158,11,0.5);
+                                        white-space: nowrap;
+                                    ">${site.name}</div>
+                                </div>
+                            `,
+                            iconSize: [28, 34],
+                            iconAnchor: [14, 17]
+                        });
+
+                        const marker = L.marker([site.lat, site.lng], { icon: droneIcon, zIndexOffset: 600 }).addTo(droneGroup);
+                        marker.bindPopup(`
+                            <div style="font-family: 'Inter', monospace;">
+                                <div style="color:#f59e0b; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">${site.name}</div>
+                                <div style="color:#87929b; font-size:9px;">TYPE: ${site.type}</div>
+                                <div style="color:#87929b; font-size:9px;">CODE: ${site.code}</div>
+                                <div style="color:#87929b; font-size:9px;">PATROL RADIUS: ${(site.range / 1000).toFixed(0)} KM</div>
+                                <div style="color:#f59e0b; font-size:9px; margin-top:4px; font-weight:600;">● DRÖNARE: STANDBY</div>
+                            </div>
+                        `);
+
+                        // Patrol radius
+                        L.circle([site.lat, site.lng], {
+                            radius: site.range,
+                            color: 'rgba(245, 158, 11, 0.2)',
+                            weight: 1,
+                            fillColor: 'rgba(245, 158, 11, 0.03)',
+                            fillOpacity: 1,
+                            dashArray: '4 6',
+                            interactive: false
+                        }).addTo(droneGroup);
+                    });
+
+                    // Add GBAD and Drone to default-on layers
+                    gbadGroup.addTo(map);
+                    droneGroup.addTo(map);
+
+                    // ══════════════════════════════════════════
+                    //  EFFECTOR RECOMMENDATION LISTENER
+                    // ══════════════════════════════════════════
+                    if (window._tacticalEffectorListener) {
+                        window.removeEventListener('ai-effector-recommendation', window._tacticalEffectorListener);
+                    }
+                    window._tacticalEffectorListener = (e) => {
+                        const { type } = e.detail;
+                        // Flash the relevant asset layer
+                        if (type === 'GBAD') {
+                            if (!map.hasLayer(gbadGroup)) map.addLayer(gbadGroup);
+                            // Briefly brighten GBAD markers
+                            document.querySelectorAll('.gbad-shield').forEach(el => {
+                                el.style.filter = 'brightness(2) drop-shadow(0 0 15px rgba(255,85,85,0.9))';
+                                setTimeout(() => { el.style.filter = ''; }, 3000);
+                            });
+                        } else if (type === 'DRONE') {
+                            if (!map.hasLayer(droneGroup)) map.addLayer(droneGroup);
+                            document.querySelectorAll('.drone-hex').forEach(el => {
+                                el.style.filter = 'brightness(2) drop-shadow(0 0 15px rgba(245,158,11,0.9))';
+                                setTimeout(() => { el.style.filter = ''; }, 3000);
+                            });
+                        }
+                    };
+                    window.addEventListener('ai-effector-recommendation', window._tacticalEffectorListener);
+
+                    // ══════════════════════════════════════════
+                    //  PREDICTIVE LOGISTICS MAP OVERLAY
+                    // ══════════════════════════════════════════
+                    const predictiveGroup = L.layerGroup().addTo(map);
+
+                    if (window._tacticalPredictiveListener) {
+                        window.removeEventListener('ai-predictive-alert', window._tacticalPredictiveListener);
+                    }
+                    window._tacticalPredictiveListener = (e) => {
+                        const alert = e.detail;
+                        predictiveGroup.clearLayers();
+
+                        // Red pulsing ring on depleted base
+                        const depletedRing = L.circle([alert.depletedLat, alert.depletedLng], {
+                            radius: 80000,
+                            color: '#ff5555',
+                            weight: 2,
+                            fillColor: 'rgba(255, 85, 85, 0.08)',
+                            fillOpacity: 1,
+                            dashArray: '6 4',
+                            className: 'animate-pulse',
+                            interactive: false
+                        }).addTo(predictiveGroup);
+
+                        // Depleted base warning label
+                        const warningIcon = L.divIcon({
+                            className: '',
+                            html: `<div style="
+                                font-family: 'Inter', monospace;
+                                font-size: 8px;
+                                font-weight: 700;
+                                color: #ff5555;
+                                text-shadow: 0 0 8px rgba(255,85,85,0.5);
+                                white-space: nowrap;
+                                background: rgba(10,14,20,0.8);
+                                border: 1px solid rgba(255,85,85,0.4);
+                                padding: 2px 6px;
+                                pointer-events: none;
+                            ">⚠ READINESS: ${alert.depletedReadiness}%</div>`,
+                            iconSize: [120, 18],
+                            iconAnchor: [60, -20]
+                        });
+                        L.marker([alert.depletedLat, alert.depletedLng], { icon: warningIcon, interactive: false, zIndexOffset: 1100 }).addTo(predictiveGroup);
+
+                        // Expose function to draw transfer lines after approval
+                        window.executeTacticalTransfer = function() {
+                            const transferLine = L.polyline(
+                                [[alert.donorLat, alert.donorLng], [alert.depletedLat, alert.depletedLng]],
+                                {
+                                    color: '#82cfff',
+                                    weight: 2.5,
+                                    dashArray: '8 8',
+                                    opacity: 0.8,
+                                    interactive: false
+                                }
+                            ).addTo(predictiveGroup);
+
+                            const midLat = (alert.donorLat + alert.depletedLat) / 2;
+                            const midLng = (alert.donorLng + alert.depletedLng) / 2;
+
+                            const transferLabelIcon = L.divIcon({
+                                className: '',
+                                html: `<div style="
+                                    font-family: 'Inter', monospace;
+                                    font-size: 9px;
+                                    font-weight: 700;
+                                    letter-spacing: 0.06em;
+                                    color: #82cfff;
+                                    text-shadow: 0 0 10px rgba(130,207,255,0.7), 0 1px 3px rgba(0,0,0,0.8);
+                                    white-space: nowrap;
+                                    background: rgba(10,14,20,0.85);
+                                    border: 1px solid rgba(130,207,255,0.4);
+                                    padding: 3px 8px;
+                                    pointer-events: none;
+                                    text-align: center;
+                                ">
+                                    <span style="color:#f59e0b;">⚠</span> TRANSFER: ${alert.suggestedTransfer}× JAS 39<br/>
+                                    <span style="font-size:7px;color:#87929b;">${alert.donorBase} → ${alert.depletedBase}</span>
+                                </div>`,
+                                iconSize: [180, 30],
+                                iconAnchor: [90, 15]
+                            });
+                            L.marker([midLat, midLng], { icon: transferLabelIcon, interactive: false, zIndexOffset: 1100 }).addTo(predictiveGroup);
+                        };
+
+                        // Also show the on-screen alert card
+                        const existing = document.getElementById('predictive-alert-card');
+                        if (existing) existing.remove();
+
+                        const isCritical = alert.severity === 'CRITICAL';
+                        const borderColor = isCritical ? 'border-error' : 'border-amber-500';
+                        const bgColor = isCritical ? 'bg-red-950/90' : 'bg-amber-950/90';
+                        const textColor = isCritical ? 'text-error' : 'text-amber-400';
+                        const pulseClass = isCritical ? 'animate-pulse' : '';
+
+                        const card = document.createElement('div');
+                        card.id = 'predictive-alert-card';
+                        card.className = `fixed bottom-6 left-1/2 -translate-x-1/2 w-[600px] max-w-[90vw] ${bgColor} border-2 ${borderColor} shadow-[0_0_30px_rgba(255,100,80,0.3)] z-[1000] backdrop-blur-sm`;
+                        card.style.animation = 'slideInUp 0.5s ease-out';
+                        card.innerHTML = `
+                            <style>
+                                @keyframes slideInUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+                            </style>
+                            <div class="flex items-center gap-2 px-4 py-2 border-b ${borderColor}/50 bg-black/30">
+                                <span class="material-symbols-outlined ${textColor} text-[18px] ${pulseClass}">warning</span>
+                                <span class="font-label-caps text-label-caps ${textColor} font-bold tracking-widest">STRATEGIC ALERT // PREDICTIVE LOGISTICS</span>
+                                <span class="ml-auto font-data-mono text-[9px] text-outline">${alert.severity}</span>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <p class="font-data-mono text-[12px] text-on-surface leading-relaxed">${alert.message}</p>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="bg-black/30 border border-outline-variant/30 p-3">
+                                        <div class="font-label-caps text-[8px] text-outline tracking-widest mb-1">DEPLETED BASE</div>
+                                        <div class="font-data-mono text-[12px] ${textColor} font-bold">${alert.depletedBase}</div>
+                                        <div class="font-data-mono text-[10px] text-outline">Readiness: ${alert.depletedReadiness}%</div>
+                                    </div>
+                                    <div class="bg-black/30 border border-outline-variant/30 p-3">
+                                        <div class="font-label-caps text-[8px] text-outline tracking-widest mb-1">DONOR BASE</div>
+                                        <div class="font-data-mono text-[12px] text-primary font-bold">${alert.donorBase}</div>
+                                        <div class="font-data-mono text-[10px] text-outline">Readiness: ${alert.donorReadiness}%</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 bg-black/20 border border-outline-variant/20 px-3 py-2">
+                                    <span class="material-symbols-outlined text-primary text-[16px]">swap_horiz</span>
+                                    <span class="font-data-mono text-[11px] text-on-surface">Transfer <span class="text-primary font-bold">${alert.suggestedTransfer}× JAS 39</span> from ${alert.donorBase} → ${alert.depletedBase}</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 p-3 border-t ${borderColor}/30 bg-black/20">
+                                <button onclick="this.closest('#predictive-alert-card').remove(); if(typeof SharedComponents !== 'undefined') SharedComponents.showToast('TRANSFER APPROVED', 'Asset repositioning initiated', 'check_circle', 'success'); if(window.executeTacticalTransfer) window.executeTacticalTransfer();"
+                                    class="flex-1 py-2.5 bg-sky-950 border border-sky-500 text-sky-400 font-label-caps text-label-caps flex items-center justify-center gap-2 hover:bg-sky-900 active:scale-95 transition-all">
+                                    <span class="material-symbols-outlined text-[14px]">check</span>
+                                    APPROVE TRANSFER
+                                </button>
+                                <button onclick="this.closest('#predictive-alert-card').remove();"
+                                    class="px-6 py-2.5 bg-surface border border-outline text-outline font-label-caps text-label-caps hover:bg-surface-bright transition-colors">
+                                    DISMISS
+                                </button>
+                            </div>
+                        `;
+                        document.body.appendChild(card);
+                    };
+                    window.addEventListener('ai-predictive-alert', window._tacticalPredictiveListener);
+                    
+                    setTimeout(() => {
+                        if (window.tacticalMapInstance) {
+                            window.tacticalMapInstance.invalidateSize();
+                        }
+                    }, 250);
+                });
+            })();
+            </script>
         </main>
     </div>
 
     <script src="./ai-system.js"></script>
     <script src="./shared-components.js"></script>
-    <script>
-        // AI Integration for Map
-        window.addEventListener('ai-update', (e) => {
-            if (e.detail.phase === 'SUGGEST') {
-                const vector = document.getElementById('ai-intercept-vector');
-                if (vector) {
-                    vector.classList.remove('hidden');
-                    vector.classList.add('animate-pulse');
-                }
-            }
-            if (e.detail.phase === 'PROTECT') {
-                const geofence = document.getElementById('ai-geofence-zone');
-                if (geofence) {
-                    geofence.classList.remove('hidden');
-                }
-            }
-        });
-
-        function triggerAIScan() {
-            AISystem.scan({
-                speed: 1150,
-                distance: 42,
-                iff: false
-            });
-        }
-    </script>
 </body>
 
 </html>
