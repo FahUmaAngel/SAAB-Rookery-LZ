@@ -20,6 +20,10 @@ const SharedComponents = {
             flex-shrink: 0;
             height: 100%;
         }
+        #main-wrapper > main {
+            flex: 1 1 0%;
+            min-width: 0;
+        }
         aside {
             width: var(--sidebar-width);
         }
