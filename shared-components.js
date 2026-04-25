@@ -14,6 +14,11 @@ const SharedComponents = {
         #main-wrapper {
             padding-left: var(--sidebar-width);
             width: 100%;
+            display: flex;
+        }
+        #subsidebar-placeholder {
+            flex-shrink: 0;
+            height: 100%;
         }
         aside {
             width: var(--sidebar-width);
@@ -150,6 +155,40 @@ const SharedComponents = {
         `;
     },
 
+    subSidebars: {
+        strategicOps: {
+            pages: ['logistics.html', 'supply-chain.html', 'maintenance.html', 'personnel.html'],
+            title: 'STRATEGIC OPS',
+            subtitle: 'V-22 OSPREY WING',
+            width: '220px',
+            items: [
+                { label: 'Dashboard',    icon: 'dashboard', href: './logistics.html' },
+                { label: 'Supply Chain', icon: 'package_2', href: './supply-chain.html' },
+                { label: 'Maintenance',  icon: 'build',     href: './maintenance.html' },
+                { label: 'Personnel',    icon: 'groups',    href: './personnel.html' },
+            ],
+            bottomButton: (filename) => {
+                if (filename === 'personnel.html')   return 'DEPLOY PERSONNEL';
+                if (filename === 'maintenance.html') return 'NEW WORK ORDER';
+                return 'INITIATE RESUPPLY';
+            },
+            footerLinks: true,
+        },
+        logsIntel: {
+            pages: ['mission_logs.html', 'asset-tracking.html', 'intel-brief.html'],
+            title: 'LOGS & INTEL',
+            subtitle: 'HISTORICAL ANALYSIS',
+            width: '180px',
+            items: [
+                { label: 'Mission Logs',   icon: 'history_edu',  href: './mission_logs.html' },
+                { label: 'Asset Tracking', icon: 'navigation',   href: './asset-tracking.html' },
+                { label: 'Intel Brief',    icon: 'description',  href: './intel-brief.html' },
+            ],
+            bottomButton: null,
+            footerLinks: false,
+        },
+    },
+
     initHeader: (_currentPage) => {
         const headerPlaceholder = document.getElementById('header-placeholder');
         if (headerPlaceholder) {
@@ -162,6 +201,76 @@ const SharedComponents = {
         if (sidebarPlaceholder) {
             sidebarPlaceholder.innerHTML = SharedComponents.sidebar(currentPage);
         }
+    },
+
+    initSubSidebar: (currentPage) => {
+        // Auto-create placeholder if the page doesn't have one in its HTML
+        let placeholder = document.getElementById('subsidebar-placeholder');
+        if (!placeholder) {
+            placeholder = document.createElement('div');
+            placeholder.id = 'subsidebar-placeholder';
+            const mainWrapper = document.getElementById('main-wrapper');
+            const mainEl = mainWrapper?.querySelector(':scope > main');
+            if (mainEl) {
+                mainWrapper.insertBefore(placeholder, mainEl);
+            } else if (mainWrapper) {
+                mainWrapper.appendChild(placeholder);
+            } else {
+                return;
+            }
+        }
+
+        const filename = currentPage.split('/').pop().split('?')[0] || currentPage;
+        const group = Object.values(SharedComponents.subSidebars).find(g =>
+            g.pages.some(p => filename === p)
+        );
+
+        if (!group) {
+            placeholder.innerHTML = '';
+            return;
+        }
+
+        const itemsHtml = group.items.map(item => {
+            const isActive = filename === item.href.replace('./', '');
+            const cls = isActive
+                ? 'bg-slate-900 text-sky-400 border-l-4 border-sky-500'
+                : 'text-slate-500 border-l-4 border-transparent hover:bg-slate-900 hover:text-slate-200 transition-all';
+            const fill = isActive ? " style=\"font-variation-settings:'FILL' 1;\"" : '';
+            return `<a class="px-4 py-3 flex items-center gap-3 ${cls}" href="${item.href}">
+                <span class="material-symbols-outlined text-lg"${fill}>${item.icon}</span>
+                ${item.label}
+            </a>`;
+        }).join('');
+
+        const bottomHtml = group.bottomButton ? `
+            <div class="px-4 mt-auto mb-4 shrink-0">
+                <button class="w-full bg-sky-900/20 text-sky-400 border border-sky-800/50 py-2 text-[10px] uppercase font-bold tracking-widest hover:bg-sky-800/40 transition-colors font-['Space_Grotesk']">
+                    ${group.bottomButton(filename)}
+                </button>
+            </div>` : '';
+
+        const footerHtml = group.footerLinks ? `
+            <div class="flex flex-col gap-1 font-['Space_Grotesk'] uppercase text-[11px] font-semibold tracking-wider mt-4 border-t border-slate-800 pt-4 shrink-0">
+                <a class="text-slate-500 px-4 py-2 flex items-center gap-3 border-l-4 border-transparent hover:text-slate-300 transition-all" href="#">
+                    <span class="material-symbols-outlined text-base">terminal</span>Diagnostics
+                </a>
+                <a class="text-slate-500 px-4 py-2 flex items-center gap-3 border-l-4 border-transparent hover:text-slate-300 transition-all" href="#">
+                    <span class="material-symbols-outlined text-base">help_center</span>Help
+                </a>
+            </div>` : '';
+
+        placeholder.innerHTML = `
+            <aside class="bg-slate-950/80 border-r border-slate-800 flex flex-col py-4 h-full backdrop-blur-md overflow-y-auto custom-scrollbar hidden md:flex" style="width:${group.width};flex-shrink:0">
+                <div class="px-4 mb-6 shrink-0">
+                    <h2 class="text-sky-500 font-bold font-['Space_Grotesk'] uppercase text-xs tracking-widest">${group.title}</h2>
+                    <div class="text-slate-400 text-[10px] uppercase font-semibold tracking-wider mt-1">${group.subtitle}</div>
+                </div>
+                <div class="flex-1 flex flex-col gap-1 font-['Space_Grotesk'] uppercase text-[11px] font-semibold tracking-wider">
+                    ${itemsHtml}
+                </div>
+                ${bottomHtml}
+                ${footerHtml}
+            </aside>`;
     },
 
     initZuluClock: () => {
@@ -283,8 +392,9 @@ const SharedComponents = {
                 // Notify page modules that SPA navigation completed
                 dispatchEvent(new CustomEvent('spa-navigated', { detail: { url } }));
 
-                // Update active state in sidebar
+                // Update active states in sidebar and sub-sidebar
                 SharedComponents.initSidebar(url);
+                SharedComponents.initSubSidebar(url);
             }
         } catch (err) {
             console.error('Failed to load content:', err);
@@ -357,6 +467,7 @@ const SharedComponents = {
 
         SharedComponents.initHeader(currentPage);
         SharedComponents.initSidebar(currentPage);
+        SharedComponents.initSubSidebar(currentPage);
         SharedComponents.initZuluClock();
         SharedComponents.initAIUpdates();
     },

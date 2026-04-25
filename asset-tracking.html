@@ -12,29 +12,7 @@
 <div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
 <div id="sidebar-placeholder"></div>
 
-<main class="h-full flex flex-1 w-full overflow-hidden hex-bg">
-    <!-- Subsidebar for Logs & Intel -->
-    <aside class="bg-slate-950/80 w-[180px] border-r border-slate-800 flex flex-col py-4 hidden md:flex shrink-0 h-full backdrop-blur-md">
-        <div class="px-4 mb-6">
-            <h2 class="text-sky-500 font-bold font-['Space_Grotesk'] uppercase text-xs tracking-widest">LOGS & INTEL</h2>
-            <div class="text-slate-400 text-[10px] uppercase font-semibold tracking-wider mt-1">HISTORICAL ANALYSIS</div>
-        </div>
-        <div class="flex-1 flex flex-col gap-1 font-['Space_Grotesk'] uppercase text-[11px] font-semibold tracking-wider">
-            <a class="text-slate-400 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-800 hover:text-white transition-all" href="./mission_logs.html">
-                <span class="material-symbols-outlined text-lg" data-icon="history_edu">history_edu</span>
-                Mission Logs
-            </a>
-            <a class="bg-slate-900 text-sky-300 border-l-4 border-sky-500 px-4 py-3 flex items-center gap-3" href="./asset-tracking.html">
-                <span class="material-symbols-outlined text-lg" data-icon="navigation">navigation</span>
-                Asset Tracking
-            </a>
-            <a class="text-slate-400 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-800 hover:text-white transition-all" href="./intel-brief.html" onclick="SharedComponents.handleNav(event, './intel-brief.html')">
-                <span class="material-symbols-outlined text-lg" data-icon="description">description</span>
-                Intel Brief
-            </a>
-        </div>
-    </aside>
-
+<main class="h-full flex flex-1 overflow-hidden hex-bg">
     <!-- Main Content Canvas -->
     <div class="flex-1 p-gutter overflow-y-auto h-full scrollbar-hide w-full">
         <div class="max-w-[1700px] mx-auto flex flex-col gap-gutter pb-margin">
