@@ -309,7 +309,7 @@ const SharedComponents = {
     },
 
     loadContent: async (url) => {
-        // Validate URL is a same-origin relative path to prevent open redirect / XSS
+        // Validate URL
         const allowedPaths = [
             'map-view.html', 'tactical-map.html', 'logistics.html',
             'Asset-ready.html', 'Sensor-Fusion.html', 'sensor_map.html',
@@ -336,44 +336,45 @@ const SharedComponents = {
             const currentMain = document.querySelector('main');
 
             if (newMain && currentMain) {
-                // Fade out current content to prevent flicker
+                // Fade out current content
                 currentMain.classList.add('spa-loading');
                 await new Promise(r => setTimeout(r, 150));
 
-                // Use safe DOM adoption instead of innerHTML to prevent XSS
+                // Swap content
                 currentMain.className = newMain.className;
                 currentMain.replaceChildren(
                     ...Array.from(newMain.childNodes).map(node => document.adoptNode(node))
                 );
 
-                // Re-execute any inline scripts inside the new <main>
-                currentMain.querySelectorAll('script').forEach(oldScript => {
-                    const newScript = document.createElement('script');
-                    Array.from(oldScript.attributes).forEach(attr =>
-                        newScript.setAttribute(attr.name, attr.value)
-                    );
-                    newScript.textContent = oldScript.textContent;
-                    oldScript.replaceWith(newScript);
-                });
-
-                // Execute page-level scripts declared after </main> in fetched pages.
-                // Many pages keep their page controller scripts at the end of <body>,
-                // so navigating via the shared sidebar would otherwise swap markup
-                // without re-running the page logic.
-                const bodyScripts = Array.from(doc.body.querySelectorAll('script'));
-                for (const sourceScript of bodyScripts) {
+                // Collect all scripts from the fetched document to re-execute them.
+                // We exclude scripts already in the initial document's <head> to avoid re-loading libraries like Tailwind or shared-components itself.
+                const scriptsToRun = Array.from(doc.querySelectorAll('script'));
+                
+                for (const sourceScript of scriptsToRun) {
                     const src = sourceScript.getAttribute('src');
+                    
                     if (src) {
+                        // Skip core shared scripts that should only run once
+                        if (src.includes('shared-components.js') || src.includes('tailwind.config.js')) continue;
+
                         const resolvedSrc = new URL(src, new URL(url, window.location.href)).href;
                         const alreadyLoaded = Array.from(document.scripts).some(existing => {
                             if (!existing.src) return false;
                             try {
                                 return new URL(existing.src, window.location.href).href === resolvedSrc;
-                            } catch {
-                                return false;
-                            }
+                            } catch { return false; }
                         });
-                        if (alreadyLoaded) continue;
+
+                        // For page-specific JS files (like sensor-data.js or asset-ready.js),
+                        // we might need them to re-init. However, many are designed to run once.
+                        // We'll skip if already loaded to avoid duplicate intervals/listeners,
+                        // but we will manually trigger their start if they have a known init pattern.
+                        if (alreadyLoaded) {
+                            if (src.includes('sensor-data.js') && window.SensorDataEngine) {
+                                window.SensorDataEngine.start();
+                            }
+                            continue;
+                        }
 
                         await new Promise((resolve) => {
                             const scriptEl = document.createElement('script');
@@ -385,25 +386,30 @@ const SharedComponents = {
                             document.body.appendChild(scriptEl);
                         });
                     } else if (sourceScript.textContent.trim()) {
+                        // Inline scripts (often page controllers) MUST re-run every time.
                         const scriptEl = document.createElement('script');
                         scriptEl.textContent = sourceScript.textContent;
                         document.body.appendChild(scriptEl);
-                        scriptEl.remove();
+                        scriptEl.remove(); // Clean up from DOM but it has already executed
                     }
                 }
 
-                // Fade in new content, then remove the loading overlay only after
-                // the transition has started — removing the overlay before the
-                // fade-in begins causes a brief transparent flash (flicker).
+                // Ensure data engine is running if present
+                if (window.SensorDataEngine && !window.SensorDataEngine.state.running) {
+                    window.SensorDataEngine.start();
+                }
+
+                // Fade in new content
                 requestAnimationFrame(() => {
                     currentMain.classList.remove('spa-loading');
                     setTimeout(() => SharedComponents.showLoading(false), 150);
                 });
 
-                // Notify page modules that SPA navigation completed
+                // Notify page modules that SPA navigation completed.
+                // Page scripts should listen to 'spa-navigated' instead of 'DOMContentLoaded'.
                 dispatchEvent(new CustomEvent('spa-navigated', { detail: { url } }));
 
-                // Update active states in sidebar and sub-sidebar
+                // Update active states in sidebar
                 SharedComponents.initSidebar(url);
                 SharedComponents.initSubSidebar(url);
             }
