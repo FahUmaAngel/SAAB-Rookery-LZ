@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>C2 // MAINTENANCE</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="tailwind.config.js"></script>
+    <style>
+        .gantt-bar {
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .gantt-bar:hover {
+            filter: brightness(1.3);
+        }
+        .gantt-bar:hover .gantt-tooltip {
+            opacity: 1;
+            transform: translateY(-4px);
+        }
+        .gantt-tooltip {
+            opacity: 0;
+            transform: translateY(0);
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+        .progress-ring {
+            transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+
+<div id="header-placeholder"></div>
+<div id="main-wrapper" class="mt-12 w-full h-[calc(100vh-48px)]">
+<div id="sidebar-placeholder"></div>
+
+<main class="h-full flex flex-1 w-full overflow-hidden hex-bg">
+    <!-- Subsidebar -->
+    <aside class="bg-slate-950/80 w-[220px] border-r border-slate-800 flex flex-col py-4 hidden md:flex shrink-0 h-full backdrop-blur-md">
+        <div class="px-4 mb-6">
+            <h2 class="text-sky-500 font-bold font-['Space_Grotesk'] uppercase text-xs tracking-widest">STRATEGIC OPS</h2>
+            <div class="text-slate-500 text-[10px] uppercase font-semibold tracking-wider mt-1">V-22 OSPREY WING</div>
+        </div>
+        <div class="flex-1 flex flex-col gap-1 font-['Space_Grotesk'] uppercase text-[11px] font-semibold tracking-wider">
+            <a class="text-slate-500 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-900 hover:text-slate-200 transition-all" href="./logistics.html">
+                <span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+            <a class="text-slate-500 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-900 hover:text-slate-200 transition-all" href="./supply-chain.html">
+                <span class="material-symbols-outlined text-lg" data-icon="package_2">package_2</span>
+                Supply Chain
+            </a>
+            <!-- Active Nav Item -->
+            <a class="bg-slate-900 text-sky-400 border-l-4 border-sky-500 px-4 py-3 flex items-center gap-3" href="#">
+                <span class="material-symbols-outlined text-lg" data-icon="build" style="font-variation-settings: 'FILL' 1;">build</span>
+                Maintenance
+            </a>
+            <a class="text-slate-500 px-4 py-3 flex items-center gap-3 border-l-4 border-transparent hover:bg-slate-900 hover:text-slate-200 transition-all" href="./personnel.html">
+                <span class="material-symbols-outlined text-lg" data-icon="groups">groups</span>
+                Personnel
+            </a>
+        </div>
+        <div class="px-4 mt-auto mb-4">
+            <button class="w-full bg-sky-900/20 text-sky-400 border border-sky-800/50 py-2 text-[10px] uppercase font-bold tracking-widest hover:bg-sky-800/40 transition-colors font-['Space_Grotesk']">
+                NEW WORK ORDER
+            </button>
+        </div>
+        <div class="flex flex-col gap-1 font-['Space_Grotesk'] uppercase text-[11px] font-semibold tracking-wider mt-4 border-t border-slate-800 pt-4">
+            <a class="text-slate-500 px-4 py-2 flex items-center gap-3 border-l-4 border-transparent hover:text-slate-300 transition-all" href="#">
+                <span class="material-symbols-outlined text-base" data-icon="terminal">terminal</span>
+                Diagnostics
+            </a>
+            <a class="text-slate-500 px-4 py-2 flex items-center gap-3 border-l-4 border-transparent hover:text-slate-300 transition-all" href="#">
+                <span class="material-symbols-outlined text-base" data-icon="help_center">help_center</span>
+                Help
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <div class="flex-1 p-gutter overflow-y-auto bg-surface/90 h-full scrollbar-hide">
+        <div class="max-w-[1600px] mx-auto space-y-gutter pb-margin">
+            <!-- Page Header -->
+            <header class="flex justify-between items-end border-b border-outline-variant pb-unit mb-margin pt-4">
+                <div>
+                    <h1 class="font-headline-lg text-headline-lg text-on-surface uppercase tracking-widest">Maintenance Control</h1>
+                    <p class="font-data-mono text-data-mono text-on-surface-variant mt-1">FLEET HEALTH // WORK ORDERS // TIMESTAMP: 2024-10-24T08:45:00Z</p>
+                </div>
+                <div class="flex gap-2">
+                    <span class="font-label-caps text-label-caps text-secondary bg-surface-container-high px-2 py-1 border border-outline-variant rounded-sm flex items-center gap-1 cursor-pointer hover:bg-surface-variant">
+                        <span class="material-symbols-outlined text-[14px]" data-icon="filter_alt">filter_alt</span> FILTER
+                    </span>
+                    <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-1 border border-primary/30 rounded-sm flex items-center gap-1 cursor-pointer hover:bg-primary/20">
+                        <span class="material-symbols-outlined text-[14px]" data-icon="sync">sync</span> REFRESH
+                    </span>
+                </div>
+            </header>
+
+            <!-- KPI Tiles -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+                <!-- Airframes Operational -->
+                <div class="bg-surface-container-low border border-outline-variant p-panel-padding rounded-sm">
+                    <div class="flex justify-between items-center border-b border-outline-variant/50 pb-2 mb-4">
+                        <h3 class="font-label-caps text-label-caps text-on-surface-variant">AIRFRAMES OPERATIONAL</h3>
+                        <span class="material-symbols-outlined text-primary text-sm">flight</span>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <span class="font-headline-lg text-[40px] leading-none text-primary font-bold">47</span>
+                        <span class="font-data-mono text-data-mono text-on-surface-variant mb-1">/ 58 TOTAL</span>
+                    </div>
+                    <div class="w-full bg-surface-dim h-2 mt-4 rounded-full overflow-hidden border border-outline-variant/30">
+                        <div class="bg-primary h-full w-[81%]"></div>
+                    </div>
+                    <div class="flex justify-between mt-2 font-data-mono text-[10px] text-on-surface-variant">
+                        <span>8 IN MAINT · 3 AOG</span>
+                        <span>81% MISSION READY</span>
+                    </div>
+                </div>
+
+                <!-- MTBF -->
+                <div class="bg-surface-container-low border border-outline-variant p-panel-padding rounded-sm">
+                    <div class="flex justify-between items-center border-b border-outline-variant/50 pb-2 mb-4">
+                        <h3 class="font-label-caps text-label-caps text-on-surface-variant">MEAN TIME BETWEEN FAILURES</h3>
+                        <span class="material-symbols-outlined text-secondary text-sm">trending_up</span>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <span class="font-headline-lg text-[40px] leading-none text-secondary font-bold">342</span>
+                        <span class="font-data-mono text-data-mono text-on-surface-variant mb-1">FLIGHT HOURS</span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-4">
+                        <span class="material-symbols-outlined text-primary text-[14px]">arrow_upward</span>
+                        <span class="font-data-mono text-[10px] text-primary">+18 HRS vs. LAST QUARTER</span>
+                    </div>
+                    <div class="font-data-mono text-[10px] text-on-surface-variant mt-1">TARGET: 300 FH (EXCEEDED)</div>
+                </div>
+
+                <!-- Overdue Inspections -->
+                <div class="bg-surface-container-low border border-error/30 p-panel-padding rounded-sm relative">
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-error shadow-[0_0_6px_#ffb4ab]"></div>
+                    <div class="flex justify-between items-center border-b border-outline-variant/50 pb-2 mb-4">
+                        <h3 class="font-label-caps text-label-caps text-error">OVERDUE INSPECTIONS</h3>
+                        <span class="material-symbols-outlined text-error text-sm animate-pulse">warning</span>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <span class="font-headline-lg text-[40px] leading-none text-error font-bold">5</span>
+                        <span class="font-data-mono text-data-mono text-error/80 mb-1">ITEMS OVERDUE</span>
+                    </div>
+                    <div class="mt-4 space-y-1">
+                        <div class="flex justify-between font-data-mono text-[10px]">
+                            <span class="text-error">A/C-391 — Engine HSI</span>
+                            <span class="text-error">3 DAYS OVER</span>
+                        </div>
+                        <div class="flex justify-between font-data-mono text-[10px]">
+                            <span class="text-error">A/C-407 — Landing Gear</span>
+                            <span class="text-error">1 DAY OVER</span>
+                        </div>
+                        <div class="flex justify-between font-data-mono text-[10px]">
+                            <span class="text-tertiary">+3 MINOR INSPECTIONS</span>
+                            <span class="text-tertiary">< 24H</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Work Orders -->
+            <div class="bg-surface-container-low border border-outline-variant flex flex-col rounded-sm">
+                <div class="bg-surface-container p-panel-padding border-b border-outline-variant flex justify-between items-center">
+                    <h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[14px] text-primary">assignment</span>
+                        ACTIVE WORK ORDERS
+                    </h3>
+                    <div class="flex items-center gap-2">
+                        <span class="font-data-mono text-[10px] text-tertiary">3 HIGH PRIORITY</span>
+                        <span class="font-data-mono text-[10px] text-on-surface-variant">· 8 TOTAL</span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-surface-dim font-label-caps text-label-caps text-on-surface-variant">
+                                <th class="p-3 border-b border-outline-variant/50 font-normal">WO #</th>
+                                <th class="p-3 border-b border-outline-variant/50 font-normal">ASSET</th>
+                                <th class="p-3 border-b border-outline-variant/50 font-normal">PROCEDURE</th>
+                                <th class="p-3 border-b border-outline-variant/50 font-normal">CREW</th>
+                                <th class="p-3 border-b border-outline-variant/50 font-normal">PROGRESS</th>
+                                <th class="p-3 border-b border-outline-variant/50 font-normal">PRIORITY</th>
+                                <th class="p-3 border-b border-outline-variant/50 font-normal">ETC</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-data-mono text-data-mono text-on-surface">
+                            <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors bg-error/5 border-l-2 border-l-error">
+                                <td class="p-3 text-error font-bold">WO-4891</td>
+                                <td class="p-3 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[16px] text-error">flight</span> A/C-391
+                                </td>
+                                <td class="p-3">Engine Hot Section Inspection</td>
+                                <td class="p-3 text-on-surface-variant">TEAM DELTA-1</td>
+                                <td class="p-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-20 bg-surface-dim h-1.5 rounded-full overflow-hidden"><div class="bg-error h-full w-[35%]"></div></div>
+                                        <span class="text-error text-[10px]">35%</span>
+                                    </div>
+                                </td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-error/10 text-error border border-error/20 text-[10px]">CRITICAL</span></td>
+                                <td class="p-3 text-error">36H</td>
+                            </tr>
+                            <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                <td class="p-3 text-primary font-bold">WO-4894</td>
+                                <td class="p-3 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[16px] text-secondary">flight</span> A/C-394
+                                </td>
+                                <td class="p-3">Radar Array Calibration</td>
+                                <td class="p-3 text-on-surface-variant">TEAM ECHO-2</td>
+                                <td class="p-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-20 bg-surface-dim h-1.5 rounded-full overflow-hidden"><div class="bg-tertiary h-full w-[72%]"></div></div>
+                                        <span class="text-tertiary text-[10px]">72%</span>
+                                    </div>
+                                </td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-tertiary/10 text-tertiary border border-tertiary/20 text-[10px]">HIGH</span></td>
+                                <td class="p-3 text-on-surface-variant">4H</td>
+                            </tr>
+                            <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                <td class="p-3 text-primary font-bold">WO-4897</td>
+                                <td class="p-3 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[16px] text-secondary">flight</span> A/C-402
+                                </td>
+                                <td class="p-3">500H Scheduled Check</td>
+                                <td class="p-3 text-on-surface-variant">TEAM DELTA-2</td>
+                                <td class="p-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-20 bg-surface-dim h-1.5 rounded-full overflow-hidden"><div class="bg-primary h-full w-[90%]"></div></div>
+                                        <span class="text-primary text-[10px]">90%</span>
+                                    </div>
+                                </td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-surface-dim text-on-surface-variant border border-outline-variant text-[10px]">ROUTINE</span></td>
+                                <td class="p-3 text-on-surface-variant">2H</td>
+                            </tr>
+                            <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                <td class="p-3 text-primary font-bold">WO-4899</td>
+                                <td class="p-3 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[16px] text-secondary">helicopter</span> V-22 #03
+                                </td>
+                                <td class="p-3">Tilt-Rotor Gearbox Service</td>
+                                <td class="p-3 text-on-surface-variant">TEAM FOXTROT</td>
+                                <td class="p-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-20 bg-surface-dim h-1.5 rounded-full overflow-hidden"><div class="bg-tertiary h-full w-[50%]"></div></div>
+                                        <span class="text-tertiary text-[10px]">50%</span>
+                                    </div>
+                                </td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-tertiary/10 text-tertiary border border-tertiary/20 text-[10px]">HIGH</span></td>
+                                <td class="p-3 text-on-surface-variant">18H</td>
+                            </tr>
+                            <tr class="hover:bg-surface-container-high transition-colors">
+                                <td class="p-3 text-primary font-bold">WO-4901</td>
+                                <td class="p-3 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[16px] text-secondary">flight</span> A/C-410
+                                </td>
+                                <td class="p-3">Avionics Software Update</td>
+                                <td class="p-3 text-on-surface-variant">TEAM ECHO-1</td>
+                                <td class="p-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-20 bg-surface-dim h-1.5 rounded-full overflow-hidden"><div class="bg-primary h-full w-[15%]"></div></div>
+                                        <span class="text-on-surface-variant text-[10px]">15%</span>
+                                    </div>
+                                </td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-surface-dim text-on-surface-variant border border-outline-variant text-[10px]">ROUTINE</span></td>
+                                <td class="p-3 text-on-surface-variant">8H</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Maintenance Schedule (14-Day Gantt) -->
+            <div class="bg-surface-container-low border border-outline-variant rounded-sm">
+                <div class="bg-surface-container p-panel-padding border-b border-outline-variant flex justify-between items-center">
+                    <h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[14px] text-primary">calendar_month</span>
+                        MAINTENANCE SCHEDULE — 14 DAY OUTLOOK
+                    </h3>
+                    <div class="flex items-center gap-3 font-data-mono text-[9px]">
+                        <span class="flex items-center gap-1"><span class="w-3 h-2 bg-error/60 inline-block"></span> AOG</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-2 bg-tertiary/60 inline-block"></span> ACTIVE</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-2 bg-primary/40 inline-block"></span> SCHEDULED</span>
+                    </div>
+                </div>
+                <div class="p-panel-padding">
+                    <!-- Day Headers -->
+                    <div class="flex items-center mb-2 ml-[120px]">
+                        <div class="flex-1 grid grid-cols-7 font-data-mono text-[9px] text-on-surface-variant">
+                            <span>OCT 24</span>
+                            <span>OCT 26</span>
+                            <span>OCT 28</span>
+                            <span>OCT 30</span>
+                            <span>NOV 01</span>
+                            <span>NOV 03</span>
+                            <span>NOV 05</span>
+                        </div>
+                    </div>
+
+                    <!-- Aircraft Rows -->
+                    <div class="space-y-2">
+                        <!-- A/C-391 -->
+                        <div class="flex items-center">
+                            <div class="w-[120px] shrink-0 pr-3">
+                                <span class="font-data-mono text-data-mono text-error font-bold">A/C-391</span>
+                            </div>
+                            <div class="flex-1 h-5 bg-surface-dim border border-outline-variant/30 relative rounded-sm overflow-hidden">
+                                <div class="gantt-bar absolute h-full bg-error/60 left-[0%] w-[28%] flex items-center pl-1">
+                                    <span class="text-[8px] text-error font-bold">ENGINE HSI</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- A/C-394 -->
+                        <div class="flex items-center">
+                            <div class="w-[120px] shrink-0 pr-3">
+                                <span class="font-data-mono text-data-mono text-on-surface font-bold">A/C-394</span>
+                            </div>
+                            <div class="flex-1 h-5 bg-surface-dim border border-outline-variant/30 relative rounded-sm overflow-hidden">
+                                <div class="gantt-bar absolute h-full bg-tertiary/60 left-[0%] w-[7%] flex items-center justify-center">
+                                    <span class="text-[8px] text-tertiary font-bold">RAD</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- A/C-402 -->
+                        <div class="flex items-center">
+                            <div class="w-[120px] shrink-0 pr-3">
+                                <span class="font-data-mono text-data-mono text-on-surface font-bold">A/C-402</span>
+                            </div>
+                            <div class="flex-1 h-5 bg-surface-dim border border-outline-variant/30 relative rounded-sm overflow-hidden">
+                                <div class="gantt-bar absolute h-full bg-tertiary/60 left-[0%] w-[5%]"></div>
+                            </div>
+                        </div>
+                        <!-- V-22 #03 -->
+                        <div class="flex items-center">
+                            <div class="w-[120px] shrink-0 pr-3">
+                                <span class="font-data-mono text-data-mono text-on-surface font-bold">V-22 #03</span>
+                            </div>
+                            <div class="flex-1 h-5 bg-surface-dim border border-outline-variant/30 relative rounded-sm overflow-hidden">
+                                <div class="gantt-bar absolute h-full bg-tertiary/60 left-[0%] w-[14%] flex items-center pl-1">
+                                    <span class="text-[8px] text-tertiary font-bold">GEARBOX</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- A/C-410 -->
+                        <div class="flex items-center">
+                            <div class="w-[120px] shrink-0 pr-3">
+                                <span class="font-data-mono text-data-mono text-on-surface font-bold">A/C-410</span>
+                            </div>
+                            <div class="flex-1 h-5 bg-surface-dim border border-outline-variant/30 relative rounded-sm overflow-hidden">
+                                <div class="gantt-bar absolute h-full bg-tertiary/60 left-[0%] w-[10%]"></div>
+                            </div>
+                        </div>
+                        <!-- A/C-415 (Scheduled) -->
+                        <div class="flex items-center">
+                            <div class="w-[120px] shrink-0 pr-3">
+                                <span class="font-data-mono text-data-mono text-on-surface-variant font-bold">A/C-415</span>
+                            </div>
+                            <div class="flex-1 h-5 bg-surface-dim border border-outline-variant/30 relative rounded-sm overflow-hidden">
+                                <div class="gantt-bar absolute h-full bg-primary/40 border border-primary/20 left-[35%] w-[14%] flex items-center pl-1">
+                                    <span class="text-[8px] text-primary/80 font-bold">200H CHK</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- A/C-420 (Scheduled) -->
+                        <div class="flex items-center">
+                            <div class="w-[120px] shrink-0 pr-3">
+                                <span class="font-data-mono text-data-mono text-on-surface-variant font-bold">A/C-420</span>
+                            </div>
+                            <div class="flex-1 h-5 bg-surface-dim border border-outline-variant/30 relative rounded-sm overflow-hidden">
+                                <div class="gantt-bar absolute h-full bg-primary/40 border border-primary/20 left-[57%] w-[21%] flex items-center pl-1">
+                                    <span class="text-[8px] text-primary/80 font-bold">PHASE INSP</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parts Requisition Queue -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+                <div class="lg:col-span-2 bg-surface-container-low border border-outline-variant flex flex-col rounded-sm">
+                    <div class="bg-surface-container p-panel-padding border-b border-outline-variant flex justify-between items-center">
+                        <h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[14px] text-tertiary">inventory</span>
+                            PARTS REQUISITION QUEUE — BLOCKING WORK ORDERS
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-surface-dim font-label-caps text-label-caps text-on-surface-variant">
+                                    <th class="p-3 border-b border-outline-variant/50 font-normal">PART #</th>
+                                    <th class="p-3 border-b border-outline-variant/50 font-normal">DESCRIPTION</th>
+                                    <th class="p-3 border-b border-outline-variant/50 font-normal">BLOCKS WO</th>
+                                    <th class="p-3 border-b border-outline-variant/50 font-normal">SOURCE</th>
+                                    <th class="p-3 border-b border-outline-variant/50 font-normal">STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody class="font-data-mono text-data-mono text-on-surface">
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors bg-error/5 border-l-2 border-l-error">
+                                    <td class="p-3 text-error font-bold">884-AX</td>
+                                    <td class="p-3">Rotor Hub Assembly</td>
+                                    <td class="p-3 text-error">WO-4891 (A/C-391)</td>
+                                    <td class="p-3 text-on-surface-variant">SAAB DYNAMICS</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-error/10 text-error border border-error/20 text-[10px]">DELAYED</span></td>
+                                </tr>
+                                <tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                                    <td class="p-3 text-primary font-bold">EJ2-TB-04</td>
+                                    <td class="p-3">EJ200 Turbine Blade Set</td>
+                                    <td class="p-3 text-tertiary">WO-4899 (V-22 #03)</td>
+                                    <td class="p-3 text-on-surface-variant">BAE SYSTEMS</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-tertiary/10 text-tertiary border border-tertiary/20 text-[10px]">IN TRANSIT</span></td>
+                                </tr>
+                                <tr class="hover:bg-surface-container-high transition-colors">
+                                    <td class="p-3 text-primary font-bold">AV-SW-2.4</td>
+                                    <td class="p-3">Avionics Suite v2.4 Media</td>
+                                    <td class="p-3 text-on-surface-variant">WO-4901 (A/C-410)</td>
+                                    <td class="p-3 text-on-surface-variant">SAAB AERO</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 text-[10px]">RECEIVED</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Crew Utilization -->
+                <div class="bg-surface-container-low border border-outline-variant flex flex-col rounded-sm">
+                    <div class="bg-surface-container p-panel-padding border-b border-outline-variant">
+                        <h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[14px] text-primary">engineering</span>
+                            MAINTENANCE CREW STATUS
+                        </h3>
+                    </div>
+                    <div class="p-panel-padding space-y-3 flex-1">
+                        <div class="flex justify-between items-center">
+                            <span class="font-data-mono text-[10px] text-on-surface-variant flex items-center gap-1.5">
+                                <span class="w-2 h-2 bg-primary rounded-full"></span> TEAM DELTA-1
+                            </span>
+                            <span class="font-data-mono text-[10px] text-error">ON WO-4891</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-data-mono text-[10px] text-on-surface-variant flex items-center gap-1.5">
+                                <span class="w-2 h-2 bg-primary rounded-full"></span> TEAM DELTA-2
+                            </span>
+                            <span class="font-data-mono text-[10px] text-tertiary">ON WO-4897</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-data-mono text-[10px] text-on-surface-variant flex items-center gap-1.5">
+                                <span class="w-2 h-2 bg-primary rounded-full"></span> TEAM ECHO-1
+                            </span>
+                            <span class="font-data-mono text-[10px] text-on-surface-variant">ON WO-4901</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-data-mono text-[10px] text-on-surface-variant flex items-center gap-1.5">
+                                <span class="w-2 h-2 bg-primary rounded-full"></span> TEAM ECHO-2
+                            </span>
+                            <span class="font-data-mono text-[10px] text-tertiary">ON WO-4894</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-data-mono text-[10px] text-on-surface-variant flex items-center gap-1.5">
+                                <span class="w-2 h-2 bg-primary rounded-full"></span> TEAM FOXTROT
+                            </span>
+                            <span class="font-data-mono text-[10px] text-tertiary">ON WO-4899</span>
+                        </div>
+                        <div class="border-t border-outline-variant/30 pt-3 flex justify-between items-center">
+                            <span class="font-data-mono text-[10px] text-on-surface-variant flex items-center gap-1.5">
+                                <span class="w-2 h-2 bg-outline-variant rounded-full"></span> TEAM GOLF
+                            </span>
+                            <span class="font-data-mono text-[10px] text-primary">AVAILABLE</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-data-mono text-[10px] text-on-surface-variant flex items-center gap-1.5">
+                                <span class="w-2 h-2 bg-outline-variant rounded-full"></span> TEAM HOTEL
+                            </span>
+                            <span class="font-data-mono text-[10px] text-on-surface-variant">REST CYCLE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</div>
+
+<script src="./shared-components.js"></script>
+</body>
+</html>
