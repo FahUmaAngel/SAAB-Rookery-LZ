@@ -75,17 +75,71 @@ const AISystem = {
     },
 
     /**
-     * Phase 3: SUGGEST - Generate recommendations
+     * Effector Classification — determines optimal countermeasure type
+     * based on threat speed, distance, and IFF profile.
+     */
+    classifyEffector: (data) => {
+        // data: { speed (kts), distance (km), iff (bool) }
+        if (data.speed <= 500) {
+            return {
+                type: 'DRONE',
+                label: 'Drönare (Reconnaissance Drone)',
+                icon: 'flight_class',
+                reason: 'Low-speed / recon profile — deploy drone for intercept & identification.',
+                color: 'amber'
+            };
+        }
+        if (data.speed > 500 && data.distance < 80) {
+            return {
+                type: 'GBAD',
+                label: 'Luftvärn (Ground-Based Air Defense)',
+                icon: 'rocket_launch',
+                reason: 'High-speed target close to high-value assets — activate GBAD system.',
+                color: 'error'
+            };
+        }
+        return {
+            type: 'INTERCEPTOR',
+            label: 'Gripen Interceptor',
+            icon: 'flight_takeoff',
+            reason: 'Distant / unknown threat — scramble fighter interceptor.',
+            color: 'primary'
+        };
+    },
+
+    /**
+     * Phase 3: SUGGEST - Generate recommendations with effector classification
      */
     suggest: async (data) => {
         AISystem.state.currentPhase = 'SUGGEST';
         AISystem.log('SUGGEST', "AI Generating tactical suggestions...");
-        
+
+        // Classify the optimal effector type
+        const effector = AISystem.classifyEffector(data);
+        AISystem.state.lastEffector = effector;
+        AISystem.log('SUGGEST', `[EFFECTOR] Classified: ${effector.label} — ${effector.reason}`);
+
+        // Dispatch effector recommendation event for UI
+        dispatchEvent(new CustomEvent('ai-effector-recommendation', { detail: effector }));
+
+        // Build effector-specific fallback action
+        const fallbackActions = {
+            'DRONE':       `Deploy UAV Reconnaissance Drone to intercept & identify target`,
+            'GBAD':        `Activate Luftvärn GBAD Battery — engage with surface-to-air missile`,
+            'INTERCEPTOR': `Scramble Gripen Interceptor for airborne intercept`
+        };
+        const fallbackAction = fallbackActions[effector.type] || 'Scramble Gripen 01';
+
         if (AISystem.state.apiKey) {
-            const aiResponse = await AISystem.callOpenRouter(`Analyze this threat: Speed ${data.speed}kts, Distance ${data.distance}km, IFF ${data.iff ? 'Friendly' : 'Unknown'}. Provide a 1-sentence tactical recommendation for the C2 Commander. Be professional and decisive.`);
+            const prompt = `Analyze this threat data: Speed ${data.speed}kts, Distance ${data.distance}km, IFF ${data.iff ? 'Friendly' : 'Unknown'}.
+The AI has classified the optimal effector as: ${effector.label}.
+Reason: ${effector.reason}
+Provide a 2-sentence tactical recommendation for the C2 Commander. First sentence: confirm the effector choice. Second sentence: specific operational directive. Be professional, decisive, and reference the effector by name.`;
+
+            const aiResponse = await AISystem.callOpenRouter(prompt);
             if (aiResponse) {
                 const recommendations = [
-                    { id: 'ai-scramble', action: aiResponse, priority: 'CRITICAL' },
+                    { id: 'ai-scramble', action: aiResponse, priority: 'CRITICAL', effector },
                     { id: 'warn', action: 'Issue Radio Warning (Standard)', priority: 'MEDIUM' }
                 ];
                 AISystem.state.suggestions = recommendations;
@@ -95,7 +149,7 @@ const AISystem = {
         }
 
         const recommendations = [
-            { id: 'scramble', action: 'Scramble Gripen 01', priority: 'HIGH' },
+            { id: 'scramble', action: fallbackAction, priority: 'HIGH', effector },
             { id: 'warn', action: 'Issue Radio Warning', priority: 'MEDIUM' }
         ];
         AISystem.state.suggestions = recommendations;
@@ -113,13 +167,22 @@ const AISystem = {
         if (!action) return;
         AISystem.log('PROTECT', `HUMAN APPROVED: ${action.action}`);
         AISystem.generateReport();
+
+        // Trigger predictive logistics after a scramble/deploy action
+        if (actionId.includes('scramble') || actionId.includes('ai-scramble')) {
+            setTimeout(() => {
+                AISystem.predictiveLogistics('Baltic Sea', [
+                    { base: 'F17 Kallinge', count: 6 }
+                ]);
+            }, 1500);
+        }
     },
 
     /**
-     * Asset Optimization Logic
+     * Asset Optimization Logic — supports INTERCEPTOR, GBAD, and DRONE types
      */
-    recommendAsset: (incidentSector) => {
-        AISystem.log('SUGGEST', `Optimizing asset allocation for sector: ${incidentSector}`);
+    recommendAsset: (incidentSector, effectorType) => {
+        AISystem.log('SUGGEST', `Optimizing asset allocation for sector: ${incidentSector}${effectorType ? ` [${effectorType}]` : ''}`);
 
         // Map base names → sector names so callers can pass either
         const baseToSector = {
@@ -129,29 +192,113 @@ const AISystem = {
         };
         const resolvedSector = baseToSector[incidentSector] || incidentSector;
 
-        // Simulated airbase data
-        const bases = [
-            { name: 'F7 Såtenäs',  readiness: 75, distance: 350, sector: 'North Sea' },
-            { name: 'F17 Kallinge', readiness: 87, distance: 120, sector: 'Baltic Sea' },
-            { name: 'F21 Luleå',    readiness: 44, distance: 800, sector: 'Barents Sea' }
+        // Full multi-domain asset data
+        const allAssets = [
+            // Fighter bases
+            { name: 'F7 Såtenäs',   type: 'INTERCEPTOR', readiness: 75, distance: 350, sector: 'North Sea' },
+            { name: 'F17 Kallinge',  type: 'INTERCEPTOR', readiness: 87, distance: 120, sector: 'Baltic Sea' },
+            { name: 'F21 Luleå',     type: 'INTERCEPTOR', readiness: 44, distance: 800, sector: 'Barents Sea' },
+            // GBAD batteries
+            { name: 'GBAD Gotland',  type: 'GBAD', readiness: 92, distance: 40,  sector: 'Baltic Sea' },
+            { name: 'GBAD Blekinge', type: 'GBAD', readiness: 85, distance: 90,  sector: 'Baltic Sea' },
+            // Drone stations
+            { name: 'UAV Visby',     type: 'DRONE', readiness: 90, distance: 60,  sector: 'Baltic Sea' },
+            { name: 'UAV Halmstad',  type: 'DRONE', readiness: 78, distance: 200, sector: 'North Sea' },
         ];
 
+        // Filter by effector type if specified, otherwise use all
+        const resolvedType = effectorType || AISystem.state.lastEffector?.type || null;
+        const assets = resolvedType
+            ? allAssets.filter(a => a.type === resolvedType)
+            : allAssets;
+
         // Scoring: Higher readiness is good, sector match gets proximity bonus
-        const scoredBases = bases.map(b => {
+        const scoredAssets = assets.map(b => {
             let score = b.readiness;
             if (b.sector === resolvedSector) score += 50;
             return { ...b, totalScore: score };
         });
 
-        const best = scoredBases.toSorted((a, b) => b.totalScore - a.totalScore)[0];
+        const best = scoredAssets.toSorted((a, b) => b.totalScore - a.totalScore)[0];
 
-        AISystem.log('SUGGEST', `AI Optimized: ${best.name} is recommended (Score: ${best.totalScore})`);
+        if (!best) {
+            AISystem.log('SUGGEST', `No matching assets found for type: ${resolvedType}`);
+            return null;
+        }
+
+        AISystem.log('SUGGEST', `AI Optimized: ${best.name} [${best.type}] recommended (Score: ${best.totalScore})`);
 
         dispatchEvent(new CustomEvent('ai-asset-recommendation', {
-            detail: { baseName: best.name, score: best.totalScore }
+            detail: { baseName: best.name, score: best.totalScore, type: best.type }
         }));
 
         return best;
+    },
+
+    /**
+     * Predictive Logistics — detects base depletion and suggests preemptive transfers
+     * Answers: "Hur säkerställs fortsatt förmåga när resurser förbrukas?"
+     */
+    predictiveLogistics: (currentSector, deployedAssets) => {
+        AISystem.log('SUGGEST', '[PREDICTIVE] Analyzing resource distribution across bases...');
+
+        // Simulated per-base inventory
+        const baseInventory = {
+            'F7 Såtenäs':   { total: 24, ready: 18, scrambled: 0, sector: 'North Sea',    lat: 58.43, lng: 12.71 },
+            'F17 Kallinge':  { total: 16, ready: 14, scrambled: 0, sector: 'Baltic Sea',   lat: 56.26, lng: 15.26 },
+            'F21 Luleå':     { total: 18, ready: 8,  scrambled: 0, sector: 'Barents Sea',  lat: 65.58, lng: 22.16 },
+        };
+
+        // Apply current deployments
+        deployedAssets.forEach(dep => {
+            if (baseInventory[dep.base]) {
+                baseInventory[dep.base].ready = Math.max(0, baseInventory[dep.base].ready - dep.count);
+                baseInventory[dep.base].scrambled += dep.count;
+            }
+        });
+
+        // Find depleted bases (ready < 30% of total)
+        const alerts = [];
+        Object.entries(baseInventory).forEach(([name, inv]) => {
+            const readinessRatio = inv.ready / inv.total;
+            if (readinessRatio < 0.60) {
+                // Find the safest donor base (highest readiness ratio NOT in threatened sector)
+                const donors = Object.entries(baseInventory)
+                    .filter(([n]) => n !== name)
+                    .map(([n, d]) => [n, d])
+                    .sort((a, b) => (b[1].ready / b[1].total) - (a[1].ready / a[1].total));
+
+                if (donors.length > 0) {
+                    const [donorName, donorInv] = donors[0];
+                    const transferCount = Math.min(4, Math.floor(donorInv.ready * 0.25));
+                    if (transferCount > 0) {
+                        const alert = {
+                            type: 'PREDICTIVE_REPOSITION',
+                            severity: readinessRatio < 0.20 ? 'CRITICAL' : 'WARNING',
+                            depletedBase: name,
+                            depletedReadiness: Math.round(readinessRatio * 100),
+                            depletedLat: inv.lat,
+                            depletedLng: inv.lng,
+                            donorBase: donorName,
+                            donorReadiness: Math.round((donorInv.ready / donorInv.total) * 100),
+                            donorLat: donorInv.lat,
+                            donorLng: donorInv.lng,
+                            suggestedTransfer: transferCount,
+                            message: `${name} readiness at ${Math.round(readinessRatio * 100)}%. Recommend transferring ${transferCount} aircraft from ${donorName} (${Math.round((donorInv.ready / donorInv.total) * 100)}% ready) to ensure continued capability.`
+                        };
+                        alerts.push(alert);
+                    }
+                }
+            }
+        });
+
+        // Dispatch alerts
+        alerts.forEach(alert => {
+            AISystem.log('SUGGEST', `[PREDICTIVE] ${alert.message}`);
+            dispatchEvent(new CustomEvent('ai-predictive-alert', { detail: alert }));
+        });
+
+        return alerts;
     },
 
     /**

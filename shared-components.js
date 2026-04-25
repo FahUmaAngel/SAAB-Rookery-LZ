@@ -483,6 +483,26 @@ const SharedComponents = {
 
         const suggestion = globalThis.AISystem?.state.suggestions[0];
         if (!suggestion) return;
+
+        // Get effector classification if available
+        const effector = suggestion.effector || globalThis.AISystem?.state.lastEffector;
+        const effectorColorMap = {
+            amber:   { bg: 'bg-amber-950/50', border: 'border-amber-500', text: 'text-amber-400', iconColor: 'text-amber-500' },
+            error:   { bg: 'bg-red-950/50', border: 'border-error', text: 'text-error', iconColor: 'text-error' },
+            primary: { bg: 'bg-sky-950/50', border: 'border-sky-500', text: 'text-sky-400', iconColor: 'text-sky-500' }
+        };
+        const ec = effector ? (effectorColorMap[effector.color] || effectorColorMap.primary) : null;
+
+        const effectorBadgeHtml = effector ? `
+            <div class="flex items-center gap-2 ${ec.bg} border ${ec.border} px-2 py-1.5 mb-3">
+                <span class="material-symbols-outlined ${ec.iconColor} text-[16px]">${effector.icon}</span>
+                <div>
+                    <div class="font-['Space_Grotesk'] text-[9px] font-bold ${ec.text} uppercase tracking-widest">EFFECTOR: ${effector.type}</div>
+                    <div class="text-[8px] text-slate-500">${effector.label}</div>
+                </div>
+            </div>
+        ` : '';
+
         const card = document.createElement('div');
         card.id = 'ai-hitl-card';
         card.className = "fixed top-20 right-6 w-80 bg-slate-950 border-2 border-sky-500 shadow-[0_0_20px_rgba(130,207,255,0.2)] z-[100] p-4 animate-in slide-in-from-right fade-in";
@@ -491,6 +511,7 @@ const SharedComponents = {
                 <span class="material-symbols-outlined text-sky-500">psychology</span>
                 <span class="font-['Space_Grotesk'] text-xs font-bold text-sky-400 uppercase tracking-widest">AI Suggestion</span>
             </div>
+            ${effectorBadgeHtml}
             <p class="text-slate-300 text-sm mb-4 font-medium">${suggestion.action}</p>
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="AISystem.approveAction('${suggestion.id}'); document.getElementById('ai-hitl-card').remove();" 

@@ -79,6 +79,26 @@
                 .leaflet-popup-content-wrapper { background: rgba(10, 14, 20, 0.95) !important; border: 1px solid #3e4850 !important; border-radius: 4px !important; color: #e5e2e1 !important; font-family: 'Inter', sans-serif !important; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important; }
                 .leaflet-popup-tip { background: rgba(10, 14, 20, 0.95) !important; border: 1px solid #3e4850 !important; }
                 .leaflet-popup-content { margin: 8px 12px !important; font-size: 11px !important; line-height: 1.6 !important; }
+
+                /* GBAD shield pulse */
+                @keyframes gbadPulse {
+                    0%, 100% { filter: drop-shadow(0 0 4px rgba(255,100,90,0.5)); }
+                    50%      { filter: drop-shadow(0 0 10px rgba(255,100,90,0.9)); }
+                }
+                .gbad-shield { animation: gbadPulse 2.5s ease-in-out infinite; }
+
+                /* Drone hexagon pulse */
+                @keyframes dronePulse {
+                    0%, 100% { filter: drop-shadow(0 0 4px rgba(245,158,11,0.5)); }
+                    50%      { filter: drop-shadow(0 0 10px rgba(245,158,11,0.9)); }
+                }
+                .drone-hex { animation: dronePulse 2.5s ease-in-out infinite; }
+
+                /* Transfer arrow dash animation */
+                @keyframes dashFlow {
+                    from { stroke-dashoffset: 24; }
+                    to   { stroke-dashoffset: 0; }
+                }
             </style>
             
             <!-- ══════════════════════════════════════════════
@@ -148,6 +168,14 @@
                             <div class="flex items-center gap-2">
                                 <div class="w-2.5 h-2.5 rounded-full border border-primary/40 bg-primary/10"></div>
                                 <span class="font-data-mono text-[10px] text-on-surface-variant">RADAR COVERAGE</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[12px] text-error" style="margin:0 1px;">shield</span>
+                                <span class="font-data-mono text-[10px] text-on-surface-variant">GBAD / LUFTVÄRN</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[12px] text-amber-400" style="margin:0 1px;">flight_class</span>
+                                <span class="font-data-mono text-[10px] text-on-surface-variant">UAV / DRÖNARE</span>
                             </div>
                         </div>
                     </div>
@@ -750,6 +778,244 @@
                         }
                     };
                     window.addEventListener('ai-update', window.tacticalMapAIListener);
+
+                    // ══════════════════════════════════════════
+                    //  GBAD BATTERIES (Ground-Based Air Defense)
+                    // ══════════════════════════════════════════
+                    const gbadSites = [
+                        { name: 'GBAD GOTLAND',  code: 'GB-01', lat: 57.63, lng: 18.30, range: 60000, system: 'RBS 70 NG' },
+                        { name: 'GBAD BLEKINGE', code: 'GB-02', lat: 56.16, lng: 15.60, range: 50000, system: 'RBS 98' },
+                    ];
+
+                    const gbadGroup = L.layerGroup();
+
+                    gbadSites.forEach(site => {
+                        const gbadIcon = L.divIcon({
+                            className: '',
+                            html: `
+                                <div style="position:relative; width:28px; height:28px;" class="gbad-shield">
+                                    <div style="
+                                        position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                                        width:22px; height:22px; border-radius:3px;
+                                        background: rgba(255,100,90,0.15);
+                                        border: 2px solid #ffb4ab;
+                                        display: flex; align-items: center; justify-content: center;
+                                    ">
+                                        <svg width="12" height="14" viewBox="0 0 12 14" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);">
+                                            <path d="M6,1 L11,5 L11,10 C11,12 6,13 6,13 C6,13 1,12 1,10 L1,5 Z" fill="rgba(255,100,90,0.4)" stroke="#ffb4ab" stroke-width="1"/>
+                                        </svg>
+                                    </div>
+                                    <div style="
+                                        position:absolute; bottom:-16px; left:50%; transform: translateX(-50%);
+                                        font-family: 'Inter', monospace;
+                                        font-size: 7px;
+                                        font-weight: 700;
+                                        letter-spacing: 0.08em;
+                                        color: #ffb4ab;
+                                        text-shadow: 0 0 6px rgba(255,180,171,0.5);
+                                        white-space: nowrap;
+                                    ">${site.name}</div>
+                                </div>
+                            `,
+                            iconSize: [28, 28],
+                            iconAnchor: [14, 14]
+                        });
+
+                        const marker = L.marker([site.lat, site.lng], { icon: gbadIcon, zIndexOffset: 600 }).addTo(gbadGroup);
+                        marker.bindPopup(`
+                            <div style="font-family: 'Inter', monospace;">
+                                <div style="color:#ffb4ab; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">${site.name}</div>
+                                <div style="color:#87929b; font-size:9px;">SYSTEM: ${site.system}</div>
+                                <div style="color:#87929b; font-size:9px;">CODE: ${site.code}</div>
+                                <div style="color:#87929b; font-size:9px;">RANGE: ${(site.range / 1000).toFixed(0)} KM</div>
+                                <div style="color:#ffb4ab; font-size:9px; margin-top:4px; font-weight:600;">● LUFTVÄRN: ARMED</div>
+                            </div>
+                        `);
+
+                        // Engagement envelope
+                        L.circle([site.lat, site.lng], {
+                            radius: site.range,
+                            color: 'rgba(255, 180, 171, 0.25)',
+                            weight: 1,
+                            fillColor: 'rgba(255, 100, 90, 0.05)',
+                            fillOpacity: 1,
+                            dashArray: '4 6',
+                            interactive: false
+                        }).addTo(gbadGroup);
+                    });
+
+                    // ══════════════════════════════════════════
+                    //  DRONE STATIONS (UAV)
+                    // ══════════════════════════════════════════
+                    const droneSites = [
+                        { name: 'UAV VISBY',    code: 'UV-01', lat: 57.60, lng: 18.25, range: 80000, type: 'Skeldar V-200' },
+                        { name: 'UAV HALMSTAD', code: 'UV-02', lat: 56.68, lng: 12.86, range: 70000, type: 'GlobalEye UAV' },
+                    ];
+
+                    const droneGroup = L.layerGroup();
+
+                    droneSites.forEach(site => {
+                        const droneIcon = L.divIcon({
+                            className: '',
+                            html: `
+                                <div style="position:relative; width:28px; height:34px;" class="drone-hex">
+                                    <svg width="22" height="20" viewBox="0 0 22 20" style="position:absolute;top:2px;left:3px;">
+                                        <polygon points="11,0 22,6 22,14 11,20 0,14 0,6" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="1.5"/>
+                                    </svg>
+                                    <div style="
+                                        position:absolute; bottom:-2px; left:50%; transform: translateX(-50%);
+                                        font-family: 'Inter', monospace;
+                                        font-size: 7px;
+                                        font-weight: 700;
+                                        letter-spacing: 0.08em;
+                                        color: #f59e0b;
+                                        text-shadow: 0 0 6px rgba(245,158,11,0.5);
+                                        white-space: nowrap;
+                                    ">${site.name}</div>
+                                </div>
+                            `,
+                            iconSize: [28, 34],
+                            iconAnchor: [14, 17]
+                        });
+
+                        const marker = L.marker([site.lat, site.lng], { icon: droneIcon, zIndexOffset: 600 }).addTo(droneGroup);
+                        marker.bindPopup(`
+                            <div style="font-family: 'Inter', monospace;">
+                                <div style="color:#f59e0b; font-size:11px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px;">${site.name}</div>
+                                <div style="color:#87929b; font-size:9px;">TYPE: ${site.type}</div>
+                                <div style="color:#87929b; font-size:9px;">CODE: ${site.code}</div>
+                                <div style="color:#87929b; font-size:9px;">PATROL RADIUS: ${(site.range / 1000).toFixed(0)} KM</div>
+                                <div style="color:#f59e0b; font-size:9px; margin-top:4px; font-weight:600;">● DRÖNARE: STANDBY</div>
+                            </div>
+                        `);
+
+                        // Patrol radius
+                        L.circle([site.lat, site.lng], {
+                            radius: site.range,
+                            color: 'rgba(245, 158, 11, 0.2)',
+                            weight: 1,
+                            fillColor: 'rgba(245, 158, 11, 0.03)',
+                            fillOpacity: 1,
+                            dashArray: '4 6',
+                            interactive: false
+                        }).addTo(droneGroup);
+                    });
+
+                    // Add GBAD and Drone to default-on layers
+                    gbadGroup.addTo(map);
+                    droneGroup.addTo(map);
+
+                    // ══════════════════════════════════════════
+                    //  EFFECTOR RECOMMENDATION LISTENER
+                    // ══════════════════════════════════════════
+                    if (window._tacticalEffectorListener) {
+                        window.removeEventListener('ai-effector-recommendation', window._tacticalEffectorListener);
+                    }
+                    window._tacticalEffectorListener = (e) => {
+                        const { type } = e.detail;
+                        // Flash the relevant asset layer
+                        if (type === 'GBAD') {
+                            if (!map.hasLayer(gbadGroup)) map.addLayer(gbadGroup);
+                            // Briefly brighten GBAD markers
+                            document.querySelectorAll('.gbad-shield').forEach(el => {
+                                el.style.filter = 'brightness(2) drop-shadow(0 0 15px rgba(255,85,85,0.9))';
+                                setTimeout(() => { el.style.filter = ''; }, 3000);
+                            });
+                        } else if (type === 'DRONE') {
+                            if (!map.hasLayer(droneGroup)) map.addLayer(droneGroup);
+                            document.querySelectorAll('.drone-hex').forEach(el => {
+                                el.style.filter = 'brightness(2) drop-shadow(0 0 15px rgba(245,158,11,0.9))';
+                                setTimeout(() => { el.style.filter = ''; }, 3000);
+                            });
+                        }
+                    };
+                    window.addEventListener('ai-effector-recommendation', window._tacticalEffectorListener);
+
+                    // ══════════════════════════════════════════
+                    //  PREDICTIVE LOGISTICS MAP OVERLAY
+                    // ══════════════════════════════════════════
+                    const predictiveGroup = L.layerGroup().addTo(map);
+
+                    if (window._tacticalPredictiveListener) {
+                        window.removeEventListener('ai-predictive-alert', window._tacticalPredictiveListener);
+                    }
+                    window._tacticalPredictiveListener = (e) => {
+                        const alert = e.detail;
+                        predictiveGroup.clearLayers();
+
+                        // Red pulsing ring on depleted base
+                        const depletedRing = L.circle([alert.depletedLat, alert.depletedLng], {
+                            radius: 80000,
+                            color: '#ff5555',
+                            weight: 2,
+                            fillColor: 'rgba(255, 85, 85, 0.08)',
+                            fillOpacity: 1,
+                            dashArray: '6 4',
+                            className: 'animate-pulse',
+                            interactive: false
+                        }).addTo(predictiveGroup);
+
+                        // Transfer arrow — animated dashed line from donor to depleted
+                        const transferLine = L.polyline(
+                            [[alert.donorLat, alert.donorLng], [alert.depletedLat, alert.depletedLng]],
+                            {
+                                color: '#82cfff',
+                                weight: 2.5,
+                                dashArray: '8 8',
+                                opacity: 0.8,
+                                interactive: false
+                            }
+                        ).addTo(predictiveGroup);
+
+                        // Arrow head at midpoint
+                        const midLat = (alert.donorLat + alert.depletedLat) / 2;
+                        const midLng = (alert.donorLng + alert.depletedLng) / 2;
+
+                        const transferLabelIcon = L.divIcon({
+                            className: '',
+                            html: `<div style="
+                                font-family: 'Inter', monospace;
+                                font-size: 9px;
+                                font-weight: 700;
+                                letter-spacing: 0.06em;
+                                color: #82cfff;
+                                text-shadow: 0 0 10px rgba(130,207,255,0.7), 0 1px 3px rgba(0,0,0,0.8);
+                                white-space: nowrap;
+                                background: rgba(10,14,20,0.85);
+                                border: 1px solid rgba(130,207,255,0.4);
+                                padding: 3px 8px;
+                                pointer-events: none;
+                                text-align: center;
+                            ">
+                                <span style="color:#f59e0b;">⚠</span> TRANSFER: ${alert.suggestedTransfer}× JAS 39<br/>
+                                <span style="font-size:7px;color:#87929b;">${alert.donorBase} → ${alert.depletedBase}</span>
+                            </div>`,
+                            iconSize: [180, 30],
+                            iconAnchor: [90, 15]
+                        });
+                        L.marker([midLat, midLng], { icon: transferLabelIcon, interactive: false, zIndexOffset: 1100 }).addTo(predictiveGroup);
+
+                        // Depleted base warning label
+                        const warningIcon = L.divIcon({
+                            className: '',
+                            html: `<div style="
+                                font-family: 'Inter', monospace;
+                                font-size: 8px;
+                                font-weight: 700;
+                                color: #ff5555;
+                                text-shadow: 0 0 8px rgba(255,85,85,0.5);
+                                white-space: nowrap;
+                                background: rgba(10,14,20,0.8);
+                                border: 1px solid rgba(255,85,85,0.4);
+                                padding: 2px 6px;
+                                pointer-events: none;
+                            ">⚠ READINESS: ${alert.depletedReadiness}%</div>`,
+                            iconSize: [120, 18],
+                            iconAnchor: [60, -20]
+                        });
+                        L.marker([alert.depletedLat, alert.depletedLng], { icon: warningIcon, interactive: false, zIndexOffset: 1100 }).addTo(predictiveGroup);
+                    };
+                    window.addEventListener('ai-predictive-alert', window._tacticalPredictiveListener);
                 });
             })();
             </script>

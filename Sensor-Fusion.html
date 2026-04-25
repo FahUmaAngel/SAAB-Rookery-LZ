@@ -366,6 +366,91 @@
                 }
             });
 
+            // --- AI Effector Recommendation Listener ---
+            window.addEventListener('ai-effector-recommendation', (e) => {
+                const { type, label, icon, reason, color } = e.detail;
+                const logContainer = document.getElementById('comms-log');
+                if (!logContainer) return;
+
+                const colorMap = {
+                    amber: { bg: 'bg-amber-500/10', border: 'border-amber-500', text: 'text-amber-400', iconColor: 'text-amber-500' },
+                    error: { bg: 'bg-error/10', border: 'border-error', text: 'text-error', iconColor: 'text-error' },
+                    primary: { bg: 'bg-sky-500/10', border: 'border-sky-500', text: 'text-sky-400', iconColor: 'text-sky-500' }
+                };
+                const c = colorMap[color] || colorMap.primary;
+
+                const banner = document.createElement('div');
+                banner.className = `flex items-center gap-3 ${c.bg} border-l-2 ${c.border} px-3 py-2 my-1 animate-in fade-in slide-in-from-left duration-500`;
+                banner.innerHTML = `
+                    <span class="material-symbols-outlined ${c.iconColor} text-[18px]">${icon}</span>
+                    <div class="flex-1">
+                        <div class="font-data-mono text-[10px] ${c.text} font-bold uppercase tracking-wider">EFFECTOR: ${type}</div>
+                        <div class="font-data-mono text-[9px] text-outline">${label} — ${reason}</div>
+                    </div>
+                `;
+                logContainer.appendChild(banner);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            });
+
+            // --- Predictive Logistics Alert Listener ---
+            window.addEventListener('ai-predictive-alert', (e) => {
+                const alert = e.detail;
+                const existing = document.getElementById('predictive-alert-card');
+                if (existing) existing.remove();
+
+                const isCritical = alert.severity === 'CRITICAL';
+                const borderColor = isCritical ? 'border-error' : 'border-amber-500';
+                const bgColor = isCritical ? 'bg-red-950/90' : 'bg-amber-950/90';
+                const textColor = isCritical ? 'text-error' : 'text-amber-400';
+                const pulseClass = isCritical ? 'animate-pulse' : '';
+
+                const card = document.createElement('div');
+                card.id = 'predictive-alert-card';
+                card.className = `fixed bottom-6 left-1/2 -translate-x-1/2 w-[600px] max-w-[90vw] ${bgColor} border-2 ${borderColor} shadow-[0_0_30px_rgba(255,100,80,0.3)] z-[100] backdrop-blur-sm`;
+                card.style.animation = 'slideInUp 0.5s ease-out';
+                card.innerHTML = `
+                    <style>
+                        @keyframes slideInUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+                    </style>
+                    <div class="flex items-center gap-2 px-4 py-2 border-b ${borderColor}/50 bg-black/30">
+                        <span class="material-symbols-outlined ${textColor} text-[18px] ${pulseClass}">warning</span>
+                        <span class="font-label-caps text-label-caps ${textColor} font-bold tracking-widest">STRATEGIC ALERT // PREDICTIVE LOGISTICS</span>
+                        <span class="ml-auto font-data-mono text-[9px] text-outline">${alert.severity}</span>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <p class="font-data-mono text-[12px] text-on-surface leading-relaxed">${alert.message}</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-black/30 border border-outline-variant/30 p-3">
+                                <div class="font-label-caps text-[8px] text-outline tracking-widest mb-1">DEPLETED BASE</div>
+                                <div class="font-data-mono text-[12px] ${textColor} font-bold">${alert.depletedBase}</div>
+                                <div class="font-data-mono text-[10px] text-outline">Readiness: ${alert.depletedReadiness}%</div>
+                            </div>
+                            <div class="bg-black/30 border border-outline-variant/30 p-3">
+                                <div class="font-label-caps text-[8px] text-outline tracking-widest mb-1">DONOR BASE</div>
+                                <div class="font-data-mono text-[12px] text-primary font-bold">${alert.donorBase}</div>
+                                <div class="font-data-mono text-[10px] text-outline">Readiness: ${alert.donorReadiness}%</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 bg-black/20 border border-outline-variant/20 px-3 py-2">
+                            <span class="material-symbols-outlined text-primary text-[16px]">swap_horiz</span>
+                            <span class="font-data-mono text-[11px] text-on-surface">Transfer <span class="text-primary font-bold">${alert.suggestedTransfer}× JAS 39</span> from ${alert.donorBase} → ${alert.depletedBase}</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 p-3 border-t ${borderColor}/30 bg-black/20">
+                        <button onclick="this.closest('#predictive-alert-card').remove(); if(typeof SharedComponents !== 'undefined') SharedComponents.showToast('TRANSFER APPROVED', 'Asset repositioning initiated', 'check_circle', 'success');"
+                            class="flex-1 py-2.5 bg-sky-950 border border-sky-500 text-sky-400 font-label-caps text-label-caps flex items-center justify-center gap-2 hover:bg-sky-900 active:scale-95 transition-all">
+                            <span class="material-symbols-outlined text-[14px]">check</span>
+                            APPROVE TRANSFER
+                        </button>
+                        <button onclick="this.closest('#predictive-alert-card').remove();"
+                            class="px-6 py-2.5 bg-surface border border-outline text-outline font-label-caps text-label-caps hover:bg-surface-bright transition-colors">
+                            DISMISS
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(card);
+            });
+
             // --- Live telemetry listener ---
             window.addEventListener('sensor-update', (e) => {
                 const d = e.detail;
