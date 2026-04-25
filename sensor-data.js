@@ -73,6 +73,10 @@ const SensorDataEngine = {
     ],
     _commsIndex: 0,
 
+    /** Cross-tab sync via BroadcastChannel */
+    _channel: null,
+    _isLeader: false,
+
     /** Start the simulation loop */
     start() {
         if (this.state.running) return;
@@ -80,22 +84,95 @@ const SensorDataEngine = {
         // Try to restore state from sessionStorage
         this._restoreState();
 
-        this.state.running = true;
-        this.state.intervalId = setInterval(() => this._tick(), 1500);
-        this._tick(); // Immediate first tick
-        console.log('[SensorDataEngine] Started');
+        // --- Cross-tab leader election ---
+        try {
+            this._channel = new BroadcastChannel('sensor-data-sync');
+            this._channel.onmessage = (e) => this._onChannelMessage(e.data);
+        } catch (e) {
+            // BroadcastChannel not supported, run as standalone leader
+            this._channel = null;
+        }
+
+        // Check if another tab is already leading
+        const leaderTS = parseInt(localStorage.getItem('sensorLeaderTS') || '0');
+        const now = Date.now();
+
+        if (now - leaderTS < 3000) {
+            // Another tab is actively leading — become a follower
+            this._isLeader = false;
+            this.state.running = true;
+            console.log('[SensorDataEngine] Started as FOLLOWER (syncing from leader tab)');
+        } else {
+            // No active leader — become the leader
+            this._isLeader = true;
+            localStorage.setItem('sensorLeaderTS', String(now));
+            this.state.running = true;
+            this.state.intervalId = setInterval(() => this._tick(), 1500);
+            this._tick(); // Immediate first tick
+            // Heartbeat to maintain leadership
+            this._heartbeatId = setInterval(() => {
+                localStorage.setItem('sensorLeaderTS', String(Date.now()));
+            }, 1000);
+            console.log('[SensorDataEngine] Started as LEADER');
+        }
+
+        // Leader failover: periodically check if leader is alive
+        if (!this._isLeader) {
+            this._failoverId = setInterval(() => {
+                const ts = parseInt(localStorage.getItem('sensorLeaderTS') || '0');
+                if (Date.now() - ts > 4000) {
+                    // Leader is dead — take over
+                    console.log('[SensorDataEngine] Leader failover — becoming LEADER');
+                    this._isLeader = true;
+                    localStorage.setItem('sensorLeaderTS', String(Date.now()));
+                    clearInterval(this._failoverId);
+                    this.state.intervalId = setInterval(() => this._tick(), 1500);
+                    this._heartbeatId = setInterval(() => {
+                        localStorage.setItem('sensorLeaderTS', String(Date.now()));
+                    }, 1000);
+                    this._tick();
+                }
+            }, 2000);
+        }
+    },
+
+    /** Handle messages from other tabs */
+    _onChannelMessage(data) {
+        if (data.type === 'tick' && !this._isLeader) {
+            // Follower: apply the leader's state snapshot
+            const p = data.payload;
+            Object.assign(this.state.target, p.target);
+            Object.assign(this.state.interceptor, p.interceptor);
+            this.state.sensors.radar = { ...p.sensors.radar };
+            this.state.sensors.esm = { ...p.sensors.esm };
+            this.state.sensors.satellite = { ...p.sensors.satellite };
+            this.state.fusedConfidence = p.fusedConfidence;
+            this.state.phase = p.phase;
+            this.state.tickCount = p.tick;
+            this.state.threatScore = p.threatScore;
+            // Dispatch local event so UI listeners update
+            window.dispatchEvent(new CustomEvent('sensor-update', { detail: p }));
+        } else if (data.type === 'phase') {
+            // Phase changed on another tab
+            this.state.phase = this._clamp(data.phase, 1, 5);
+        }
     },
 
     /** Stop the simulation */
     stop() {
         if (!this.state.running) return;
         clearInterval(this.state.intervalId);
+        clearInterval(this._heartbeatId);
+        clearInterval(this._failoverId);
         this.state.running = false;
+        if (this._isLeader) {
+            localStorage.removeItem('sensorLeaderTS');
+        }
         this._saveState();
         console.log('[SensorDataEngine] Stopped');
     },
 
-    /** Single simulation tick */
+    /** Single simulation tick (only executed by leader) */
     _tick() {
         this.state.tickCount++;
         const t = this.state.target;
@@ -169,6 +246,11 @@ const SensorDataEngine = {
 
         window.dispatchEvent(new CustomEvent('sensor-update', { detail: payload }));
 
+        // Broadcast to follower tabs
+        if (this._channel && this._isLeader) {
+            try { this._channel.postMessage({ type: 'tick', payload }); } catch (e) { }
+        }
+
         // Persist periodically
         if (this.state.tickCount % 10 === 0) this._saveState();
     },
@@ -177,6 +259,10 @@ const SensorDataEngine = {
     setPhase(phaseNumber) {
         this.state.phase = this._clamp(phaseNumber, 1, 5);
         this._saveState();
+        // Broadcast phase change to other tabs
+        if (this._channel) {
+            try { this._channel.postMessage({ type: 'phase', phase: this.state.phase }); } catch (e) { }
+        }
     },
 
     // --- Utilities ---
@@ -219,4 +305,11 @@ window.SensorDataEngine = SensorDataEngine;
 // Auto-start when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
     SensorDataEngine.start();
+});
+
+// Cleanup on tab close — release leadership
+window.addEventListener('beforeunload', () => {
+    if (SensorDataEngine._isLeader) {
+        localStorage.removeItem('sensorLeaderTS');
+    }
 });
