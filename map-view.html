@@ -69,7 +69,7 @@
 <!-- ══════════════════════════════════════════════
      CENTER: Interactive Leaflet Map View
      ══════════════════════════════════════════════ -->
-<section class="flex-grow flex flex-col relative bg-surface-container border border-outline-variant rounded-DEFAULT overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
+<section class="flex-grow min-w-0 min-h-0 flex flex-col relative bg-surface-container border border-outline-variant rounded-DEFAULT overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
 
     <!-- Leaflet Map Container -->
     <div id="map-view-container" class="absolute inset-0 w-full h-full z-0"></div>
@@ -119,7 +119,7 @@
 </section>
 
 <!-- Right Telemetry Sidebar (Fixed Width) -->
-<aside class="w-[360px] flex flex-col gap-gutter overflow-y-auto pr-1 pb-1 scrollbar-hide shrink-0">
+<aside id="telemetry-sidebar" class="w-[360px] flex flex-col gap-gutter overflow-y-auto pr-1 pb-1 scrollbar-hide shrink-0" style="width: 360px !important;">
 <!-- Threat Level Box -->
 <div class="bg-error-container/10 border border-error/30 rounded-DEFAULT p-panel-padding relative overflow-hidden shrink-0">
 <div class="absolute top-0 left-0 w-1 h-full bg-error"></div>
