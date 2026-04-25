@@ -22,16 +22,6 @@
     .leaflet-control-zoom a:hover { background: #252b3b !important; }
     .leaflet-control-attribution { display: none !important; }
 
-    /* ── Radar sweep conic gradient overlay ── */
-    .radar-sweep-overlay {
-        background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 270deg, rgba(130,207,255,0.12) 330deg, rgba(130,207,255,0.25) 360deg);
-        border-radius: 50%;
-        animation: radarSweep 4s linear infinite;
-    }
-    @keyframes radarSweep {
-        0%   { transform: translate(-50%, -50%) rotate(0deg); }
-        100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
 
     /* ── Node pulse animation ── */
     @keyframes nodePulse {
@@ -695,18 +685,6 @@
         });
         L.marker([58.0, 20.2], { icon: firLabel, interactive: false }).addTo(map);
 
-        // Central radar sweep decoration
-        const sweepIcon = L.divIcon({
-            className: '',
-            html: `<div class="radar-sweep-overlay" style="
-                position:absolute; top:50%; left:50%;
-                width:300px; height:300px;
-                pointer-events:none; opacity:0.3;
-            "></div>`,
-            iconSize: [0, 0],
-            iconAnchor: [0, 0]
-        });
-        L.marker([59.0, 18.5], { icon: sweepIcon, interactive: false }).addTo(map);
 
     }); // end loadLeafletJS
 })();
